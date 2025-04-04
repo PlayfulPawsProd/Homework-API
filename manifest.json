@@ -1,0 +1,21 @@
+{
+  "name": "Mika's Homework Helper",
+  "short_name": "Mika Helper",
+  "description": "Your bubbly catgirl homework assistant!",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffe0f0",
+  "theme_color": "#d81b60",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
