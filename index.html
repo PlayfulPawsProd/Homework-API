@@ -87,7 +87,7 @@
         #chat-log p { margin: 5px 0 10px 0; line-height: 1.5; word-wrap: break-word; max-width: 100%; }
         #chat-log .user-message { color: var(--user-message-text); text-align: right; margin-left: auto; max-width: 85%; }
         #chat-log .user-message strong { color: var(--user-message-name); }
-        #chat-log .user-message .message-content img.thumbnail { max-width: 100px; max-height: 100px; border-radius: 5px; margin-top: 5px; border: 1px solid var(--chat-input-border); cursor: pointer; display: block; /* Ensure block display */ margin-left: auto; /* Align right with text */}
+        #chat-log .user-message .message-content img.thumbnail { max-width: 100px; max-height: 100px; border-radius: 5px; margin-top: 5px; border: 1px solid var(--chat-input-border); cursor: pointer; display: block; margin-left: auto; }
         #chat-log .mika-message { color: var(--mika-message-text); margin-right: auto; max-width: 85%; }
         #chat-log .mika-message strong { color: var(--mika-message-name); }
         #chat-log .system-message { color: var(--system-message-text); font-style: italic; font-size: 0.9em; text-align: center; }
@@ -103,18 +103,18 @@
         #image-preview-area { display: none; margin-left: 8px; position: relative; }
         #image-preview-area img { max-height: 36px; max-width: 60px; border-radius: 4px; border: 1px solid var(--chat-input-border); }
         #remove-image-button { position: absolute; top: -5px; right: -5px; background-color: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; line-height: 16px; text-align: center; cursor: pointer; font-weight: bold; }
-        #send-button { padding: 10px 20px; border: none; /* Remove border for better look */ background: linear-gradient(45deg, var(--send-button-bg-1), var(--send-button-bg-2)); color: white; font-weight: bold; cursor: pointer; border-radius: 20px; transition: background 0.2s ease, transform 0.1s; margin-left: 8px; /* Space from input/preview */ }
+        #send-button { padding: 10px 20px; border: none; background: linear-gradient(45deg, var(--send-button-bg-1), var(--send-button-bg-2)); color: white; font-weight: bold; cursor: pointer; border-radius: 20px; transition: background 0.2s ease, transform 0.1s; margin-left: 8px; }
         #send-button:hover { background: linear-gradient(45deg, var(--send-button-hover-1), var(--send-button-hover-2)); transform: scale(1.02); }
         #send-button:active { transform: scale(0.98); }
         #send-button:disabled { background: #666; cursor: not-allowed; transform: none; opacity: 0.6; }
         /* Game Area Styles */
         #game-area { display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px; width: 100%; height: 100%; box-sizing: border-box; overflow: hidden; background-color: var(--chat-bg); color: var(--chat-text); }
         #game-title { color: var(--chat-header-text); font-size: 1.3em; margin-bottom: 10px; text-shadow: 0 0 3px var(--chat-header-shadow); flex-shrink: 0; text-align: center;}
-        #game-specific-ui { width: 100%; height: auto; display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; flex-shrink: 0; overflow-y: auto; padding-bottom: 5px; }
+        #game-specific-ui { width: 100%; height: auto; display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; flex-shrink: 0; overflow-y: auto; padding-bottom: 5px; max-height: calc(100% - 100px); /* Adjust max-height if needed */ }
         #game-specific-ui > #diary-chat-view, #game-specific-ui > #diary-entries-view { width: 100%; height: 100%; } /* Let diary UI fill its container */
         #diary-chat-view, #diary-entries-view { width: 100%; height: 100%; overflow: hidden; display: flex; flex-direction: column; }
         #diary-entries-view { overflow-y: auto; }
-        /* Game Styles (TTT, RPS, GTN, 20Q, Diary) */
+        /* Game Styles (TTT, RPS, GTN, 20Q, Diary, StoryTime) */
         #ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 240px; height: 240px; margin-bottom: 10px; border: 3px solid var(--game-board-border); border-radius: 8px; background-color: var(--game-board-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .ttt-cell { border: 1px solid var(--game-cell-border); display: flex; justify-content: center; align-items: center; font-size: 2.5em; font-weight: bold; cursor: pointer; color: var(--game-cell-text); transition: background-color 0.2s, color 0.2s; user-select: none; }
         .ttt-cell:hover { background-color: var(--game-cell-hover-bg); } .ttt-cell.taken { cursor: not-allowed; color: var(--game-cell-taken-text); } .ttt-cell.taken:hover { background-color: transparent; }
@@ -158,8 +158,23 @@
         .diary-entry-item { background-color: rgba(255, 255, 255, 0.05); border: 1px solid var(--chat-input-border); padding: 8px 12px; margin-bottom: 8px; border-radius: 8px; }
         .diary-entry-date { display: block; font-size: 0.75em; color: var(--system-message-text); margin-bottom: 4px; }
         .diary-entry-item p { margin: 0; line-height: 1.4; color: var(--chat-log-text); font-size: 0.95em;}
+        /* Story Time Styles */
+        #story-wrapper { display: flex; flex-direction: column; height: 100%; width: 100%; box-sizing: border-box; }
+        .story-display-area { flex-grow: 1; overflow-y: auto; padding: 10px 15px; margin-bottom: 5px; background-color: rgba(0,0,0, 0.1); border-radius: 8px; border: 1px solid var(--chat-input-border); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; color: var(--chat-log-text); }
+        .story-display-area p { margin: 0 0 10px 0; line-height: 1.5; white-space: pre-wrap; } .story-display-area p:last-child { margin-bottom: 0; }
+        .story-display-area p > strong:first-child { color: var(--mika-message-name); } .story-display-area p > strong { font-weight: bold; } .story-display-area p > em { font-style: italic; }
+        .story-display-area p.user-action { /* Style user action display */ text-align: right; color: var(--user-message-text); font-style: italic; opacity: 0.9; margin: 5px 0; }
+        .story-status-area { flex-shrink: 0; text-align: center; padding: 3px; font-style: italic; font-size: 0.9em; color: var(--typing-indicator-text); min-height: 1.2em; display: none; }
+        .story-interaction-area { flex-shrink: 0; padding: 5px 0; border-top: 1px solid var(--chat-input-border); background-color: var(--chat-input-area-bg); }
+        .story-choices-area { text-align: center; margin-bottom: 8px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0 5px; }
+        .story-choice { font-size: 0.9em; padding: 6px 12px; }
+        .story-input-area { display: flex; justify-content: center; align-items: center; padding: 0 10px; }
+        .story-text-input { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--chat-input-border); background-color: var(--chat-input-bg); color: var(--chat-input-text); border-radius: 15px 0 0 15px; font-size: 0.95em; outline: none; }
+        .story-send-button { padding: 8px 15px; border-radius: 0 15px 15px 0; font-size: 0.95em; margin-left: -1px; }
+        /* Initial Story Prompt */
+        #story-initial-prompt { text-align: center; padding: 20px; } #story-initial-prompt h3 { color: var(--chat-header-text); margin-bottom: 10px; } #story-initial-prompt p { color: var(--chat-text); font-size: 1em; margin-bottom: 20px;} #story-initial-prompt > div { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         /* Shared Game Message Log */
-        #game-message-log { width: 100%; max-width: 450px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin-bottom: 10px; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0; margin-top: auto; }
+        #game-message-log { width: 100%; max-width: 450px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin-bottom: 10px; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0; margin-top: auto; display: none; /* Hidden by default, only shown by specific games */ }
         #game-message-log p { margin: 2px 0; line-height: 1.3; word-wrap: break-word; }
         #game-message-log .mika-gamemsg { color: var(--game-message-mika); } #game-message-log .user-gamemsg { color: var(--game-message-user); } #game-message-log .system-gamemsg { color: var(--game-message-system); font-style: italic; }
         /* Shared Game Buttons */
@@ -174,8 +189,7 @@
             .popup-modal { padding: 20px 25px; max-width: 95%; } .popup-modal h2 { font-size: 1.4em; } .popup-modal p { font-size: 0.9em;} .popup-button { padding: 8px 20px; font-size: 0.9em; }
             #chat-container { height: 95vh; border-radius: 10px; font-size: 14px; }
             #chat-header h2 { font-size: 1.1em; } .header-button { font-size: 0.75em; padding: 4px 8px; }
-            #chat-log { padding: 10px; }
-            #chat-input-area { padding: 6px 8px; } #image-upload-button { font-size: 1.4em; padding: 4px 6px; }
+            #chat-log { padding: 10px; } #chat-input-area { padding: 6px 8px; } #image-upload-button { font-size: 1.4em; padding: 4px 6px; }
             #chat-input { padding: 8px 12px; font-size: 0.9em; } #send-button { padding: 8px 12px; font-size: 0.9em; }
             #image-preview-area img { max-height: 30px; } #remove-image-button { width: 14px; height: 14px; font-size: 9px; line-height: 14px; top: -4px; right: -4px; }
             .dropdown-menu { max-height: 150px; }
@@ -193,7 +207,12 @@
             .diary-chat-log-area { padding: 6px; } .diary-chat-log-area p { padding-right: 20px; } .diary-heart-button { font-size: 0.9em; }
             .diary-input-area { padding: 6px; } .diary-chat-input { font-size: 0.9em; padding: 5px 10px; } .diary-send-button { font-size: 0.9em; padding: 5px 10px; }
             .diary-entry-item { padding: 6px 10px; } .diary-entry-date { font-size: 0.7em; } .diary-entry-item p { font-size: 0.9em; }
-            #game-message-log { max-width: 100%; height: 80px; padding: 5px;} /* Shared log */
+            /* Story Time Responsive */
+            .story-display-area { padding: 8px 10px; font-size: 0.95em; } .story-choice { font-size: 0.85em; padding: 5px 10px;}
+            .story-text-input { font-size: 0.9em; padding: 6px 10px; } .story-send-button { font-size: 0.9em; padding: 6px 10px; }
+            #story-initial-prompt h3 { font-size: 1.1em; } #story-initial-prompt p { font-size: 0.9em; }
+            /* Shared log/buttons Responsive */
+            #game-message-log { max-width: 100%; height: 80px; padding: 5px;}
             #ttt-reset-button, #back-to-chat-button { font-size: 0.85em; padding: 6px 15px; }
         }
 
@@ -225,6 +244,7 @@
                 <button id="game-gtn-button" title="Play Guess The Number!">Guess The Number~</button>
                 <button id="game-20q-button" title="Play 20 Questions!">20 Questions? Hehe!</button>
                 <button id="game-diary-button" title="Open Our Secret Diary ♡">Diary ♡</button>
+                <button id="game-story-button" title="Let's tell a story!">Story Time 📖</button>
                 <p class="no-items" style="display: none;">More games soon~!</p>
             </div>
             <div id="settings-dropdown" class="dropdown-menu">
@@ -240,7 +260,7 @@
             <div id="chat-area" style="display: none;">
                <div id="chat-log"> <p class="system-message">Initializing...</p> </div>
                 <div id="chat-input-area">
-                    <input type="file" id="image-upload-input" accept="image/png, image/jpeg, image/webp, image/gif"> <!-- Added GIF -->
+                    <input type="file" id="image-upload-input" accept="image/png, image/jpeg, image/webp, image/gif">
                     <button id="image-upload-button" title="Upload Homework Picture">📎</button>
                     <input type="text" id="chat-input" placeholder="Loading..." disabled>
                     <div id="image-preview-area">
@@ -250,9 +270,9 @@
                     <button id="send-button" disabled>Send</button>
                 </div>
             </div>
-            <!-- Game Area (for all games/diary) -->
+            <!-- Game Area (for all games/diary/story) -->
             <div id="game-area" style="display: none;">
-                <!-- Game/Diary content loaded here -->
+                <!-- Game/Diary/Story content loaded here -->
             </div>
         </div>
     </div>
@@ -263,11 +283,12 @@
     <script src="guess_number.js"></script>
     <script src="twenty_questions.js"></script>
     <script src="diary.js"></script>
+    <script src="storytime.js"></script>
     <!-- Include API script -->
     <script src="api.js"></script>
 
     <script>
-        // Nyaa~! Mika's Homework Helper with Image Upload & Diary! ♡
+        // Nyaa~! Mika's Homework Helper & Fun Time App! ♡
 
         // --- DOM Elements ---
         const bodyElement = document.body; const themeColorMeta = document.getElementById('theme-color-meta');
@@ -280,7 +301,7 @@
         const chatLog = document.getElementById('chat-log'); const chatInput = document.getElementById('chat-input'); const sendButton = document.getElementById('send-button');
         const settingsButton = document.getElementById('settings-button'); const newChatButton = document.getElementById('new-chat-button'); const historyButton = document.getElementById('history-button'); const gamesButton = document.getElementById('games-button');
         const historyDropdown = document.getElementById('history-dropdown'); const settingsDropdown = document.getElementById('settings-dropdown'); const gamesDropdown = document.getElementById('games-dropdown');
-        const gameTttButton = document.getElementById('game-ttt-button'); const gameRpsButton = document.getElementById('game-rps-button'); const gameGtnButton = document.getElementById('game-gtn-button'); const game20qButton = document.getElementById('game-20q-button'); const gameDiaryButton = document.getElementById('game-diary-button');
+        const gameTttButton = document.getElementById('game-ttt-button'); const gameRpsButton = document.getElementById('game-rps-button'); const gameGtnButton = document.getElementById('game-gtn-button'); const game20qButton = document.getElementById('game-20q-button'); const gameDiaryButton = document.getElementById('game-diary-button'); const gameStoryButton = document.getElementById('game-story-button');
         const settingsInstallButton = document.getElementById('settings-install-button'); const settingsThemeButton = document.getElementById('settings-theme-button'); const settingsResetButton = document.getElementById('settings-reset-button');
         const imageUploadInput = document.getElementById('image-upload-input'); const imageUploadButton = document.getElementById('image-upload-button'); const imagePreviewArea = document.getElementById('image-preview-area'); const imagePreview = document.getElementById('image-preview'); const removeImageButton = document.getElementById('remove-image-button');
         const deleteAllHistoryButtonTemplate = document.createElement('button'); deleteAllHistoryButtonTemplate.className = 'delete-history'; deleteAllHistoryButtonTemplate.textContent = 'Delete ALL History'; deleteAllHistoryButtonTemplate.title = 'Permanently delete all saved chats!';
@@ -316,7 +337,7 @@
 
         // --- PWA Install ---
         function setupInstallPromptHandler() { window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstallPrompt = e; console.log('beforeinstallprompt fired'); if (settingsInstallButton) settingsInstallButton.disabled = false; if (!hasInstallPromptBeenShown() && chatContainer.style.display === 'flex' && !isGameActive) { installPopup.style.display = 'flex'; } else { console.log("Install prompt deferred."); } }); installButton.addEventListener('click', handleManualInstall); installLaterButton.addEventListener('click', () => { installPopup.style.display = 'none'; saveInstallPromptShown(); console.log('Install later.'); }); window.addEventListener('appinstalled', () => { console.log('PWA installed'); installPopup.style.display = 'none'; if (settingsInstallButton) settingsInstallButton.disabled = true; deferredInstallPrompt = null; }); }
-        async function handleManualInstall() { if (installPopup.style.display === 'flex') installPopup.style.display = 'none'; closeAllDropdowns(); if (deferredInstallPrompt) { try { deferredInstallPrompt.prompt(); const { outcome } = await deferredInstallPrompt.userChoice; console.log(`Install outcome: ${outcome}`); if (outcome === 'accepted') { if (settingsInstallButton) settingsInstallButton.disabled = true; } saveInstallPromptShown(); } catch (err) { console.error("Install prompt error:", err); appendMessage('system', "Mrow! Install prompt failed..."); } } else { console.log("Install prompt not available."); appendMessage('system', "Already installed or not available."); if (settingsInstallButton) settingsInstallButton.disabled = true; } }
+        async function handleManualInstall() { if (installPopup.style.display === 'flex') installPopup.style.display = 'none'; closeAllDropdowns(); if (deferredInstallPrompt) { try { deferredInstallPrompt.prompt(); const { outcome } = await deferredInstallPrompt.userChoice; console.log(`Install outcome: ${outcome}`); if (outcome === 'accepted') { if (settingsInstallButton) settingsInstallButton.disabled = true; } saveInstallPromptShown(); } catch (err) { console.error("Install prompt error:", err); appendMessage('system', "Mrow! Install prompt failed..."); } } else { console.log("Install prompt not available."); appendMessage('system', "Already installed or not available, nyaa~!"); if (settingsInstallButton) settingsInstallButton.disabled = true; } }
         function registerServiceWorker() { if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').then((reg) => console.log('SW registered:', reg.scope)).catch((err) => console.error('SW registration failed:', err)); } else { console.log("SW not supported."); } }
 
         // --- Chat UI ---
@@ -324,19 +345,30 @@
             if (!chatLog || !chatArea || chatArea.style.display === 'none') { console.log("Skipped msg:", sender); return; }
             const msgId = `msg-${Date.now()}-${Math.random().toString(16).slice(2)}`; const el = document.createElement('p'); el.id = msgId;
             const contentSpan = document.createElement('span'); contentSpan.className = 'message-content';
-            const msgText = isHtml ? message : sanitizeHTML(message); // Sanitize text here
+            // Sanitize text content ONLY if not already HTML
+            const msgText = isHtml ? message : sanitizeHTML(message);
+
             if (sender === 'user') {
                 el.className = 'user-message';
-                contentSpan.innerHTML = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${msgText}`;
-                if (imageUrl) {
+                contentSpan.innerHTML = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${msgText}`; // Sanitize name just in case
+                if (imageUrl && imageUrl !== "[Image Placeholder]") { // Check if it's a real URL
                     const img = document.createElement('img'); img.src = imageUrl; img.alt = "Uploaded image"; img.className = "thumbnail";
                     contentSpan.appendChild(document.createElement('br')); contentSpan.appendChild(img);
+                } else if (imageUrl === "[Image Placeholder]") {
+                     // Optionally display text placeholder if image URL isn't available (e.g., loading history)
+                     const placeholder = document.createElement('em'); placeholder.textContent = ' [Image Attached]';
+                     placeholder.style.fontSize = '0.9em';
+                     contentSpan.appendChild(placeholder);
                 }
             } else if (sender === 'Mika') {
                 el.className = 'mika-message';
+                // Let sanitize handle allowed tags, process markdown after
                 let proc = msgText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>').replace(/```([\s\S]*?)```/g, (m, p1) => `<pre><code>${sanitizeHTML(p1.trim())}</code></pre>`).replace(/(?<!<br>)\n/g, '<br>');
                 contentSpan.innerHTML = `<strong>Mika:</strong> ${proc}`;
-            } else { el.className = 'system-message'; contentSpan.innerHTML = msgText; }
+            } else {
+                el.className = 'system-message';
+                contentSpan.innerHTML = msgText; // Already sanitized or system message
+            }
             el.appendChild(contentSpan); chatLog.appendChild(el); scrollToBottom();
         }
         function showTypingIndicator() { if (!chatLog || !chatArea || chatArea.style.display === 'none') return; removeTypingIndicator(); const el = document.createElement('p'); el.className = 'typing-indicator'; el.innerHTML = 'Mika is thinking... *purrrr*'; chatLog.appendChild(el); scrollToBottom(); }
@@ -358,9 +390,10 @@
                 appendMessage('system', `Loaded chat from ${new Date(parseInt(chatId)).toLocaleString()}. Welcome back, ${currentUserName}!`);
                 currentChatHistory.forEach(msg => {
                      let displayMsg = msg.parts.find(p => p.text)?.text || "";
-                     let displayImgPlaceholder = msg.parts.some(p => p.placeholder === "[Image Sent]"); // Check placeholder
-                     appendMessage(msg.role === 'user' ? 'user' : 'Mika', displayMsg, false, displayImgPlaceholder ? "[Image Placeholder]" : null); // Pass placeholder info, not URL
-                 });
+                     let displayImgPlaceholder = msg.parts.some(p => p.placeholder === "[Image Sent]");
+                     // Pass placeholder indicator instead of null/URL for history
+                     appendMessage(msg.role === 'user' ? 'user' : 'Mika', displayMsg, false, displayImgPlaceholder ? "[Image Placeholder]" : null);
+                });
                  removeSelectedImage(); enableChatInput(); console.log(`Loaded chat: ${chatId}`);
             } else { console.error(`Chat ID ${chatId} not found.`); appendMessage('system', "Mrow! Couldn't find that chat!"); }
             closeAllDropdowns(); saveAllChats();
@@ -378,31 +411,19 @@
         function switchToGameView(module = null) { if (!gameArea || !chatArea) return; chatArea.style.display = 'none'; gameArea.style.display = 'flex'; isGameActive = true; currentActiveGameModule = module; closeAllDropdowns(); if (installPopup.style.display === 'flex') { installPopup.style.display = 'none'; console.log("Hiding install prompt for game."); } console.log("View: Game"); }
 
         // --- Game Loading ---
-        function setupGameAreaBase(titleText) { if (!gameArea) return null; clearGameAreaContent(); const title = document.createElement('h2'); title.id = 'game-title'; title.textContent = titleText; gameArea.appendChild(title); const ui = document.createElement('div'); ui.id = 'game-specific-ui'; ui.style.cssText = 'width:100%; height:auto; display:flex; flex-direction:column; align-items:center; margin-bottom:10px; flex-shrink:0; overflow-y:auto; padding-bottom:5px;'; gameArea.appendChild(ui); const log = document.createElement('div'); log.id = 'game-message-log'; gameArea.appendChild(log); const back = document.createElement('button'); back.id = 'back-to-chat-button'; back.textContent = 'Back to Chat ♡'; back.onclick = switchToChatView; gameArea.appendChild(back); return ui; }
-        function displayGameMessage(sender, text) { let log = document.getElementById('game-message-log'); if (currentActiveGameModule === MikaDiary) log = document.getElementById('diary-chat-log'); if (!log) { console.warn("No log found for:", sender); return; } const el = document.createElement('p'); let css = 'system-gamemsg'; let msg = sanitizeHTML(text); if (currentActiveGameModule === MikaDiary) { if (sender === 'User') { css = 'diary-user-message'; msg = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${msg}`; } else if (sender === 'Mika') { css = 'diary-mika-message'; msg = `<strong>Mika:</strong> ${msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/(?<!<br>)\n/g,'<br>')}`; } else css = 'system-message'; el.className = css; el.innerHTML = msg; } else { if (sender === 'Mika') { css = 'mika-gamemsg'; msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); } el.className = css; el.innerHTML = msg; } log.appendChild(el); log.scrollTop = log.scrollHeight; }
+        function setupGameAreaBase(titleText) { if (!gameArea) return null; clearGameAreaContent(); const title = document.createElement('h2'); title.id = 'game-title'; title.textContent = titleText; gameArea.appendChild(title); const ui = document.createElement('div'); ui.id = 'game-specific-ui'; ui.style.cssText = 'width:100%; height:auto; display:flex; flex-direction:column; align-items:center; margin-bottom:10px; flex-shrink:0; overflow-y:auto; padding-bottom:5px; max-height: calc(100% - 100px);'; gameArea.appendChild(ui); const log = document.createElement('div'); log.id = 'game-message-log'; log.style.display = 'block'; /* Make sure shared log is visible for games using it */ gameArea.appendChild(log); const back = document.createElement('button'); back.id = 'back-to-chat-button'; back.textContent = 'Back to Chat ♡'; back.onclick = switchToChatView; gameArea.appendChild(back); return ui; }
+        function displayGameMessage(sender, text) { let log = document.getElementById('game-message-log'); let useDiaryLayout = false; if (currentActiveGameModule === MikaDiary || currentActiveGameModule === StoryTime) { log = document.getElementById(currentActiveGameModule === MikaDiary ? 'diary-chat-log' : 'story-display-area'); useDiaryLayout = (currentActiveGameModule === MikaDiary); } if (!log) { /* console.warn("No log found for:", sender); */ return; } const el = document.createElement('p'); let css = 'system-gamemsg'; let msg = sanitizeHTML(text); if (useDiaryLayout) { if (sender === 'User') { css = 'diary-user-message'; msg = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${msg}`; } else if (sender === 'Mika') { css = 'diary-mika-message'; msg = `<strong>Mika:</strong> ${msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/(?<!<br>)\n/g,'<br>')}`; } else css = 'system-message'; el.className = css; el.innerHTML = msg; } else if (currentActiveGameModule === StoryTime) { if (sender === 'User') { css = 'user-action'; msg = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${msg}`; } else { msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); } el.className = css; el.innerHTML = msg; } else { if (sender === 'Mika') { css = 'mika-gamemsg'; msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); } el.className = css; el.innerHTML = msg; } log.appendChild(el); log.scrollTop = log.scrollHeight; }
         async function callMikaApiForGame(prompt, context = []) { if (!currentApiKey) return Promise.reject("API Key missing!"); const user = currentUserName || "Study Buddy"; console.log(`API game call: ${prompt.substring(0,60)}...`); try { const resp = await sendMessageToMika(prompt, context, currentApiKey, user); return (typeof resp === 'string' && resp.trim()) ? resp : null; } catch (err) { console.error("API game error:", err); return Promise.reject(`API error: ${err}`); } }
         function loadTicTacToe() { switchToGameView(TicTacToe); const ui = setupGameAreaBase('Tic-Tac-Toe ♡'); if (ui && TicTacToe?.init) { const b = document.createElement('div'); b.id = 'ttt-board'; ui.appendChild(b); TicTacToe.init(b, displayGameMessage); displayGameMessage('System', "Game loaded! You (X) go first!"); } else { console.error("TTT load fail"); displayGameMessage('System', 'Mrow! TTT failed...'); currentActiveGameModule = null; } }
         function loadRPS() { switchToGameView(RockPaperScissors); const ui = setupGameAreaBase('Rock Paper Scissors!'); if (ui && RockPaperScissors?.init) { RockPaperScissors.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); displayGameMessage('System', "Make your choice!"); } else { console.error("RPS load fail"); displayGameMessage('System', 'Mrow! RPS failed...'); currentActiveGameModule = null; } }
         function loadGuessTheNumber() { switchToGameView(GuessTheNumber); const ui = setupGameAreaBase('Guess My Number~'); if (ui && GuessTheNumber?.init) { GuessTheNumber.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("GTN load fail"); displayGameMessage('System', 'Mrow! GTN failed...'); currentActiveGameModule = null; } }
         function loadTwentyQuestions() { switchToGameView(TwentyQuestions); const ui = setupGameAreaBase('20 Questions!'); if (ui && TwentyQuestions?.init) { TwentyQuestions.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("20Q load fail"); displayGameMessage('System', 'Mrow! 20Q failed...'); currentActiveGameModule = null; } }
         function loadDiary() { if (!gameArea) return; clearGameAreaContent(); switchToGameView(MikaDiary); if (MikaDiary?.init) { MikaDiary.init(gameArea, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("Diary load fail"); gameArea.innerHTML = '<p class="system-message">Mrow! Diary failed...</p>'; const b = document.createElement('button'); b.id='back-to-chat-button'; b.textContent='Back ♡'; b.onclick=switchToChatView; gameArea.appendChild(b); currentActiveGameModule = null; } }
+        function loadStoryTime() { if (!gameArea) return; clearGameAreaContent(); switchToGameView(StoryTime); if (StoryTime?.init) { StoryTime.init(gameArea, displayGameMessage, callMikaApiForGame, currentUserName); const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView; gameArea.appendChild(backBtn); } else { console.error("StoryTime load fail"); gameArea.innerHTML = '<p class="system-message">Mrow! Story Time failed...</p>'; const b = document.createElement('button'); b.id='back-to-chat-button'; b.textContent='Back ♡'; b.onclick=switchToChatView; gameArea.appendChild(b); currentActiveGameModule = null; } }
         function clearGameAreaContent() { if (gameArea) gameArea.innerHTML = ''; }
 
         // --- Image Handling ---
-        function handleImageSelection(event) {
-            const file = event.target.files[0];
-            if (!file) { removeSelectedImage(); return; }
-            if (!file.type.startsWith('image/')) { appendMessage('system', "Mrow! Not an image file!"); removeSelectedImage(); return; }
-            if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) { appendMessage('system', `Eek! Image too big! (Max ${MAX_IMAGE_SIZE_MB}MB)`); removeSelectedImage(); return; }
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imagePreview.src = e.target.result; imagePreviewArea.style.display = 'inline-block';
-                selectedImageData = e.target.result.split(',')[1]; selectedImageMimeType = file.type;
-                console.log(`Selected: ${file.name}, Type: ${selectedImageMimeType}`); enableChatInput();
-            };
-            reader.onerror = (e) => { console.error("File read error:", e); appendMessage('system', "Meeeow! Error reading image..."); removeSelectedImage(); }
-            reader.readAsDataURL(file);
-        }
+        function handleImageSelection(event) { const file = event.target.files[0]; if (!file) { removeSelectedImage(); return; } if (!file.type.startsWith('image/')) { appendMessage('system', "Mrow! Not an image file!"); removeSelectedImage(); return; } if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) { appendMessage('system', `Eek! Image too big! (Max ${MAX_IMAGE_SIZE_MB}MB)`); removeSelectedImage(); return; } const reader = new FileReader(); reader.onload = (e) => { imagePreview.src = e.target.result; imagePreviewArea.style.display = 'inline-block'; selectedImageData = e.target.result.split(',')[1]; selectedImageMimeType = file.type; console.log(`Selected: ${file.name}, Type: ${selectedImageMimeType}`); enableChatInput(); }; reader.onerror = (e) => { console.error("File read error:", e); appendMessage('system', "Meeeow! Error reading image..."); removeSelectedImage(); }; reader.readAsDataURL(file); }
         function removeSelectedImage() { selectedImageData = null; selectedImageMimeType = null; if (imageUploadInput) imageUploadInput.value = null; if (imagePreviewArea) imagePreviewArea.style.display = 'none'; if (imagePreview) imagePreview.src = '#'; enableChatInput(); console.log("Image removed."); }
 
         // --- API Call & Message Handling ---
@@ -417,18 +438,24 @@
             appendMessage('user', txt || "[Image Attached]", false, imgPreviewUrl); // Show message/placeholder and thumbnail
              const userParts = [];
              if (hasTxt) userParts.push({ text: txt });
-             if (hasImg) userParts.push({ placeholder: "[Image Sent]", mimeType: imgMime }); // Add placeholder to history
+             // Store placeholder in history, not actual data URL
+             if (hasImg) userParts.push({ placeholder: "[Image Sent]", mimeType: imgMime });
              currentChatHistory.push({ role: 'user', parts: userParts });
 
             chatInput.value = ''; isMikaTyping = true; disableChatInput(); showTypingIndicator();
-            if (currentChatHistory.length > MAX_HISTORY_LENGTH) { currentChatHistory = currentChatHistory.slice(-MAX_HISTORY_LENGTH); }
+            // Prepare history for API call, excluding placeholders
+            const historyContext = currentChatHistory.slice(0, -1).map(msg => ({
+                role: msg.role,
+                parts: msg.parts.filter(p => p.text) // Only send parts with text
+            })).filter(msg => msg.parts.length > 0); // Ensure message has text parts
+
+            if (historyContext.length > MAX_HISTORY_LENGTH) {
+                 historyContext = historyContext.slice(-MAX_HISTORY_LENGTH);
+                 console.log("Chat history pruned for API context.");
+            }
 
             try {
                 const user = currentUserName || "Study Buddy";
-                const historyContext = currentChatHistory.slice(0, -1).map(msg => ({ // Prepare history for API
-                    role: msg.role,
-                    parts: msg.parts.filter(p => p.text) // Only send text parts from history
-                }));
                 const resp = await sendMessageToMika(txt, historyContext, currentApiKey, user, imgData, imgMime);
                  removeTypingIndicator(); appendMessage('Mika', resp);
                  currentChatHistory.push({ role: 'model', parts: [{ text: resp }] });
@@ -446,9 +473,9 @@
         // --- Event Listeners ---
         if (disclaimerAgreeButton) disclaimerAgreeButton.addEventListener('click', () => { saveDisclaimerAgreement(); disclaimerPopup.style.display = 'none'; checkNameAndProceed(); });
         if (saveApiKeyButton) saveApiKeyButton.addEventListener('click', () => { if (!apiKeyInput) return; const key = apiKeyInput.value.trim(); if (key) { if (saveApiKey(key)) { currentApiKey = key; apiKeyPopup.style.display = 'none'; apiKeyError.style.display = 'none'; proceedToChat(); } else { apiKeyError.textContent = "Save failed?"; apiKeyError.style.display = 'block'; } } else { apiKeyError.textContent = "Key needed!"; apiKeyError.style.display = 'block'; } });
-        if (apiKeyInput) apiKeyInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveApiKeyButton?.click(); apiKeyError.style.display = 'none'; });
+        if (apiKeyInput) apiKeyInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveApiKeyButton?.click(); if (apiKeyError) apiKeyError.style.display = 'none'; });
         if (saveNameButton) saveNameButton.addEventListener('click', () => { if (!nameInput) return; const name = nameInput.value.trim(); if (name) { if (saveUserName(name)) { currentUserName = name; namePopup.style.display = 'none'; nameError.style.display = 'none'; checkApiKeyAndProceed(); } else { nameError.textContent = "Save failed?"; nameError.style.display = 'block'; } } else { nameError.textContent = "Name needed!"; nameError.style.display = 'block'; } });
-        if (nameInput) nameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveNameButton?.click(); nameError.style.display = 'none'; });
+        if (nameInput) nameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveNameButton?.click(); if (nameError) nameError.style.display = 'none'; });
         if (sendButton) sendButton.addEventListener('click', handleSendMessage);
         if (chatInput) { chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }); chatInput.addEventListener('input', enableChatInput); }
         if (imageUploadButton) imageUploadButton.addEventListener('click', () => imageUploadInput?.click());
@@ -464,15 +491,16 @@
         if (gameGtnButton) gameGtnButton.addEventListener('click', () => { closeAllDropdowns(); loadGuessTheNumber(); });
         if (game20qButton) game20qButton.addEventListener('click', () => { closeAllDropdowns(); loadTwentyQuestions(); });
         if (gameDiaryButton) gameDiaryButton.addEventListener('click', () => { closeAllDropdowns(); loadDiary(); });
+        if (gameStoryButton) gameStoryButton.addEventListener('click', () => { closeAllDropdowns(); loadStoryTime(); });
         // Settings Listeners
         if (settingsInstallButton) settingsInstallButton.addEventListener('click', handleManualInstall);
         if (settingsThemeButton) settingsThemeButton.addEventListener('click', toggleTheme);
         if (settingsResetButton) settingsResetButton.addEventListener('click', () => { closeAllDropdowns(); if (confirm(`⚠️ Reset Settings for ${currentUserName}? Clears API Key, Name, Disclaimer, Theme, Install status & reloads. Sure, ${currentUserName}?!`)) { clearApiKey(); clearUserName(); clearDisclaimerAgreement(); clearInstallPromptShown(); clearThemePreference(); clearFromLocalStorage('mikaHelper_allChats'); window.location.reload(); } });
-        // Close dropdowns on outside click
+        // Close dropdowns
         document.addEventListener('click', (e) => { if (historyDropdown?.style.display === 'block' && !historyDropdown.contains(e.target) && e.target !== historyButton) historyDropdown.style.display = 'none'; if (settingsDropdown?.style.display === 'block' && !settingsDropdown.contains(e.target) && e.target !== settingsButton) settingsDropdown.style.display = 'none'; if (gamesDropdown?.style.display === 'block' && !gamesDropdown.contains(e.target) && e.target !== gamesButton) gamesDropdown.style.display = 'none'; });
 
         // --- Start the App ---
-        document.addEventListener('DOMContentLoaded', initializeApp); // Wait for DOM before initializing
+        document.addEventListener('DOMContentLoaded', initializeApp); // Wait for DOM
 
         // Auto-save chats
         window.addEventListener('beforeunload', saveAllChats);
