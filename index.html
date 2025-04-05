@@ -276,7 +276,7 @@
         }
          /* Specific dropdown positioning */
         #history-dropdown { right: 15px; }
-        #games-dropdown { right: 15px; } /* ** NEW ** Position Games Dropdown */
+        #games-dropdown { right: 15px; }
         #settings-dropdown { right: 15px; }
 
         .dropdown-menu button:last-child { border-bottom: none; }
@@ -359,12 +359,12 @@
         #send-button:disabled { background: #666; cursor: not-allowed; transform: none; border-color: #666; } /* Keep disabled style simple */
 
 
-        /* --- ** NEW ** Game Area Styles --- */
+        /* --- Game Area Styles --- */
         #game-area {
             display: none; /* Hidden by default */
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* Center content vertically */
+            justify-content: flex-start; /* Align items to the top */
             padding: 20px;
             width: 100%;
             height: 100%;
@@ -381,6 +381,17 @@
             font-size: 1.4em;
             margin-bottom: 15px;
             text-shadow: 0 0 3px var(--chat-header-shadow);
+            flex-shrink: 0; /* Prevent title from shrinking */
+        }
+
+        /* Container for the specific game's UI elements */
+        #game-specific-ui {
+             width: 100%;
+             display: flex;
+             flex-direction: column;
+             align-items: center; /* Center game elements */
+             margin-bottom: 15px; /* Space between game ui and message log */
+             flex-shrink: 0;
         }
 
         /* Tic Tac Toe Board Specifics */
@@ -390,7 +401,7 @@
             grid-template-rows: repeat(3, 1fr);
             width: 240px; /* Fixed size, adjust as needed */
             height: 240px;
-            margin-bottom: 15px;
+            margin-bottom: 15px; /* Space below board */
             border: 3px solid var(--game-board-border);
             border-radius: 8px;
             background-color: var(--game-board-bg);
@@ -419,23 +430,61 @@
              background-color: transparent; /* Don't highlight taken cells on hover */
         }
 
-        /* Game Messages */
+        /* RPS Specific Styles */
+        .rps-choice-button {
+             font-family: inherit;
+             padding: 10px 20px;
+             font-size: 1.1em;
+             border-radius: 10px;
+             border: none;
+             cursor: pointer;
+             background: var(--header-button-bg, #f06292);
+             color: var(--header-button-text, #1a0d13);
+             transition: transform 0.1s ease, background-color 0.2s, color 0.2s;
+             flex-shrink: 0; /* Prevent buttons shrinking weirdly */
+        }
+        .rps-choice-button:hover {
+             transform: scale(1.05);
+             background: var(--header-button-hover-bg, #d81b60);
+        }
+        .rps-choice-button:active {
+             transform: scale(0.98);
+        }
+        #rps-result-display {
+            margin-top: 10px;
+            padding: 10px;
+            min-height: 30px; /* Ensure space */
+            text-align: center;
+            font-weight: bold;
+            border: 1px dashed var(--game-cell-border, #f06292);
+            border-radius: 5px;
+            background-color: rgba(0,0,0,0.1); /* Slight background */
+            opacity: 0.6; /* Start slightly faded */
+            transition: opacity 0.3s ease;
+            color: var(--game-cell-text); /* Use game text color */
+            width: 90%; /* Take up most of the width */
+            max-width: 350px; /* Max width */
+        }
+
+
+        /* Shared Game Message Log */
         #game-message-log {
             width: 100%;
-            max-width: 400px; /* Limit width */
-            height: 100px; /* Fixed height */
+            max-width: 450px; /* Limit width */
+            height: 120px; /* Slightly taller log */
             overflow-y: auto;
             border: 1px solid var(--game-message-log-border);
             background: var(--game-message-log-bg);
             padding: 10px;
-            margin-top: 10px; /* Space below reset button */
-            margin-bottom: 15px;
+            margin-bottom: 15px; /* Space below log, above back button */
             border-radius: 5px;
             font-size: 0.9em;
             color: var(--game-message-log-text);
             scrollbar-width: thin;
             scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
             box-sizing: border-box;
+            flex-shrink: 0; /* Prevent shrinking */
+            margin-top: auto; /* Push log towards bottom if space allows */
         }
         #game-message-log p {
             margin: 3px 0;
@@ -443,12 +492,12 @@
             word-wrap: break-word;
         }
         #game-message-log .mika-gamemsg { color: var(--game-message-mika); }
-        #game-message-log .user-gamemsg { color: var(--game-message-user); } /* If user messages appear */
-        #game-message-log .system-gamemsg { color: var(--system-message-text); font-style: italic; }
+        #game-message-log .user-gamemsg { color: var(--game-message-user); }
+        #game-message-log .system-gamemsg { color: var(--game-message-system); font-style: italic; }
 
-        /* Game Buttons (Reset is added by JS, Back is added here) */
-        #ttt-reset-button, /* Style the one from games.js */
-        #back-to-chat-button { /* Style our new button */
+        /* Shared Game Buttons (Reset added by specific games, Back is shared) */
+        #ttt-reset-button, /* Style TTT reset */
+        #back-to-chat-button { /* Style back button */
              padding: 8px 20px;
              font-size: 0.9em;
              font-weight: bold;
@@ -459,13 +508,18 @@
              border: none;
              color: var(--button-text);
              background: linear-gradient(45deg, var(--button-gradient-1), var(--button-gradient-2));
-             margin-top: 15px; /* Space above back button */
+             margin-top: 10px; /* Adjusted margin */
+             flex-shrink: 0; /* Prevent shrinking */
+        }
+        #ttt-reset-button {
+            /* Specific placement might be needed in games.js or here */
+            /* Example: margin-top: 5px; margin-bottom: 10px; */
         }
         #ttt-reset-button:hover,
         #back-to-chat-button:hover {
              transform: scale(1.05);
              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-             background: linear-gradient(45deg, var(--send-button-hover-1), var(--send-button-hover-2)); /* Use send hover gradient */
+             background: linear-gradient(45deg, var(--send-button-hover-1), var(--send-button-hover-2));
         }
         #ttt-reset-button:active,
         #back-to-chat-button:active {
@@ -492,14 +546,15 @@
              #chat-input-area { padding: 8px 10px; }
              #chat-input { padding: 8px 12px; font-size: 0.95em; }
              #send-button { padding: 8px 15px; font-size: 0.95em; }
-             .dropdown-menu { max-height: 150px; /* Adjust dropdown height too */ }
+             .dropdown-menu { max-height: 150px; }
 
              /* Game specific responsive */
              #game-area { padding: 10px; }
              #game-title { font-size: 1.2em; margin-bottom: 10px; }
              #ttt-board { width: 180px; height: 180px; } /* Smaller board */
              .ttt-cell { font-size: 1.8em; }
-             #game-message-log { max-width: 100%; height: 80px; }
+             .rps-choice-button { font-size: 1em; padding: 8px 15px; }
+             #game-message-log { max-width: 100%; height: 100px; } /* Adjust height */
              #ttt-reset-button, #back-to-chat-button { font-size: 0.85em; padding: 6px 15px; }
          }
 
@@ -575,10 +630,11 @@
               <div id="history-dropdown" class="dropdown-menu">
                    <!-- History items will be added here -->
               </div>
-               <!-- ** NEW ** Games Dropdown -->
+               <!-- Games Dropdown -->
                <div id="games-dropdown" class="dropdown-menu">
                    <button id="game-ttt-button" title="Play Tic-Tac-Toe with Mika!">Tic-Tac-Toe ♡</button>
-                   <!-- More game buttons can be added here later -->
+                   <!-- ** NEW ** RPS Button -->
+                   <button id="game-rps-button" title="Play Rock Paper Scissors!">Rock Paper Scissors!</button>
                    <p class="no-items" style="display: none;">More games soon~!</p> <!-- Placeholder -->
                </div>
               <!-- Settings Dropdown -->
@@ -607,26 +663,20 @@
              <!-- ** NEW ** Game Area -->
              <div id="game-area">
                  <!-- Game content will be loaded here by JS -->
-                 <!-- Example structure for TTT:
-                 <h2 id="game-title">Tic-Tac-Toe Time!</h2>
-                 <div id="ttt-board"></div> <!- Board elements added by games.js ->
-                 <div id="game-message-log"></div>
-                 <!- Reset button added by games.js near ttt-board ->
-                 <button id="back-to-chat-button">Back to Chat ♡</button>
-                 -->
              </div>
 
          </div> <!-- End main-content-area -->
 
     </div> <!-- End chat-container -->
 
-    <!-- Include the GAME script -->
-    <script src="games.js"></script> <!-- Make sure this is loaded -->
+    <!-- Include the GAME scripts -->
+    <script src="games.js"></script> <!-- Tic Tac Toe -->
+    <script src="rps.js"></script> <!-- ** NEW ** Rock Paper Scissors -->
     <!-- Include the API script -->
     <script src="api.js"></script>
 
     <script>
-        // Nyaa~! Homework Helper Mika with Games, Themes & More! ♡
+        // Nyaa~! Homework Helper Mika with MORE Games! ♡
 
         // --- DOM Elements ---
         const bodyElement = document.body;
@@ -671,15 +721,16 @@
         const settingsButton = document.getElementById('settings-button');
         const newChatButton = document.getElementById('new-chat-button');
         const historyButton = document.getElementById('history-button');
-        const gamesButton = document.getElementById('games-button'); // ** NEW **
+        const gamesButton = document.getElementById('games-button');
 
         // Dropdowns
         const historyDropdown = document.getElementById('history-dropdown');
         const settingsDropdown = document.getElementById('settings-dropdown');
-        const gamesDropdown = document.getElementById('games-dropdown'); // ** NEW **
+        const gamesDropdown = document.getElementById('games-dropdown');
 
-        // ** NEW ** Games Dropdown Buttons
+        // ** UPDATED ** Games Dropdown Buttons
         const gameTttButton = document.getElementById('game-ttt-button');
+        const gameRpsButton = document.getElementById('game-rps-button'); // ** NEW ** RPS Button
 
         // Settings Dropdown Buttons (unchanged references)
         const settingsInstallButton = document.getElementById('settings-install-button');
@@ -706,7 +757,7 @@
         const THEME_PREFERENCE_KEY = 'mikaThemePreference_v1';
         const INSTALL_PROMPT_SHOWN_KEY = 'mikaInstallPromptShown'; // Use constant
 
-        // --- ** NEW ** Game State ---
+        // --- Game State ---
         let isGameActive = false; // Track if we are in game view
 
         // --- Utility Functions ---
@@ -714,7 +765,8 @@
         const sanitizeHTML = (str) => {
             const temp = document.createElement('div');
             temp.textContent = str;
-            return temp.innerHTML;
+            // Basic sanitization, replace potential script tags (though textContent usually handles this)
+            return temp.innerHTML.replace(/<script.*?>.*?<\/script>/gi, '');
         };
 
         // --- Local Storage Functions ---
@@ -731,8 +783,6 @@
              try { localStorage.removeItem(key); console.log(`Cleared ${key}`); }
              catch (e) { console.error(`Failed to clear ${key}:`, e); }
         }
-
-        // Specific storage functions
         const saveApiKey = (key) => saveToLocalStorage('geminiApiKey_mikaHelper', key);
         const loadApiKey = () => loadFromLocalStorage('geminiApiKey_mikaHelper');
         const clearApiKey = () => clearFromLocalStorage('geminiApiKey_mikaHelper');
@@ -748,7 +798,6 @@
         const saveThemePreference = (theme) => saveToLocalStorage(THEME_PREFERENCE_KEY, theme);
         const loadThemePreference = () => loadFromLocalStorage(THEME_PREFERENCE_KEY);
         const clearThemePreference = () => clearFromLocalStorage(THEME_PREFERENCE_KEY);
-
 
         // Chat history functions
         function saveAllChats() {
@@ -776,11 +825,11 @@
              if (confirm(`Hey ${currentUserName}! Are you SURE you want to delete ALL our chat history forever?! (ฅΦωΦฅ);; This can't be undone!`)) {
                  clearFromLocalStorage('mikaHelper_allChats');
                  allChats = {};
-                 startNewChat(false); // Start new without greeting, msg below explains
-                 updateHistoryDropdown(); // Update dropdown to show empty
+                 startNewChat(false);
+                 updateHistoryDropdown();
                  appendMessage('system', "All chat history deleted. It's like we just met again, nyaa~!");
                  console.log("All chat history deleted.");
-                 closeAllDropdowns(); // Close dropdown after action
+                 closeAllDropdowns();
              }
          }
 
@@ -789,21 +838,20 @@
             if (theme === 'dark') {
                 bodyElement.classList.add('dark-mode');
                 settingsThemeButton.textContent = "☀️ Switch to Light Mode";
-                themeColorMeta.content = '#2c1f30'; // Dark theme color for browser UI
-            } else { // Default to light
+                themeColorMeta.content = '#2c1f30';
+            } else {
                 bodyElement.classList.remove('dark-mode');
                 settingsThemeButton.textContent = "🌙 Switch to Dark Mode";
-                themeColorMeta.content = '#d81b60'; // Light theme color
+                themeColorMeta.content = '#d81b60';
             }
             console.log(`Theme applied: ${theme}`);
         }
-
         function toggleTheme() {
             const currentTheme = bodyElement.classList.contains('dark-mode') ? 'dark' : 'light';
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             applyTheme(newTheme);
             saveThemePreference(newTheme);
-            closeAllDropdowns(); // Close dropdown after action
+            closeAllDropdowns();
         }
 
         // --- PWA Install Functions ---
@@ -814,7 +862,7 @@
                 console.log('`beforeinstallprompt` event fired and stored.');
                 if (settingsInstallButton) settingsInstallButton.disabled = false;
                 if (!hasInstallPromptBeenShown()) {
-                     if (chatContainer.style.display === 'flex') {
+                     if (chatContainer.style.display === 'flex' && !isGameActive) { // Only show if chat is visible
                          installPopup.style.display = 'flex';
                      } else {
                          console.log("Deferring initial install prompt until main chat is visible.");
@@ -839,7 +887,6 @@
         async function handleManualInstall() {
             if (installPopup.style.display === 'flex') installPopup.style.display = 'none';
             closeAllDropdowns();
-
             if (deferredInstallPrompt) {
                  try {
                     deferredInstallPrompt.prompt();
@@ -854,7 +901,7 @@
                      appendMessage('system', "Mrow! Couldn't show the install prompt... maybe try again?");
                  }
             } else {
-                console.log("Install prompt not available (already installed or browser doesn't support?).");
+                console.log("Install prompt not available.");
                 appendMessage('system', "Looks like you've either already installed me, or your browser doesn't want to right now, nyaa~!");
                 if (settingsInstallButton) settingsInstallButton.disabled = true;
             }
@@ -862,15 +909,13 @@
         function registerServiceWorker() {
              if ('serviceWorker' in navigator) {
                  navigator.serviceWorker.register('sw.js')
-                 .then((registration) => console.log('Mika Service Worker registered with scope:', registration.scope))
+                 .then((registration) => console.log('Mika Service Worker registered:', registration.scope))
                  .catch((error) => console.error('Mika Service Worker registration failed:', error));
              } else { console.log("Service Workers not supported."); }
          }
 
-
         // --- Chat Interface Functions ---
         function appendMessage(sender, message, isHtml = false) {
-            // Only append if chat is visible and chatLog exists
             if (!chatLog || !chatArea || chatArea.style.display === 'none') {
                 console.log("Skipped appending chat message while chat is hidden:", sender, message);
                 return;
@@ -886,7 +931,7 @@
                 messageElement.innerHTML = `<strong>Mika:</strong> ${processedMessage}`;
             } else { messageElement.className = 'system-message'; messageElement.innerHTML = sanitizedMessage; }
             chatLog.appendChild(messageElement);
-            scrollToBottom(); // Scroll chat log
+            scrollToBottom();
         }
         function showTypingIndicator() { if (!chatLog || !chatArea || chatArea.style.display === 'none') return; removeTypingIndicator(); const typingElement = document.createElement('p'); typingElement.className = 'typing-indicator'; typingElement.innerHTML = 'Mika is thinking... *purrrr*'; chatLog.appendChild(typingElement); scrollToBottom(); }
         function removeTypingIndicator() { if (!chatLog || !chatArea || chatArea.style.display === 'none') return; const typingIndicator = chatLog.querySelector('.typing-indicator'); if (typingIndicator) typingIndicator.remove(); }
@@ -899,16 +944,16 @@
 
         // --- Chat Management Functions ---
         function startNewChat(greet = true) {
-             switchToChatView(); // ** NEW ** Ensure chat is visible
+             switchToChatView();
              if (currentChatId && currentChatHistory.length > 0) { allChats[currentChatId] = currentChatHistory; saveAllChats(); }
              currentChatId = getTimestamp(); currentChatHistory = []; clearChatDisplay();
              if (greet) { appendMessage('system', `Started a new chat! What can I help you with, ${currentUserName}? Nyaa~!`); }
              else { appendMessage('system', `Started a new chat.`); }
              enableChatInput(); updateHistoryDropdown(); console.log(`Started new chat ID: ${currentChatId}`);
-             closeAllDropdowns(); // Close dropdowns on new chat
+             closeAllDropdowns();
         }
         function loadChat(chatId) {
-            switchToChatView(); // ** NEW ** Ensure chat is visible
+            switchToChatView();
              if (currentChatId && currentChatHistory.length > 0 && currentChatId !== chatId) { allChats[currentChatId] = currentChatHistory; }
              if (allChats[chatId]) {
                  currentChatId = chatId; currentChatHistory = allChats[chatId]; clearChatDisplay();
@@ -916,33 +961,30 @@
                  currentChatHistory.forEach(msg => { if (msg.role === 'user') { appendMessage('user', msg.parts[0].text); } else if (msg.role === 'model') { appendMessage('Mika', msg.parts[0].text); } });
                  enableChatInput(); console.log(`Loaded chat ID: ${chatId}`);
              } else { console.error(`Chat ID ${chatId} not found.`); appendMessage('system', "Mrow! Couldn't find that chat history!"); }
-             closeAllDropdowns(); // Close dropdowns on load
-             saveAllChats(); // Ensure save after loading different chat
+             closeAllDropdowns();
+             saveAllChats();
         }
 
         // --- Dropdown Management ---
         function closeAllDropdowns() {
             if (historyDropdown && historyDropdown.style.display === 'block') { historyDropdown.style.display = 'none'; }
             if (settingsDropdown && settingsDropdown.style.display === 'block') { settingsDropdown.style.display = 'none'; }
-            if (gamesDropdown && gamesDropdown.style.display === 'block') { gamesDropdown.style.display = 'none'; } // ** NEW ** Close games dropdown
+            if (gamesDropdown && gamesDropdown.style.display === 'block') { gamesDropdown.style.display = 'none'; }
         }
-
         function toggleDropdown(dropdownElement) {
             const isCurrentlyOpen = dropdownElement.style.display === 'block';
-            closeAllDropdowns(); // Close all first
-            if (!isCurrentlyOpen) { // If it wasn't open, open it now
+            closeAllDropdowns();
+            if (!isCurrentlyOpen) {
                  dropdownElement.style.display = 'block';
-                 // Special updates needed when opening
                  if (dropdownElement === historyDropdown) updateHistoryDropdown();
                  if (dropdownElement === settingsDropdown) updateSettingsDropdown();
-                 if (dropdownElement === gamesDropdown) updateGamesDropdown(); // ** NEW ** Update games dropdown if needed
+                 if (dropdownElement === gamesDropdown) updateGamesDropdown();
             }
         }
-
         function updateHistoryDropdown() {
              if (!historyDropdown) return;
-             historyDropdown.innerHTML = ''; // Clear previous items
-             const chatIds = Object.keys(allChats).sort((a, b) => b - a); // Sort newest first
+             historyDropdown.innerHTML = '';
+             const chatIds = Object.keys(allChats).sort((a, b) => b - a);
              if (chatIds.length === 0) {
                  const noHistoryMsg = document.createElement('p');
                  noHistoryMsg.className = 'no-items';
@@ -978,98 +1020,148 @@
                 settingsThemeButton.textContent = "🌙 Switch to Dark Mode";
             }
         }
-        // ** NEW ** Update Games Dropdown (currently does nothing, but placeholder)
         function updateGamesDropdown() {
-            // Could potentially disable game buttons if needed in future
             console.log("Updating games dropdown (currently no dynamic updates).");
         }
 
-
-        // --- ** NEW ** View Switching ---
+        // --- View Switching ---
         function switchToChatView() {
             if (!gameArea || !chatArea) return;
             gameArea.style.display = 'none';
-            chatArea.style.display = 'flex'; // Use flex for chat layout
+            chatArea.style.display = 'flex';
             isGameActive = false;
              if (chatInput && !chatInput.disabled) {
                 setTimeout(() => chatInput.focus(), 50);
              }
-             clearGameAreaContent(); // Clean up game area when switching back
+             clearGameAreaContent();
             console.log("Switched to Chat View");
+             // Re-check if install prompt should be shown
+             if (deferredInstallPrompt && !hasInstallPromptBeenShown()) {
+                console.log("Showing deferred install prompt after switching to chat.");
+                 installPopup.style.display = 'flex';
+             }
         }
-
         function switchToGameView() {
             if (!gameArea || !chatArea) return;
             chatArea.style.display = 'none';
-            gameArea.style.display = 'flex'; // Use flex for game layout
+            gameArea.style.display = 'flex';
             isGameActive = true;
-            closeAllDropdowns(); // Close any open dropdowns
+            closeAllDropdowns();
+            // Hide install prompt if it was visible
+            if (installPopup.style.display === 'flex') {
+                 installPopup.style.display = 'none';
+                 console.log("Hiding install prompt while game is active.");
+            }
             console.log("Switched to Game View");
         }
 
-        // --- ** NEW ** Game Loading Logic ---
-        function loadTicTacToe() {
-            switchToGameView();
-            clearGameAreaContent(); // Clear previous game stuff
-
-            // 1. Add Game Title
-             const title = document.createElement('h2');
-             title.id = 'game-title';
-             title.textContent = 'Tic-Tac-Toe with Mika! ♡';
-             gameArea.appendChild(title);
-
-            // 2. Create Board Container
-            const tttBoard = document.createElement('div');
-            tttBoard.id = 'ttt-board'; // The game script will populate this
-            gameArea.appendChild(tttBoard);
-
-            // 3. Create Game Message Log Container
+        // --- Game Loading Logic ---
+        function setupGameAreaBase(gameTitleText) {
+            if (!gameArea) return null;
+            clearGameAreaContent();
+            const title = document.createElement('h2');
+            title.id = 'game-title';
+            title.textContent = gameTitleText;
+            gameArea.appendChild(title);
+            const gameUiContainer = document.createElement('div');
+            gameUiContainer.id = 'game-specific-ui';
+            gameUiContainer.style.width = '100%';
+            gameUiContainer.style.display = 'flex';
+            gameUiContainer.style.flexDirection = 'column';
+            gameUiContainer.style.alignItems = 'center';
+            gameArea.appendChild(gameUiContainer);
             const gameMessageLog = document.createElement('div');
             gameMessageLog.id = 'game-message-log';
-            // Insert message log *after* the board (JS adds reset button near board)
-            gameArea.appendChild(gameMessageLog); // Add it now, messages will populate
+            gameArea.appendChild(gameMessageLog);
+            const backButton = document.createElement('button');
+            backButton.id = 'back-to-chat-button';
+            backButton.textContent = 'Back to Chat ♡';
+            backButton.onclick = switchToChatView;
+            gameArea.appendChild(backButton);
+            return gameUiContainer;
+        }
 
-            // 4. Define Message Callback for the game
-            function displayGameMessage(sender, text) {
-                if (!gameMessageLog) return;
-                const msgElement = document.createElement('p');
-                let cssClass = 'system-gamemsg'; // Default
-                if (sender === 'Mika') {
-                    cssClass = 'mika-gamemsg';
-                    // Process basic markdown for game messages too?
-                    let processedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>');
-                    msgElement.innerHTML = processedText; // Use innerHTML for formatting
-                } else { // Assume system/user turn message
-                     msgElement.textContent = text; // Plain text for system
-                }
-
-                msgElement.className = cssClass;
-                gameMessageLog.appendChild(msgElement);
-                // Scroll to bottom of game messages
-                gameMessageLog.scrollTop = gameMessageLog.scrollHeight;
-            }
-
-            // 5. Add "Back to Chat" button
-             const backButton = document.createElement('button');
-             backButton.id = 'back-to-chat-button';
-             backButton.textContent = 'Back to Chat ♡';
-             backButton.onclick = switchToChatView; // Set its action
-             gameArea.appendChild(backButton); // Add to the end
-
-             // 6. Initialize the game (MUST be after board container exists)
-             if (typeof TicTacToe !== 'undefined' && TicTacToe.init) {
-                TicTacToe.init(tttBoard, displayGameMessage);
-                // The init function should also add the reset button near the board.
+         function displayGameMessage(sender, text) {
+             const gameMessageLog = document.getElementById('game-message-log');
+             if (!gameMessageLog) return;
+             const msgElement = document.createElement('p');
+             let cssClass = 'system-gamemsg';
+             let processedText = sanitizeHTML(text);
+             if (sender === 'Mika') {
+                 cssClass = 'mika-gamemsg';
+                  processedText = processedText
+                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                     .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                     .replace(/`([^`]+)`/g, '<code>$1</code>')
+                     .replace(/~(\S.*?\S)~/g, '<del>$1</del>')
+                     .replace(/(?<!<br>)\n/g, '<br>');
+                 msgElement.innerHTML = processedText;
              } else {
-                console.error("TicTacToe game script not loaded or init function missing!");
-                displayGameMessage('System', 'Mrow! Game failed to load... is games.js included?');
+                 msgElement.innerHTML = processedText;
+             }
+             msgElement.className = cssClass;
+             gameMessageLog.appendChild(msgElement);
+             gameMessageLog.scrollTop = gameMessageLog.scrollHeight;
+         }
+
+        async function callMikaApiForGame(prompt) {
+            if (!currentApiKey) {
+                 console.error("API Key missing, cannot make game API call.");
+                 // Return a specific error message the game can display
+                 return Promise.reject("Mrow! My magic connection is fuzzy without the secret code!");
+            }
+            const userNameForApi = currentUserName || "Study Buddy";
+            console.log(`Calling API for game with prompt: ${prompt.substring(0,100)}...`);
+            try {
+                // Ensure sendMessageToMika is awaited and returns the text directly
+                 const responseText = await sendMessageToMika(prompt, [], currentApiKey, userNameForApi);
+                 // Check if responseText is valid before returning
+                 if (typeof responseText === 'string' && responseText.trim().length > 0) {
+                    return responseText;
+                 } else {
+                    console.warn("API call returned empty or invalid response.");
+                     // Return null or a default message instead of rejecting? Let's return null.
+                     return null;
+                 }
+            } catch (error) {
+                console.error("Error during API call from game:", error);
+                // Reject the promise so the caller knows it failed
+                return Promise.reject(`Meeeow! API call failed: ${error}`);
+            }
+        }
+
+
+        function loadTicTacToe() {
+            switchToGameView();
+             const gameUiContainer = setupGameAreaBase('Tic-Tac-Toe with Mika! ♡');
+             if (gameUiContainer && typeof TicTacToe !== 'undefined' && TicTacToe.init) {
+                 const tttBoard = document.createElement('div');
+                 tttBoard.id = 'ttt-board';
+                 gameUiContainer.appendChild(tttBoard); // Add board to specific UI area
+                 // TTT's init adds the reset button, so we don't add it here
+                 TicTacToe.init(tttBoard, displayGameMessage);
+                 displayGameMessage('System', "Game loaded! You go first (X)!");
+             } else {
+                 console.error("TicTacToe game script not loaded or init function missing!");
+                 displayGameMessage('System', 'Mrow! TTT Game failed to load...');
+             }
+        }
+
+        function loadRPS() {
+            switchToGameView();
+             const gameUiContainer = setupGameAreaBase('Rock Paper Scissors! ♡');
+             if (gameUiContainer && typeof RockPaperScissors !== 'undefined' && RockPaperScissors.init) {
+                 // RPS init adds its own buttons to the passed container
+                 RockPaperScissors.init(gameUiContainer, displayGameMessage, callMikaApiForGame, currentUserName);
+                 displayGameMessage('System', "Rock Paper Scissors! Make your choice!");
+             } else {
+                 console.error("RockPaperScissors game script not loaded or init function missing!");
+                 displayGameMessage('System', 'Mrow! RPS Game failed to load...');
              }
         }
 
         function clearGameAreaContent() {
             if (gameArea) {
-                // Preserve essential elements if needed, otherwise clear all
-                // For now, let's clear everything. If persistent game elements are needed, adjust this.
                 gameArea.innerHTML = '';
             }
         }
@@ -1077,31 +1169,29 @@
 
         // --- API Call & Message Handling ---
         async function handleSendMessage() {
-             if (isGameActive) { // Don't send chat messages while game is active
+             if (isGameActive) {
                  console.log("Chat input blocked while game is active.");
                  return;
              }
              if (!chatInput || !currentApiKey || isMikaTyping) return;
-             const messageText = chatInput.value.trim(); const userNameForApi = currentUserName || "Study Buddy";
+             const messageText = chatInput.value.trim();
              if (!messageText) return;
              appendMessage('user', messageText); currentChatHistory.push({ role: 'user', parts: [{ text: messageText }] });
              chatInput.value = ''; isMikaTyping = true; disableChatInput(); showTypingIndicator();
              if (currentChatHistory.length > MAX_HISTORY_LENGTH) { currentChatHistory = currentChatHistory.slice(-MAX_HISTORY_LENGTH); console.log("Chat history pruned."); }
              try {
-                 // Make sure to pass the correct user name to the API
-                 const mikaResponse = await sendMessageToMika(messageText, currentChatHistory, currentApiKey, currentUserName);
+                 const userNameForApi = currentUserName || "Study Buddy"; // Use current user name
+                 const mikaResponse = await sendMessageToMika(messageText, currentChatHistory, currentApiKey, userNameForApi);
                  removeTypingIndicator(); appendMessage('Mika', mikaResponse); currentChatHistory.push({ role: 'model', parts: [{ text: mikaResponse }] });
-                 saveAllChats(); // Save after successful response
+                 saveAllChats();
              } catch (error) {
                  console.error("Error in handleSendMessage:", error); removeTypingIndicator();
-                 // Pass user name here too for error message consistency
                  appendMessage('system', error.message || `Mrow! Something went wrong, ${currentUserName}... Mika can't talk right now. ;_;`);
              } finally {
                  isMikaTyping = false;
-                 // Re-enable input only if chat view is active and API key exists
                  if (!isGameActive && currentApiKey) { enableChatInput(); if (chatInput) chatInput.focus(); }
                  else if (!currentApiKey) { disableChatInput("API Key needed!"); }
-                 else { disableChatInput("Game Active"); } // Keep disabled if game is active
+                 else { disableChatInput("Game Active"); }
              }
         }
 
@@ -1109,31 +1199,26 @@
         // --- Initialization Flow ---
         function proceedToChat() {
             if (!chatContainer) return;
-            chatContainer.style.display = 'flex'; // Show main container
+            chatContainer.style.display = 'flex';
             switchToChatView(); // Ensure chat area is shown initially
             const mostRecentChatId = loadAllChats();
-            // No need to clear display here, loadChat/startNewChat handle it
             updateInputPlaceholder();
             if (mostRecentChatId) { loadChat(mostRecentChatId); }
             else { startNewChat(true); }
             updateChatTitle(); updateHistoryDropdown();
-            // Check if we should show the install prompt now that chat is visible
+             // Check if we should show the install prompt now that chat is visible
              if (deferredInstallPrompt && !hasInstallPromptBeenShown()) {
-                 console.log("Showing deferred install prompt now.");
+                 console.log("Showing deferred install prompt now chat is visible.");
                  installPopup.style.display = 'flex';
              }
         }
-
         function checkNameAndProceed() {
             const storedName = loadUserName();
             if (storedName) {
                 currentUserName = storedName; if (namePopup) namePopup.style.display = 'none';
-                // Don't call proceedToChat here yet, wait for API key check
-                // updateInputPlaceholder(); // Called later
-                checkApiKeyAndProceed(); // Move API check here
+                checkApiKeyAndProceed();
             } else {
                 if (namePopup && nameInput) {
-                    // Make sure other popups are hidden if name popup shown
                     if(apiKeyPopup) apiKeyPopup.style.display = 'none';
                     if(disclaimerPopup) disclaimerPopup.style.display = 'none';
                     nameInput.value = "Study Buddy";
@@ -1142,18 +1227,15 @@
                 }
             }
         }
-
         function checkApiKeyAndProceed() {
             const loadedKey = loadApiKey();
             if (loadedKey) {
                 currentApiKey = loadedKey; if (apiKeyPopup) apiKeyPopup.style.display = 'none';
-                proceedToChat(); // API key exists, now proceed to show chat/load history
+                proceedToChat();
             } else {
                 if (apiKeyPopup && chatContainer && apiKeyInput) {
-                    // Make sure other popups are hidden if API popup shown
                      if (namePopup) namePopup.style.display = 'none';
                      if(disclaimerPopup) disclaimerPopup.style.display = 'none';
-                     // Ensure main container is hidden until API key is provided
                      chatContainer.style.display = 'none';
                      apiKeyPopup.style.display = 'flex';
                      disableChatInput("API Key needed!");
@@ -1161,25 +1243,17 @@
                 }
             }
         }
-
-        // ** ADJUSTED ** Initialization starts here
         function initializeApp() {
             registerServiceWorker();
-            setupInstallPromptHandler(); // Setup install prompt listeners early
-
-            // 1. Apply saved theme preference FIRST
+            setupInstallPromptHandler();
             const savedTheme = loadThemePreference();
-            applyTheme(savedTheme || 'light'); // Default to light
-
-            // 2. Check Disclaimer agreement
+            applyTheme(savedTheme || 'light');
             if (hasAgreedToDisclaimer()) {
                 console.log("Disclaimer already agreed to.");
-                // 3. Proceed to check Name (which then checks API key)
                 checkNameAndProceed();
             } else {
                 console.log("Showing disclaimer popup.");
                  if (disclaimerPopup) disclaimerPopup.style.display = 'flex';
-                 // Ensure others are hidden
                  if (apiKeyPopup) apiKeyPopup.style.display = 'none';
                  if (namePopup) namePopup.style.display = 'none';
                  if (chatContainer) chatContainer.style.display = 'none';
@@ -1189,16 +1263,12 @@
         }
 
         // --- Event Listeners ---
-
-        // Disclaimer Agreement
         if (disclaimerAgreeButton) {
             disclaimerAgreeButton.addEventListener('click', () => {
                 saveDisclaimerAgreement(); if (disclaimerPopup) disclaimerPopup.style.display = 'none';
-                checkNameAndProceed(); // Start name check after disclaimer
+                checkNameAndProceed();
             });
         }
-
-        // API Key Save
         if (saveApiKeyButton) {
             saveApiKeyButton.addEventListener('click', () => {
                 if (!apiKeyInput) return; const key = apiKeyInput.value.trim();
@@ -1207,7 +1277,7 @@
                          currentApiKey = key;
                          if (apiKeyPopup) apiKeyPopup.style.display = 'none';
                          if (apiKeyError) apiKeyError.style.display = 'none';
-                         proceedToChat(); // API key saved, now show chat
+                         proceedToChat();
                     }
                     else { if (apiKeyError) { apiKeyError.textContent = "Mrow! Couldn't save the key... is storage full?"; apiKeyError.style.display = 'block'; } }
                 } else { if (apiKeyError) { apiKeyError.textContent = "Meeeow! You need to paste a key in here!"; apiKeyError.style.display = 'block'; } }
@@ -1216,8 +1286,6 @@
         if (apiKeyInput) {
             apiKeyInput.addEventListener('keypress', (event) => { if (event.key === 'Enter') saveApiKeyButton?.click(); if (apiKeyError && apiKeyError.style.display === 'block') apiKeyError.style.display = 'none'; });
         }
-
-        // Name Save
         if (saveNameButton) {
              saveNameButton.addEventListener('click', () => {
                 if (!nameInput) return; const name = nameInput.value.trim();
@@ -1226,8 +1294,7 @@
                         currentUserName = name;
                         if (namePopup) namePopup.style.display = 'none';
                         if (nameError) nameError.style.display = 'none';
-                        // updateInputPlaceholder(); // Called later by proceedToChat
-                        checkApiKeyAndProceed(); // Name saved, now check/prompt for API key
+                        checkApiKeyAndProceed();
                     }
                     else { if (nameError) { nameError.textContent = "Mrow! Couldn't save the name... storage issue?"; nameError.style.display = 'block'; } }
                 } else { if (nameError) { nameError.textContent = "Please enter a name!"; nameError.style.display = 'block'; } }
@@ -1236,46 +1303,39 @@
         if (nameInput) {
              nameInput.addEventListener('keypress', (event) => { if (event.key === 'Enter') saveNameButton?.click(); if (nameError && nameError.style.display === 'block') nameError.style.display = 'none'; });
         }
-
-        // Send Message
         if (sendButton) sendButton.addEventListener('click', handleSendMessage);
         if (chatInput) {
             chatInput.addEventListener('keypress', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleSendMessage(); } });
         }
-
-        // New Chat Button
         if (newChatButton) newChatButton.addEventListener('click', () => startNewChat(true));
-
-        // History Button
         if (historyButton) {
              historyButton.addEventListener('click', (event) => {
                  event.stopPropagation(); toggleDropdown(historyDropdown);
              });
         }
-
-        // ** NEW ** Games Button
         if (gamesButton) {
             gamesButton.addEventListener('click', (event) => {
                 event.stopPropagation(); toggleDropdown(gamesDropdown);
             });
         }
-
-        // Settings Button
         if (settingsButton) {
             settingsButton.addEventListener('click', (event) => {
                  event.stopPropagation(); toggleDropdown(settingsDropdown);
             });
         }
-
-        // ** NEW ** Game Selection Button Listeners
+        // Game Selection Button Listeners
         if (gameTttButton) {
             gameTttButton.addEventListener('click', () => {
-                console.log("Tic-Tac-Toe button clicked!");
-                closeAllDropdowns(); // Close the dropdown first
-                loadTicTacToe(); // Load and switch to the game view
+                closeAllDropdowns();
+                loadTicTacToe();
             });
         }
-
+        if (gameRpsButton) {
+            gameRpsButton.addEventListener('click', () => {
+                closeAllDropdowns();
+                loadRPS();
+            });
+        }
         // Settings Dropdown Button Listeners
         if (settingsInstallButton) {
             settingsInstallButton.addEventListener('click', handleManualInstall);
@@ -1287,18 +1347,13 @@
              settingsResetButton.addEventListener('click', () => {
                  closeAllDropdowns();
                  if (confirm(`⚠️ Reset Settings for ${currentUserName}? This clears API Key, Name, Disclaimer, Theme, and Install Prompt status, then reloads the page. Are you absolutely sure, Master?!`)) {
-                     clearApiKey();
-                     clearUserName();
-                     clearDisclaimerAgreement();
-                     clearInstallPromptShown();
-                     clearThemePreference();
+                     clearApiKey(); clearUserName(); clearDisclaimerAgreement();
+                     clearInstallPromptShown(); clearThemePreference();
                      clearFromLocalStorage('mikaHelper_allChats');
                      window.location.reload();
                  }
              });
         }
-
-
         // Close dropdowns when clicking outside
          document.addEventListener('click', (event) => {
              if (historyDropdown && historyDropdown.style.display === 'block' && !historyDropdown.contains(event.target) && event.target !== historyButton) {
@@ -1316,9 +1371,9 @@
         initializeApp();
 
         // Auto-save chats when the window is closed/reloaded
-         window.addEventListener('beforeunload', saveAllChats);
+        window.addEventListener('beforeunload', saveAllChats);
 
-        // Nyaa~! Ready for games, Master! ♡
+        // Nyaa~! Ready for even MORE games, Master! ♡
 
     </script>
 
