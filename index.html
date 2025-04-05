@@ -466,7 +466,7 @@
             max-width: 350px; /* Max width */
         }
 
-        /* ** NEW ** Guess The Number Styles */
+        /* Guess The Number Styles */
         #gtn-input {
              padding: 8px 12px;
              border: 1px solid var(--input-border, #ccc);
@@ -478,59 +478,52 @@
              font-size: 1em;
              margin-right: 5px; /* Space before button */
         }
-        /* Style for number input arrows (optional) */
         #gtn-input::-webkit-outer-spin-button,
-        #gtn-input::-webkit-inner-spin-button {
-          -webkit-appearance: none;
-          margin: 0;
-        }
-        #gtn-input[type=number] {
-          -moz-appearance: textfield; /* Firefox */
-        }
-
-        #gtn-submit {
-            /* Using .rps-choice-button class now */
-             padding: 8px 15px; /* Adjust if needed */
-        }
-
-        #gtn-feedback {
-            min-height: 20px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            text-align: center;
-            font-size: 1.1em; /* Slightly larger feedback */
-            color: var(--game-cell-text); /* Default color */
-            transition: color 0.3s ease;
-        }
-        /* Optional feedback type styling */
+        #gtn-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        #gtn-input[type=number] { -moz-appearance: textfield; }
+        #gtn-submit { padding: 8px 15px; }
+        #gtn-feedback { min-height: 20px; font-weight: bold; margin-bottom: 5px; text-align: center; font-size: 1.1em; color: var(--game-cell-text); transition: color 0.3s ease; }
         .gtn-feedback-win { color: var(--mika-message-name, #f06292); }
         .gtn-feedback-lose { color: var(--error-color, #c62828); }
         .gtn-feedback-error { color: var(--error-color, #c62828); }
         .gtn-feedback-warn { color: orange; }
         .gtn-feedback-info { color: var(--game-cell-text); }
+        #gtn-indicator { padding: 5px 15px; border-radius: 15px; color: white; font-weight: bold; text-align: center; display: inline-block; min-width: 160px; margin-bottom: 10px; transition: background-color 0.5s ease, opacity 0.5s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        #gtn-guesses-left { margin-bottom: 15px; text-align: center; color: var(--system-message-text); font-size: 0.9em; }
+        #gtn-new-game { margin-top: 10px; }
 
-
-        #gtn-indicator {
-            padding: 5px 15px; /* More padding */
-            border-radius: 15px;
-            color: white; /* Text always white? */
-            font-weight: bold;
-            text-align: center;
-            display: inline-block;
-            min-width: 160px; /* Wider */
-            margin-bottom: 10px;
-            transition: background-color 0.5s ease, opacity 0.5s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        /* ** NEW ** 20 Questions Styles */
+        #tq-question-input, #tq-guess-input {
+             padding: 8px 12px;
+             border: 1px solid var(--input-border, #ccc);
+             border-radius: 5px;
+             width: calc(80% - 70px); /* Adjust width based on button size */
+             max-width: 300px; /* Limit max width */
+             margin-right: 5px;
+             background-color: var(--input-bg);
+             color: var(--text-color);
+             font-size: 0.95em; /* Slightly smaller font */
+             display: inline-block; /* Align with button */
+             vertical-align: middle;
         }
 
-        #gtn-guesses-left {
-            margin-bottom: 15px;
-            text-align: center;
-            color: var(--system-message-text); /* Use system color */
-            font-size: 0.9em;
+        #tq-ask-button, #tq-guess-button {
+             /* Using .rps-choice-button class now */
+             padding: 8px 10px; /* Slightly less padding */
+             font-size: 0.9em;
+             display: inline-block;
+             vertical-align: middle;
         }
 
-        #gtn-new-game {
+        #tq-questions-left {
+             margin-bottom: 20px;
+             text-align: center;
+             font-size: 1.1em;
+             color: var(--system-message-text); /* Default color */
+             transition: color 0.3s ease, font-weight 0.3s ease;
+        }
+
+        #tq-new-game {
              /* Uses .rps-choice-button class */
              margin-top: 10px;
         }
@@ -626,6 +619,9 @@
               #gtn-input { width: 100px; font-size: 0.9em; }
               #gtn-submit { font-size: 0.9em; padding: 8px 10px; }
               #gtn-indicator { min-width: 140px; font-size: 0.9em; }
+             #tq-question-input, #tq-guess-input { width: calc(100% - 80px); max-width: 250px; font-size: 0.9em; }
+             #tq-ask-button, #tq-guess-button { font-size: 0.85em; padding: 8px; }
+             #tq-questions-left { font-size: 1em; }
              #game-message-log { max-width: 100%; height: 100px; } /* Adjust height */
              #ttt-reset-button, #back-to-chat-button { font-size: 0.85em; padding: 6px 15px; }
          }
@@ -703,8 +699,9 @@
                <div id="games-dropdown" class="dropdown-menu">
                    <button id="game-ttt-button" title="Play Tic-Tac-Toe with Mika!">Tic-Tac-Toe ♡</button>
                    <button id="game-rps-button" title="Play Rock Paper Scissors!">Rock Paper Scissors!</button>
-                   <!-- ** NEW ** GTN Button -->
                    <button id="game-gtn-button" title="Play Guess The Number!">Guess The Number~</button>
+                   <!-- ** NEW ** 20Q Button -->
+                   <button id="game-20q-button" title="Play 20 Questions!">20 Questions? Hehe!</button>
                    <p class="no-items" style="display: none;">More games soon~!</p>
                </div>
               <!-- Settings Dropdown -->
@@ -738,12 +735,13 @@
     <!-- Include the GAME scripts -->
     <script src="games.js"></script> <!-- Tic Tac Toe -->
     <script src="rps.js"></script> <!-- Rock Paper Scissors -->
-    <script src="guess_number.js"></script> <!-- ** NEW ** Guess The Number -->
+    <script src="guess_number.js"></script> <!-- Guess The Number -->
+    <script src="twenty_questions.js"></script> <!-- ** NEW ** 20 Questions -->
     <!-- Include the API script -->
     <script src="api.js"></script>
 
     <script>
-        // Nyaa~! Homework Helper Mika with even MORE Games! ♡
+        // Nyaa~! Homework Helper Mika with ALL the Games! ♡
 
         // --- DOM Elements ---
         const bodyElement = document.body;
@@ -778,7 +776,8 @@
         const gamesDropdown = document.getElementById('games-dropdown');
         const gameTttButton = document.getElementById('game-ttt-button');
         const gameRpsButton = document.getElementById('game-rps-button');
-        const gameGtnButton = document.getElementById('game-gtn-button'); // ** NEW ** GTN Button
+        const gameGtnButton = document.getElementById('game-gtn-button');
+        const game20qButton = document.getElementById('game-20q-button'); // ** NEW ** 20Q Button
         const settingsInstallButton = document.getElementById('settings-install-button');
         const settingsThemeButton = document.getElementById('settings-theme-button');
         const settingsResetButton = document.getElementById('settings-reset-button');
@@ -878,6 +877,7 @@
         function loadTicTacToe() { switchToGameView(); const ui = setupGameAreaBase('Tic-Tac-Toe with Mika! ♡'); if (ui && typeof TicTacToe !== 'undefined' && TicTacToe.init) { const board = document.createElement('div'); board.id = 'ttt-board'; ui.appendChild(board); TicTacToe.init(board, displayGameMessage); displayGameMessage('System', "Game loaded! You go first (X)!"); } else { console.error("TTT load failed"); displayGameMessage('System', 'Mrow! TTT Game failed...'); } }
         function loadRPS() { switchToGameView(); const ui = setupGameAreaBase('Rock Paper Scissors! ♡'); if (ui && typeof RockPaperScissors !== 'undefined' && RockPaperScissors.init) { RockPaperScissors.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); displayGameMessage('System', "Rock Paper Scissors! Make your choice!"); } else { console.error("RPS load failed"); displayGameMessage('System', 'Mrow! RPS Game failed...'); } }
         function loadGuessTheNumber() { switchToGameView(); const ui = setupGameAreaBase('Guess My Number~ ♡'); if (ui && typeof GuessTheNumber !== 'undefined' && GuessTheNumber.init) { GuessTheNumber.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("GTN load failed"); displayGameMessage('System', 'Mrow! GTN Game failed...'); } }
+        function loadTwentyQuestions() { switchToGameView(); const ui = setupGameAreaBase('20 Questions! ♡'); if (ui && typeof TwentyQuestions !== 'undefined' && TwentyQuestions.init) { TwentyQuestions.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("20Q load failed"); displayGameMessage('System', 'Mrow! 20 Questions Game failed...'); } }
         function clearGameAreaContent() { if (gameArea) gameArea.innerHTML = ''; }
 
         // --- API Call & Message Handling ---
@@ -905,6 +905,7 @@
         if (gameTttButton) gameTttButton.addEventListener('click', () => { closeAllDropdowns(); loadTicTacToe(); });
         if (gameRpsButton) gameRpsButton.addEventListener('click', () => { closeAllDropdowns(); loadRPS(); });
         if (gameGtnButton) gameGtnButton.addEventListener('click', () => { closeAllDropdowns(); loadGuessTheNumber(); });
+        if (game20qButton) game20qButton.addEventListener('click', () => { closeAllDropdowns(); loadTwentyQuestions(); }); // ** NEW **
         // Settings Dropdown Listeners
         if (settingsInstallButton) settingsInstallButton.addEventListener('click', handleManualInstall);
         if (settingsThemeButton) settingsThemeButton.addEventListener('click', toggleTheme);
@@ -918,7 +919,7 @@
         // Auto-save chats
         window.addEventListener('beforeunload', saveAllChats);
 
-        // Nyaa~! Ready! ♡
+        // Nyaa~! ♡
     </script>
 
 </body>
