@@ -466,6 +466,75 @@
             max-width: 350px; /* Max width */
         }
 
+        /* ** NEW ** Guess The Number Styles */
+        #gtn-input {
+             padding: 8px 12px;
+             border: 1px solid var(--input-border, #ccc);
+             border-radius: 5px;
+             width: 150px;
+             background-color: var(--input-bg); /* Match theme */
+             color: var(--text-color); /* Match theme */
+             text-align: center;
+             font-size: 1em;
+             margin-right: 5px; /* Space before button */
+        }
+        /* Style for number input arrows (optional) */
+        #gtn-input::-webkit-outer-spin-button,
+        #gtn-input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        #gtn-input[type=number] {
+          -moz-appearance: textfield; /* Firefox */
+        }
+
+        #gtn-submit {
+            /* Using .rps-choice-button class now */
+             padding: 8px 15px; /* Adjust if needed */
+        }
+
+        #gtn-feedback {
+            min-height: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-align: center;
+            font-size: 1.1em; /* Slightly larger feedback */
+            color: var(--game-cell-text); /* Default color */
+            transition: color 0.3s ease;
+        }
+        /* Optional feedback type styling */
+        .gtn-feedback-win { color: var(--mika-message-name, #f06292); }
+        .gtn-feedback-lose { color: var(--error-color, #c62828); }
+        .gtn-feedback-error { color: var(--error-color, #c62828); }
+        .gtn-feedback-warn { color: orange; }
+        .gtn-feedback-info { color: var(--game-cell-text); }
+
+
+        #gtn-indicator {
+            padding: 5px 15px; /* More padding */
+            border-radius: 15px;
+            color: white; /* Text always white? */
+            font-weight: bold;
+            text-align: center;
+            display: inline-block;
+            min-width: 160px; /* Wider */
+            margin-bottom: 10px;
+            transition: background-color 0.5s ease, opacity 0.5s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        #gtn-guesses-left {
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--system-message-text); /* Use system color */
+            font-size: 0.9em;
+        }
+
+        #gtn-new-game {
+             /* Uses .rps-choice-button class */
+             margin-top: 10px;
+        }
+
 
         /* Shared Game Message Log */
         #game-message-log {
@@ -554,6 +623,9 @@
              #ttt-board { width: 180px; height: 180px; } /* Smaller board */
              .ttt-cell { font-size: 1.8em; }
              .rps-choice-button { font-size: 1em; padding: 8px 15px; }
+              #gtn-input { width: 100px; font-size: 0.9em; }
+              #gtn-submit { font-size: 0.9em; padding: 8px 10px; }
+              #gtn-indicator { min-width: 140px; font-size: 0.9em; }
              #game-message-log { max-width: 100%; height: 100px; } /* Adjust height */
              #ttt-reset-button, #back-to-chat-button { font-size: 0.85em; padding: 6px 15px; }
          }
@@ -622,20 +694,18 @@
              <div class="header-buttons">
                  <button id="history-button" class="header-button" title="View Past Chats">History</button>
                  <button id="new-chat-button" class="header-button" title="Start a New Chat">New Chat</button>
-                 <!-- ** NEW ** Games Button -->
                  <button id="games-button" class="header-button" title="Play Games!">🎮 Games</button>
                  <button id="settings-button" class="header-button" title="Settings">⚙️ Settings</button>
              </div>
               <!-- Chat History Dropdown -->
-              <div id="history-dropdown" class="dropdown-menu">
-                   <!-- History items will be added here -->
-              </div>
+              <div id="history-dropdown" class="dropdown-menu"></div>
                <!-- Games Dropdown -->
                <div id="games-dropdown" class="dropdown-menu">
                    <button id="game-ttt-button" title="Play Tic-Tac-Toe with Mika!">Tic-Tac-Toe ♡</button>
-                   <!-- ** NEW ** RPS Button -->
                    <button id="game-rps-button" title="Play Rock Paper Scissors!">Rock Paper Scissors!</button>
-                   <p class="no-items" style="display: none;">More games soon~!</p> <!-- Placeholder -->
+                   <!-- ** NEW ** GTN Button -->
+                   <button id="game-gtn-button" title="Play Guess The Number!">Guess The Number~</button>
+                   <p class="no-items" style="display: none;">More games soon~!</p>
                </div>
               <!-- Settings Dropdown -->
               <div id="settings-dropdown" class="dropdown-menu">
@@ -645,12 +715,11 @@
               </div>
          </div>
 
-         <!-- ** NEW ** Main Content Area Wrapper -->
+         <!-- Main Content Area Wrapper -->
          <div id="main-content-area">
-
-             <!-- ** MOVED ** Chat Area -->
+             <!-- Chat Area -->
              <div id="chat-area">
-                 <div id="chat-log">
+                <div id="chat-log">
                      <!-- Messages appear here -->
                      <p class="system-message">Initializing...</p>
                  </div>
@@ -659,130 +728,93 @@
                      <button id="send-button" disabled>Send</button>
                  </div>
              </div>
-
-             <!-- ** NEW ** Game Area -->
+             <!-- Game Area -->
              <div id="game-area">
-                 <!-- Game content will be loaded here by JS -->
+                 <!-- Game content loaded here -->
              </div>
-
-         </div> <!-- End main-content-area -->
-
-    </div> <!-- End chat-container -->
+         </div>
+    </div>
 
     <!-- Include the GAME scripts -->
     <script src="games.js"></script> <!-- Tic Tac Toe -->
-    <script src="rps.js"></script> <!-- ** NEW ** Rock Paper Scissors -->
+    <script src="rps.js"></script> <!-- Rock Paper Scissors -->
+    <script src="guess_number.js"></script> <!-- ** NEW ** Guess The Number -->
     <!-- Include the API script -->
     <script src="api.js"></script>
 
     <script>
-        // Nyaa~! Homework Helper Mika with MORE Games! ♡
+        // Nyaa~! Homework Helper Mika with even MORE Games! ♡
 
         // --- DOM Elements ---
         const bodyElement = document.body;
         const themeColorMeta = document.getElementById('theme-color-meta');
-
-        // Disclaimer elements
         const disclaimerPopup = document.getElementById('disclaimer-popup');
         const disclaimerAgreeButton = document.getElementById('disclaimer-agree-button');
-
-        // API Key elements
         const apiKeyPopup = document.getElementById('api-key-popup');
         const apiKeyInput = document.getElementById('api-key-input');
         const saveApiKeyButton = document.getElementById('save-api-key-button');
         const apiKeyError = document.getElementById('api-key-error');
-
-        // Name elements
         const namePopup = document.getElementById('name-popup');
         const nameInput = document.getElementById('name-input');
         const saveNameButton = document.getElementById('save-name-button');
         const nameError = document.getElementById('name-error');
-
-        // PWA Install elements
         const installPopup = document.getElementById('install-popup');
-        const installButton = document.getElementById('install-button'); // In the initial popup
+        const installButton = document.getElementById('install-button');
         const installLaterButton = document.getElementById('install-later-button');
-
-        // Chat elements
         const chatContainer = document.getElementById('chat-container');
         const chatTitle = document.getElementById('chat-title');
-
-        // ** NEW/ADJUSTED ** Content Area elements
         const mainContentArea = document.getElementById('main-content-area');
-        const chatArea = document.getElementById('chat-area'); // Wrapper for log+input
-        const gameArea = document.getElementById('game-area'); // Wrapper for games
-
-        // Chat Log & Input (now potentially inside chatArea)
+        const chatArea = document.getElementById('chat-area');
+        const gameArea = document.getElementById('game-area');
         const chatLog = document.getElementById('chat-log');
         const chatInput = document.getElementById('chat-input');
         const sendButton = document.getElementById('send-button');
-
-        // Header buttons
         const settingsButton = document.getElementById('settings-button');
         const newChatButton = document.getElementById('new-chat-button');
         const historyButton = document.getElementById('history-button');
         const gamesButton = document.getElementById('games-button');
-
-        // Dropdowns
         const historyDropdown = document.getElementById('history-dropdown');
         const settingsDropdown = document.getElementById('settings-dropdown');
         const gamesDropdown = document.getElementById('games-dropdown');
-
-        // ** UPDATED ** Games Dropdown Buttons
         const gameTttButton = document.getElementById('game-ttt-button');
-        const gameRpsButton = document.getElementById('game-rps-button'); // ** NEW ** RPS Button
-
-        // Settings Dropdown Buttons (unchanged references)
+        const gameRpsButton = document.getElementById('game-rps-button');
+        const gameGtnButton = document.getElementById('game-gtn-button'); // ** NEW ** GTN Button
         const settingsInstallButton = document.getElementById('settings-install-button');
         const settingsThemeButton = document.getElementById('settings-theme-button');
         const settingsResetButton = document.getElementById('settings-reset-button');
-
-        // We still need a reference to create the delete history button dynamically
         const deleteAllHistoryButtonTemplate = document.createElement('button');
         deleteAllHistoryButtonTemplate.className = 'delete-history';
         deleteAllHistoryButtonTemplate.textContent = 'Delete ALL History';
         deleteAllHistoryButtonTemplate.title = 'Permanently delete all saved chats!';
 
-
         // --- Chat State & Config ---
         let currentChatHistory = [];
         let isMikaTyping = false;
         let currentApiKey = null;
-        let currentUserName = "Study Buddy"; // Default name
+        let currentUserName = "Study Buddy";
         let allChats = {};
         let currentChatId = null;
-        const MAX_HISTORY_LENGTH = 16; // Keep last 8 pairs
+        const MAX_HISTORY_LENGTH = 16;
         let deferredInstallPrompt = null;
         const DISCLAIMER_AGREED_KEY = 'mikaDisclaimerAgreed_v1';
         const THEME_PREFERENCE_KEY = 'mikaThemePreference_v1';
-        const INSTALL_PROMPT_SHOWN_KEY = 'mikaInstallPromptShown'; // Use constant
+        const INSTALL_PROMPT_SHOWN_KEY = 'mikaInstallPromptShown';
 
         // --- Game State ---
-        let isGameActive = false; // Track if we are in game view
+        let isGameActive = false;
 
         // --- Utility Functions ---
         const getTimestamp = () => Date.now();
         const sanitizeHTML = (str) => {
             const temp = document.createElement('div');
             temp.textContent = str;
-            // Basic sanitization, replace potential script tags (though textContent usually handles this)
             return temp.innerHTML.replace(/<script.*?>.*?<\/script>/gi, '');
         };
 
         // --- Local Storage Functions ---
-        function saveToLocalStorage(key, value) {
-            try { localStorage.setItem(key, value); console.log(`Saved ${key}`); return true; }
-            catch (e) { console.error(`Failed to save ${key}:`, e); return false; }
-        }
-        function loadFromLocalStorage(key) {
-            try { const value = localStorage.getItem(key); if (value) { console.log(`Loaded ${key}`); return value; } }
-            catch (e) { console.error(`Failed to load ${key}:`, e); }
-            console.log(`No ${key} found.`); return null;
-        }
-        function clearFromLocalStorage(key) {
-             try { localStorage.removeItem(key); console.log(`Cleared ${key}`); }
-             catch (e) { console.error(`Failed to clear ${key}:`, e); }
-        }
+        function saveToLocalStorage(key, value) { try { localStorage.setItem(key, value); console.log(`Saved ${key}`); return true; } catch (e) { console.error(`Failed to save ${key}:`, e); return false; } }
+        function loadFromLocalStorage(key) { try { const value = localStorage.getItem(key); if (value) { console.log(`Loaded ${key}`); return value; } } catch (e) { console.error(`Failed to load ${key}:`, e); } console.log(`No ${key} found.`); return null; }
+        function clearFromLocalStorage(key) { try { localStorage.removeItem(key); console.log(`Cleared ${key}`); } catch (e) { console.error(`Failed to clear ${key}:`, e); } }
         const saveApiKey = (key) => saveToLocalStorage('geminiApiKey_mikaHelper', key);
         const loadApiKey = () => loadFromLocalStorage('geminiApiKey_mikaHelper');
         const clearApiKey = () => clearFromLocalStorage('geminiApiKey_mikaHelper');
@@ -800,141 +832,23 @@
         const clearThemePreference = () => clearFromLocalStorage(THEME_PREFERENCE_KEY);
 
         // Chat history functions
-        function saveAllChats() {
-            try {
-                if (currentChatId && currentChatHistory.length > 0) { allChats[currentChatId] = currentChatHistory; }
-                if (Object.keys(allChats).length > 0) { saveToLocalStorage('mikaHelper_allChats', JSON.stringify(allChats)); }
-                else { clearFromLocalStorage('mikaHelper_allChats'); }
-            } catch (e) { console.error("Failed to save chats:", e); }
-        }
-        function loadAllChats() {
-             try {
-                const storedChats = loadFromLocalStorage('mikaHelper_allChats');
-                if (storedChats) {
-                    allChats = JSON.parse(storedChats);
-                    const chatIds = Object.keys(allChats).sort((a, b) => b - a); // Most recent first
-                    if (chatIds.length > 0) return chatIds[0];
-                }
-            } catch (e) {
-                console.error("Failed to parse chats from localStorage:", e);
-                allChats = {}; clearFromLocalStorage('mikaHelper_allChats');
-            }
-            return null;
-        }
-         function deleteAllChats() {
-             if (confirm(`Hey ${currentUserName}! Are you SURE you want to delete ALL our chat history forever?! (ฅΦωΦฅ);; This can't be undone!`)) {
-                 clearFromLocalStorage('mikaHelper_allChats');
-                 allChats = {};
-                 startNewChat(false);
-                 updateHistoryDropdown();
-                 appendMessage('system', "All chat history deleted. It's like we just met again, nyaa~!");
-                 console.log("All chat history deleted.");
-                 closeAllDropdowns();
-             }
-         }
+        function saveAllChats() { try { if (currentChatId && currentChatHistory.length > 0) { allChats[currentChatId] = currentChatHistory; } if (Object.keys(allChats).length > 0) { saveToLocalStorage('mikaHelper_allChats', JSON.stringify(allChats)); } else { clearFromLocalStorage('mikaHelper_allChats'); } } catch (e) { console.error("Failed to save chats:", e); } }
+        function loadAllChats() { try { const storedChats = loadFromLocalStorage('mikaHelper_allChats'); if (storedChats) { allChats = JSON.parse(storedChats); const chatIds = Object.keys(allChats).sort((a, b) => b - a); if (chatIds.length > 0) return chatIds[0]; } } catch (e) { console.error("Failed to parse chats:", e); allChats = {}; clearFromLocalStorage('mikaHelper_allChats'); } return null; }
+        function deleteAllChats() { if (confirm(`Hey ${currentUserName}! Are you SURE you want to delete ALL our chat history forever?! (ฅΦωΦฅ);; This can't be undone!`)) { clearFromLocalStorage('mikaHelper_allChats'); allChats = {}; startNewChat(false); updateHistoryDropdown(); appendMessage('system', "All chat history deleted. It's like we just met again, nyaa~!"); console.log("All chat history deleted."); closeAllDropdowns(); } }
 
         // --- Theme Functions ---
-        function applyTheme(theme) {
-            if (theme === 'dark') {
-                bodyElement.classList.add('dark-mode');
-                settingsThemeButton.textContent = "☀️ Switch to Light Mode";
-                themeColorMeta.content = '#2c1f30';
-            } else {
-                bodyElement.classList.remove('dark-mode');
-                settingsThemeButton.textContent = "🌙 Switch to Dark Mode";
-                themeColorMeta.content = '#d81b60';
-            }
-            console.log(`Theme applied: ${theme}`);
-        }
-        function toggleTheme() {
-            const currentTheme = bodyElement.classList.contains('dark-mode') ? 'dark' : 'light';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            applyTheme(newTheme);
-            saveThemePreference(newTheme);
-            closeAllDropdowns();
-        }
+        function applyTheme(theme) { if (theme === 'dark') { bodyElement.classList.add('dark-mode'); settingsThemeButton.textContent = "☀️ Switch to Light Mode"; themeColorMeta.content = '#2c1f30'; } else { bodyElement.classList.remove('dark-mode'); settingsThemeButton.textContent = "🌙 Switch to Dark Mode"; themeColorMeta.content = '#d81b60'; } console.log(`Theme applied: ${theme}`); }
+        function toggleTheme() { const currentTheme = bodyElement.classList.contains('dark-mode') ? 'dark' : 'light'; const newTheme = currentTheme === 'dark' ? 'light' : 'dark'; applyTheme(newTheme); saveThemePreference(newTheme); closeAllDropdowns(); }
 
         // --- PWA Install Functions ---
-        function setupInstallPromptHandler() {
-            window.addEventListener('beforeinstallprompt', (event) => {
-                event.preventDefault();
-                deferredInstallPrompt = event;
-                console.log('`beforeinstallprompt` event fired and stored.');
-                if (settingsInstallButton) settingsInstallButton.disabled = false;
-                if (!hasInstallPromptBeenShown()) {
-                     if (chatContainer.style.display === 'flex' && !isGameActive) { // Only show if chat is visible
-                         installPopup.style.display = 'flex';
-                     } else {
-                         console.log("Deferring initial install prompt until main chat is visible.");
-                     }
-                } else {
-                    console.log('Initial install prompt already shown/dismissed.');
-                }
-            });
-            installButton.addEventListener('click', handleManualInstall);
-            installLaterButton.addEventListener('click', () => {
-                 installPopup.style.display = 'none';
-                 saveInstallPromptShown();
-                 console.log('User chose to install later from initial prompt.');
-             });
-            window.addEventListener('appinstalled', () => {
-               console.log('Mika PWA was installed!');
-               installPopup.style.display = 'none';
-               if (settingsInstallButton) settingsInstallButton.disabled = true;
-               deferredInstallPrompt = null;
-            });
-        }
-        async function handleManualInstall() {
-            if (installPopup.style.display === 'flex') installPopup.style.display = 'none';
-            closeAllDropdowns();
-            if (deferredInstallPrompt) {
-                 try {
-                    deferredInstallPrompt.prompt();
-                    const { outcome } = await deferredInstallPrompt.userChoice;
-                    console.log(`User response to the install prompt: ${outcome}`);
-                    if (outcome === 'accepted') {
-                        if (settingsInstallButton) settingsInstallButton.disabled = true;
-                    }
-                    saveInstallPromptShown();
-                 } catch (error) {
-                     console.error("Error triggering install prompt:", error);
-                     appendMessage('system', "Mrow! Couldn't show the install prompt... maybe try again?");
-                 }
-            } else {
-                console.log("Install prompt not available.");
-                appendMessage('system', "Looks like you've either already installed me, or your browser doesn't want to right now, nyaa~!");
-                if (settingsInstallButton) settingsInstallButton.disabled = true;
-            }
-        }
-        function registerServiceWorker() {
-             if ('serviceWorker' in navigator) {
-                 navigator.serviceWorker.register('sw.js')
-                 .then((registration) => console.log('Mika Service Worker registered:', registration.scope))
-                 .catch((error) => console.error('Mika Service Worker registration failed:', error));
-             } else { console.log("Service Workers not supported."); }
-         }
+        function setupInstallPromptHandler() { window.addEventListener('beforeinstallprompt', (event) => { event.preventDefault(); deferredInstallPrompt = event; console.log('`beforeinstallprompt` event fired.'); if (settingsInstallButton) settingsInstallButton.disabled = false; if (!hasInstallPromptBeenShown() && chatContainer.style.display === 'flex' && !isGameActive) { installPopup.style.display = 'flex'; } else { console.log("Install prompt deferred or already shown."); } }); installButton.addEventListener('click', handleManualInstall); installLaterButton.addEventListener('click', () => { installPopup.style.display = 'none'; saveInstallPromptShown(); console.log('User chose to install later.'); }); window.addEventListener('appinstalled', () => { console.log('Mika PWA installed!'); installPopup.style.display = 'none'; if (settingsInstallButton) settingsInstallButton.disabled = true; deferredInstallPrompt = null; }); }
+        async function handleManualInstall() { if (installPopup.style.display === 'flex') installPopup.style.display = 'none'; closeAllDropdowns(); if (deferredInstallPrompt) { try { deferredInstallPrompt.prompt(); const { outcome } = await deferredInstallPrompt.userChoice; console.log(`Install prompt outcome: ${outcome}`); if (outcome === 'accepted') { if (settingsInstallButton) settingsInstallButton.disabled = true; } saveInstallPromptShown(); } catch (error) { console.error("Error triggering install prompt:", error); appendMessage('system', "Mrow! Couldn't show the install prompt..."); } } else { console.log("Install prompt not available."); appendMessage('system', "Already installed or not available, nyaa~!"); if (settingsInstallButton) settingsInstallButton.disabled = true; } }
+        function registerServiceWorker() { if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').then((reg) => console.log('SW registered:', reg.scope)).catch((err) => console.error('SW registration failed:', err)); } else { console.log("Service Workers not supported."); } }
 
         // --- Chat Interface Functions ---
-        function appendMessage(sender, message, isHtml = false) {
-            if (!chatLog || !chatArea || chatArea.style.display === 'none') {
-                console.log("Skipped appending chat message while chat is hidden:", sender, message);
-                return;
-            }
-            const messageElement = document.createElement('p');
-            const sanitizedMessage = isHtml ? message : sanitizeHTML(message);
-            if (sender === 'user') {
-                messageElement.className = 'user-message';
-                messageElement.innerHTML = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${sanitizedMessage}`;
-            } else if (sender === 'Mika') {
-                messageElement.className = 'mika-message';
-                let processedMessage = sanitizedMessage.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>').replace(/```([\s\S]*?)```/g, (match, p1) => `<pre><code>${sanitizeHTML(p1.trim())}</code></pre>`).replace(/(?<!<br>)\n/g, '<br>');
-                messageElement.innerHTML = `<strong>Mika:</strong> ${processedMessage}`;
-            } else { messageElement.className = 'system-message'; messageElement.innerHTML = sanitizedMessage; }
-            chatLog.appendChild(messageElement);
-            scrollToBottom();
-        }
-        function showTypingIndicator() { if (!chatLog || !chatArea || chatArea.style.display === 'none') return; removeTypingIndicator(); const typingElement = document.createElement('p'); typingElement.className = 'typing-indicator'; typingElement.innerHTML = 'Mika is thinking... *purrrr*'; chatLog.appendChild(typingElement); scrollToBottom(); }
-        function removeTypingIndicator() { if (!chatLog || !chatArea || chatArea.style.display === 'none') return; const typingIndicator = chatLog.querySelector('.typing-indicator'); if (typingIndicator) typingIndicator.remove(); }
+        function appendMessage(sender, message, isHtml = false) { if (!chatLog || !chatArea || chatArea.style.display === 'none') { console.log("Skipped chat message:", sender); return; } const el = document.createElement('p'); const msg = isHtml ? message : sanitizeHTML(message); if (sender === 'user') { el.className = 'user-message'; el.innerHTML = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${msg}`; } else if (sender === 'Mika') { el.className = 'mika-message'; let proc = msg.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>').replace(/```([\s\S]*?)```/g, (m, p1) => `<pre><code>${sanitizeHTML(p1.trim())}</code></pre>`).replace(/(?<!<br>)\n/g, '<br>'); el.innerHTML = `<strong>Mika:</strong> ${proc}`; } else { el.className = 'system-message'; el.innerHTML = msg; } chatLog.appendChild(el); scrollToBottom(); }
+        function showTypingIndicator() { if (!chatLog || !chatArea || chatArea.style.display === 'none') return; removeTypingIndicator(); const el = document.createElement('p'); el.className = 'typing-indicator'; el.innerHTML = 'Mika is thinking... *purrrr*'; chatLog.appendChild(el); scrollToBottom(); }
+        function removeTypingIndicator() { if (!chatLog || !chatArea || chatArea.style.display === 'none') return; const ind = chatLog.querySelector('.typing-indicator'); if (ind) ind.remove(); }
         function scrollToBottom() { if (chatLog) { setTimeout(() => { chatLog.scrollTop = chatLog.scrollHeight; }, 50); } }
         function clearChatDisplay() { if (chatLog) chatLog.innerHTML = ''; }
         function enableChatInput() { if (!chatInput || !sendButton) return; chatInput.disabled = false; sendButton.disabled = false; chatInput.placeholder = `Ask Mika about your homework, ${currentUserName || 'Study Buddy'}~ ♡`; }
@@ -943,438 +857,68 @@
         function updateInputPlaceholder() { if (chatInput) { chatInput.placeholder = `Ask Mika about your homework, ${currentUserName || 'Study Buddy'}~ ♡`; } }
 
         // --- Chat Management Functions ---
-        function startNewChat(greet = true) {
-             switchToChatView();
-             if (currentChatId && currentChatHistory.length > 0) { allChats[currentChatId] = currentChatHistory; saveAllChats(); }
-             currentChatId = getTimestamp(); currentChatHistory = []; clearChatDisplay();
-             if (greet) { appendMessage('system', `Started a new chat! What can I help you with, ${currentUserName}? Nyaa~!`); }
-             else { appendMessage('system', `Started a new chat.`); }
-             enableChatInput(); updateHistoryDropdown(); console.log(`Started new chat ID: ${currentChatId}`);
-             closeAllDropdowns();
-        }
-        function loadChat(chatId) {
-            switchToChatView();
-             if (currentChatId && currentChatHistory.length > 0 && currentChatId !== chatId) { allChats[currentChatId] = currentChatHistory; }
-             if (allChats[chatId]) {
-                 currentChatId = chatId; currentChatHistory = allChats[chatId]; clearChatDisplay();
-                 appendMessage('system', `Loaded chat from ${new Date(parseInt(chatId)).toLocaleString()}. Welcome back, ${currentUserName}!`);
-                 currentChatHistory.forEach(msg => { if (msg.role === 'user') { appendMessage('user', msg.parts[0].text); } else if (msg.role === 'model') { appendMessage('Mika', msg.parts[0].text); } });
-                 enableChatInput(); console.log(`Loaded chat ID: ${chatId}`);
-             } else { console.error(`Chat ID ${chatId} not found.`); appendMessage('system', "Mrow! Couldn't find that chat history!"); }
-             closeAllDropdowns();
-             saveAllChats();
-        }
+        function startNewChat(greet = true) { switchToChatView(); if (currentChatId && currentChatHistory.length > 0) { allChats[currentChatId] = currentChatHistory; saveAllChats(); } currentChatId = getTimestamp(); currentChatHistory = []; clearChatDisplay(); if (greet) { appendMessage('system', `Started a new chat! What can I help you with, ${currentUserName}? Nyaa~!`); } else { appendMessage('system', `Started a new chat.`); } enableChatInput(); updateHistoryDropdown(); console.log(`Started new chat ID: ${currentChatId}`); closeAllDropdowns(); }
+        function loadChat(chatId) { switchToChatView(); if (currentChatId && currentChatHistory.length > 0 && currentChatId !== chatId) { allChats[currentChatId] = currentChatHistory; } if (allChats[chatId]) { currentChatId = chatId; currentChatHistory = allChats[chatId]; clearChatDisplay(); appendMessage('system', `Loaded chat from ${new Date(parseInt(chatId)).toLocaleString()}. Welcome back, ${currentUserName}!`); currentChatHistory.forEach(msg => { if (msg.role === 'user') { appendMessage('user', msg.parts[0].text); } else if (msg.role === 'model') { appendMessage('Mika', msg.parts[0].text); } }); enableChatInput(); console.log(`Loaded chat ID: ${chatId}`); } else { console.error(`Chat ID ${chatId} not found.`); appendMessage('system', "Mrow! Couldn't find that chat history!"); } closeAllDropdowns(); saveAllChats(); }
 
         // --- Dropdown Management ---
-        function closeAllDropdowns() {
-            if (historyDropdown && historyDropdown.style.display === 'block') { historyDropdown.style.display = 'none'; }
-            if (settingsDropdown && settingsDropdown.style.display === 'block') { settingsDropdown.style.display = 'none'; }
-            if (gamesDropdown && gamesDropdown.style.display === 'block') { gamesDropdown.style.display = 'none'; }
-        }
-        function toggleDropdown(dropdownElement) {
-            const isCurrentlyOpen = dropdownElement.style.display === 'block';
-            closeAllDropdowns();
-            if (!isCurrentlyOpen) {
-                 dropdownElement.style.display = 'block';
-                 if (dropdownElement === historyDropdown) updateHistoryDropdown();
-                 if (dropdownElement === settingsDropdown) updateSettingsDropdown();
-                 if (dropdownElement === gamesDropdown) updateGamesDropdown();
-            }
-        }
-        function updateHistoryDropdown() {
-             if (!historyDropdown) return;
-             historyDropdown.innerHTML = '';
-             const chatIds = Object.keys(allChats).sort((a, b) => b - a);
-             if (chatIds.length === 0) {
-                 const noHistoryMsg = document.createElement('p');
-                 noHistoryMsg.className = 'no-items';
-                 noHistoryMsg.textContent = 'No past chats yet!';
-                 historyDropdown.appendChild(noHistoryMsg);
-             } else {
-                 chatIds.forEach(id => {
-                    const chat = allChats[id];
-                    if (chat && chat.length > 0) {
-                        const button = document.createElement('button');
-                        const firstUserMsg = chat.find(m => m.role === 'user');
-                        const preview = firstUserMsg ? sanitizeHTML(firstUserMsg.parts[0].text.substring(0, 20)) + '...' : 'Chat';
-                        const dateStr = new Date(parseInt(id)).toLocaleString();
-                        button.textContent = `${dateStr} - ${preview}`;
-                        button.title = `Load chat from ${dateStr}`;
-                        button.onclick = () => loadChat(id);
-                        historyDropdown.appendChild(button);
-                    }
-                });
-             }
-             if (chatIds.length > 0) {
-                const deleteAllBtn = deleteAllHistoryButtonTemplate.cloneNode(true);
-                deleteAllBtn.onclick = deleteAllChats;
-                historyDropdown.appendChild(deleteAllBtn);
-             }
-        }
-        function updateSettingsDropdown() {
-            if (!settingsInstallButton) return;
-            settingsInstallButton.disabled = !deferredInstallPrompt;
-            if (bodyElement.classList.contains('dark-mode')) {
-                settingsThemeButton.textContent = "☀️ Switch to Light Mode";
-            } else {
-                settingsThemeButton.textContent = "🌙 Switch to Dark Mode";
-            }
-        }
-        function updateGamesDropdown() {
-            console.log("Updating games dropdown (currently no dynamic updates).");
-        }
+        function closeAllDropdowns() { if (historyDropdown) historyDropdown.style.display = 'none'; if (settingsDropdown) settingsDropdown.style.display = 'none'; if (gamesDropdown) gamesDropdown.style.display = 'none'; }
+        function toggleDropdown(dropdownElement) { const isOpen = dropdownElement.style.display === 'block'; closeAllDropdowns(); if (!isOpen) { dropdownElement.style.display = 'block'; if (dropdownElement === historyDropdown) updateHistoryDropdown(); if (dropdownElement === settingsDropdown) updateSettingsDropdown(); if (dropdownElement === gamesDropdown) updateGamesDropdown(); } }
+        function updateHistoryDropdown() { if (!historyDropdown) return; historyDropdown.innerHTML = ''; const chatIds = Object.keys(allChats).sort((a, b) => b - a); if (chatIds.length === 0) { const p = document.createElement('p'); p.className = 'no-items'; p.textContent = 'No past chats yet!'; historyDropdown.appendChild(p); } else { chatIds.forEach(id => { const chat = allChats[id]; if (chat && chat.length > 0) { const btn = document.createElement('button'); const firstMsg = chat.find(m => m.role === 'user'); const preview = firstMsg ? sanitizeHTML(firstMsg.parts[0].text.substring(0, 20)) + '...' : 'Chat'; const dateStr = new Date(parseInt(id)).toLocaleString(); btn.textContent = `${dateStr} - ${preview}`; btn.title = `Load chat from ${dateStr}`; btn.onclick = () => loadChat(id); historyDropdown.appendChild(btn); } }); } if (chatIds.length > 0) { const delBtn = deleteAllHistoryButtonTemplate.cloneNode(true); delBtn.onclick = deleteAllChats; historyDropdown.appendChild(delBtn); } }
+        function updateSettingsDropdown() { if (!settingsInstallButton) return; settingsInstallButton.disabled = !deferredInstallPrompt; applyTheme(loadThemePreference() || 'light'); } // Re-apply theme text
+        function updateGamesDropdown() { console.log("Updating games dropdown."); }
 
         // --- View Switching ---
-        function switchToChatView() {
-            if (!gameArea || !chatArea) return;
-            gameArea.style.display = 'none';
-            chatArea.style.display = 'flex';
-            isGameActive = false;
-             if (chatInput && !chatInput.disabled) {
-                setTimeout(() => chatInput.focus(), 50);
-             }
-             clearGameAreaContent();
-            console.log("Switched to Chat View");
-             // Re-check if install prompt should be shown
-             if (deferredInstallPrompt && !hasInstallPromptBeenShown()) {
-                console.log("Showing deferred install prompt after switching to chat.");
-                 installPopup.style.display = 'flex';
-             }
-        }
-        function switchToGameView() {
-            if (!gameArea || !chatArea) return;
-            chatArea.style.display = 'none';
-            gameArea.style.display = 'flex';
-            isGameActive = true;
-            closeAllDropdowns();
-            // Hide install prompt if it was visible
-            if (installPopup.style.display === 'flex') {
-                 installPopup.style.display = 'none';
-                 console.log("Hiding install prompt while game is active.");
-            }
-            console.log("Switched to Game View");
-        }
+        function switchToChatView() { if (!gameArea || !chatArea) return; gameArea.style.display = 'none'; chatArea.style.display = 'flex'; isGameActive = false; if (chatInput && !chatInput.disabled) { setTimeout(() => chatInput.focus(), 50); } clearGameAreaContent(); console.log("Switched to Chat View"); if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred install prompt."); installPopup.style.display = 'flex'; } }
+        function switchToGameView() { if (!gameArea || !chatArea) return; chatArea.style.display = 'none'; gameArea.style.display = 'flex'; isGameActive = true; closeAllDropdowns(); if (installPopup.style.display === 'flex') { installPopup.style.display = 'none'; console.log("Hiding install prompt for game."); } console.log("Switched to Game View"); }
 
         // --- Game Loading Logic ---
-        function setupGameAreaBase(gameTitleText) {
-            if (!gameArea) return null;
-            clearGameAreaContent();
-            const title = document.createElement('h2');
-            title.id = 'game-title';
-            title.textContent = gameTitleText;
-            gameArea.appendChild(title);
-            const gameUiContainer = document.createElement('div');
-            gameUiContainer.id = 'game-specific-ui';
-            gameUiContainer.style.width = '100%';
-            gameUiContainer.style.display = 'flex';
-            gameUiContainer.style.flexDirection = 'column';
-            gameUiContainer.style.alignItems = 'center';
-            gameArea.appendChild(gameUiContainer);
-            const gameMessageLog = document.createElement('div');
-            gameMessageLog.id = 'game-message-log';
-            gameArea.appendChild(gameMessageLog);
-            const backButton = document.createElement('button');
-            backButton.id = 'back-to-chat-button';
-            backButton.textContent = 'Back to Chat ♡';
-            backButton.onclick = switchToChatView;
-            gameArea.appendChild(backButton);
-            return gameUiContainer;
-        }
-
-         function displayGameMessage(sender, text) {
-             const gameMessageLog = document.getElementById('game-message-log');
-             if (!gameMessageLog) return;
-             const msgElement = document.createElement('p');
-             let cssClass = 'system-gamemsg';
-             let processedText = sanitizeHTML(text);
-             if (sender === 'Mika') {
-                 cssClass = 'mika-gamemsg';
-                  processedText = processedText
-                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                     .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                     .replace(/`([^`]+)`/g, '<code>$1</code>')
-                     .replace(/~(\S.*?\S)~/g, '<del>$1</del>')
-                     .replace(/(?<!<br>)\n/g, '<br>');
-                 msgElement.innerHTML = processedText;
-             } else {
-                 msgElement.innerHTML = processedText;
-             }
-             msgElement.className = cssClass;
-             gameMessageLog.appendChild(msgElement);
-             gameMessageLog.scrollTop = gameMessageLog.scrollHeight;
-         }
-
-        async function callMikaApiForGame(prompt) {
-            if (!currentApiKey) {
-                 console.error("API Key missing, cannot make game API call.");
-                 // Return a specific error message the game can display
-                 return Promise.reject("Mrow! My magic connection is fuzzy without the secret code!");
-            }
-            const userNameForApi = currentUserName || "Study Buddy";
-            console.log(`Calling API for game with prompt: ${prompt.substring(0,100)}...`);
-            try {
-                // Ensure sendMessageToMika is awaited and returns the text directly
-                 const responseText = await sendMessageToMika(prompt, [], currentApiKey, userNameForApi);
-                 // Check if responseText is valid before returning
-                 if (typeof responseText === 'string' && responseText.trim().length > 0) {
-                    return responseText;
-                 } else {
-                    console.warn("API call returned empty or invalid response.");
-                     // Return null or a default message instead of rejecting? Let's return null.
-                     return null;
-                 }
-            } catch (error) {
-                console.error("Error during API call from game:", error);
-                // Reject the promise so the caller knows it failed
-                return Promise.reject(`Meeeow! API call failed: ${error}`);
-            }
-        }
-
-
-        function loadTicTacToe() {
-            switchToGameView();
-             const gameUiContainer = setupGameAreaBase('Tic-Tac-Toe with Mika! ♡');
-             if (gameUiContainer && typeof TicTacToe !== 'undefined' && TicTacToe.init) {
-                 const tttBoard = document.createElement('div');
-                 tttBoard.id = 'ttt-board';
-                 gameUiContainer.appendChild(tttBoard); // Add board to specific UI area
-                 // TTT's init adds the reset button, so we don't add it here
-                 TicTacToe.init(tttBoard, displayGameMessage);
-                 displayGameMessage('System', "Game loaded! You go first (X)!");
-             } else {
-                 console.error("TicTacToe game script not loaded or init function missing!");
-                 displayGameMessage('System', 'Mrow! TTT Game failed to load...');
-             }
-        }
-
-        function loadRPS() {
-            switchToGameView();
-             const gameUiContainer = setupGameAreaBase('Rock Paper Scissors! ♡');
-             if (gameUiContainer && typeof RockPaperScissors !== 'undefined' && RockPaperScissors.init) {
-                 // RPS init adds its own buttons to the passed container
-                 RockPaperScissors.init(gameUiContainer, displayGameMessage, callMikaApiForGame, currentUserName);
-                 displayGameMessage('System', "Rock Paper Scissors! Make your choice!");
-             } else {
-                 console.error("RockPaperScissors game script not loaded or init function missing!");
-                 displayGameMessage('System', 'Mrow! RPS Game failed to load...');
-             }
-        }
-
-        function clearGameAreaContent() {
-            if (gameArea) {
-                gameArea.innerHTML = '';
-            }
-        }
-
+        function setupGameAreaBase(gameTitleText) { if (!gameArea) return null; clearGameAreaContent(); const title = document.createElement('h2'); title.id = 'game-title'; title.textContent = gameTitleText; gameArea.appendChild(title); const uiContainer = document.createElement('div'); uiContainer.id = 'game-specific-ui'; uiContainer.style.cssText = 'width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; flex-shrink: 0;'; gameArea.appendChild(uiContainer); const msgLog = document.createElement('div'); msgLog.id = 'game-message-log'; gameArea.appendChild(msgLog); const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView; gameArea.appendChild(backBtn); return uiContainer; }
+        function displayGameMessage(sender, text) { const log = document.getElementById('game-message-log'); if (!log) return; const el = document.createElement('p'); let css = 'system-gamemsg'; let msg = sanitizeHTML(text); if (sender === 'Mika') { css = 'mika-gamemsg'; msg = msg.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>').replace(/~(\S.*?\S)~/g, '<del>$1</del>').replace(/(?<!<br>)\n/g, '<br>'); } el.innerHTML = msg; el.className = css; log.appendChild(el); log.scrollTop = log.scrollHeight; }
+        async function callMikaApiForGame(prompt) { if (!currentApiKey) { console.error("API Key missing"); return Promise.reject("Mrow! API Key missing!"); } const user = currentUserName || "Study Buddy"; console.log(`API call for game: ${prompt.substring(0,100)}...`); try { const resp = await sendMessageToMika(prompt, [], currentApiKey, user); if (typeof resp === 'string' && resp.trim().length > 0) { return resp; } else { console.warn("API returned empty/invalid."); return null; } } catch (err) { console.error("API call error:", err); return Promise.reject(`Meeeow! API error: ${err}`); } }
+        function loadTicTacToe() { switchToGameView(); const ui = setupGameAreaBase('Tic-Tac-Toe with Mika! ♡'); if (ui && typeof TicTacToe !== 'undefined' && TicTacToe.init) { const board = document.createElement('div'); board.id = 'ttt-board'; ui.appendChild(board); TicTacToe.init(board, displayGameMessage); displayGameMessage('System', "Game loaded! You go first (X)!"); } else { console.error("TTT load failed"); displayGameMessage('System', 'Mrow! TTT Game failed...'); } }
+        function loadRPS() { switchToGameView(); const ui = setupGameAreaBase('Rock Paper Scissors! ♡'); if (ui && typeof RockPaperScissors !== 'undefined' && RockPaperScissors.init) { RockPaperScissors.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); displayGameMessage('System', "Rock Paper Scissors! Make your choice!"); } else { console.error("RPS load failed"); displayGameMessage('System', 'Mrow! RPS Game failed...'); } }
+        function loadGuessTheNumber() { switchToGameView(); const ui = setupGameAreaBase('Guess My Number~ ♡'); if (ui && typeof GuessTheNumber !== 'undefined' && GuessTheNumber.init) { GuessTheNumber.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("GTN load failed"); displayGameMessage('System', 'Mrow! GTN Game failed...'); } }
+        function clearGameAreaContent() { if (gameArea) gameArea.innerHTML = ''; }
 
         // --- API Call & Message Handling ---
-        async function handleSendMessage() {
-             if (isGameActive) {
-                 console.log("Chat input blocked while game is active.");
-                 return;
-             }
-             if (!chatInput || !currentApiKey || isMikaTyping) return;
-             const messageText = chatInput.value.trim();
-             if (!messageText) return;
-             appendMessage('user', messageText); currentChatHistory.push({ role: 'user', parts: [{ text: messageText }] });
-             chatInput.value = ''; isMikaTyping = true; disableChatInput(); showTypingIndicator();
-             if (currentChatHistory.length > MAX_HISTORY_LENGTH) { currentChatHistory = currentChatHistory.slice(-MAX_HISTORY_LENGTH); console.log("Chat history pruned."); }
-             try {
-                 const userNameForApi = currentUserName || "Study Buddy"; // Use current user name
-                 const mikaResponse = await sendMessageToMika(messageText, currentChatHistory, currentApiKey, userNameForApi);
-                 removeTypingIndicator(); appendMessage('Mika', mikaResponse); currentChatHistory.push({ role: 'model', parts: [{ text: mikaResponse }] });
-                 saveAllChats();
-             } catch (error) {
-                 console.error("Error in handleSendMessage:", error); removeTypingIndicator();
-                 appendMessage('system', error.message || `Mrow! Something went wrong, ${currentUserName}... Mika can't talk right now. ;_;`);
-             } finally {
-                 isMikaTyping = false;
-                 if (!isGameActive && currentApiKey) { enableChatInput(); if (chatInput) chatInput.focus(); }
-                 else if (!currentApiKey) { disableChatInput("API Key needed!"); }
-                 else { disableChatInput("Game Active"); }
-             }
-        }
-
+        async function handleSendMessage() { if (isGameActive) return; if (!chatInput || !currentApiKey || isMikaTyping) return; const txt = chatInput.value.trim(); if (!txt) return; appendMessage('user', txt); currentChatHistory.push({ role: 'user', parts: [{ text: txt }] }); chatInput.value = ''; isMikaTyping = true; disableChatInput(); showTypingIndicator(); if (currentChatHistory.length > MAX_HISTORY_LENGTH) { currentChatHistory = currentChatHistory.slice(-MAX_HISTORY_LENGTH); } try { const user = currentUserName || "Study Buddy"; const resp = await sendMessageToMika(txt, currentChatHistory, currentApiKey, user); removeTypingIndicator(); appendMessage('Mika', resp); currentChatHistory.push({ role: 'model', parts: [{ text: resp }] }); saveAllChats(); } catch (err) { console.error("Send error:", err); removeTypingIndicator(); appendMessage('system', err.message || `Mrow! Error talking, ${currentUserName}...`); } finally { isMikaTyping = false; if (!isGameActive && currentApiKey) { enableChatInput(); if (chatInput) chatInput.focus(); } else if (!currentApiKey) { disableChatInput("API Key needed!"); } else { disableChatInput("Game Active"); } } }
 
         // --- Initialization Flow ---
-        function proceedToChat() {
-            if (!chatContainer) return;
-            chatContainer.style.display = 'flex';
-            switchToChatView(); // Ensure chat area is shown initially
-            const mostRecentChatId = loadAllChats();
-            updateInputPlaceholder();
-            if (mostRecentChatId) { loadChat(mostRecentChatId); }
-            else { startNewChat(true); }
-            updateChatTitle(); updateHistoryDropdown();
-             // Check if we should show the install prompt now that chat is visible
-             if (deferredInstallPrompt && !hasInstallPromptBeenShown()) {
-                 console.log("Showing deferred install prompt now chat is visible.");
-                 installPopup.style.display = 'flex';
-             }
-        }
-        function checkNameAndProceed() {
-            const storedName = loadUserName();
-            if (storedName) {
-                currentUserName = storedName; if (namePopup) namePopup.style.display = 'none';
-                checkApiKeyAndProceed();
-            } else {
-                if (namePopup && nameInput) {
-                    if(apiKeyPopup) apiKeyPopup.style.display = 'none';
-                    if(disclaimerPopup) disclaimerPopup.style.display = 'none';
-                    nameInput.value = "Study Buddy";
-                    namePopup.style.display = 'flex';
-                    nameInput.focus(); nameInput.select();
-                }
-            }
-        }
-        function checkApiKeyAndProceed() {
-            const loadedKey = loadApiKey();
-            if (loadedKey) {
-                currentApiKey = loadedKey; if (apiKeyPopup) apiKeyPopup.style.display = 'none';
-                proceedToChat();
-            } else {
-                if (apiKeyPopup && chatContainer && apiKeyInput) {
-                     if (namePopup) namePopup.style.display = 'none';
-                     if(disclaimerPopup) disclaimerPopup.style.display = 'none';
-                     chatContainer.style.display = 'none';
-                     apiKeyPopup.style.display = 'flex';
-                     disableChatInput("API Key needed!");
-                     apiKeyInput.focus();
-                }
-            }
-        }
-        function initializeApp() {
-            registerServiceWorker();
-            setupInstallPromptHandler();
-            const savedTheme = loadThemePreference();
-            applyTheme(savedTheme || 'light');
-            if (hasAgreedToDisclaimer()) {
-                console.log("Disclaimer already agreed to.");
-                checkNameAndProceed();
-            } else {
-                console.log("Showing disclaimer popup.");
-                 if (disclaimerPopup) disclaimerPopup.style.display = 'flex';
-                 if (apiKeyPopup) apiKeyPopup.style.display = 'none';
-                 if (namePopup) namePopup.style.display = 'none';
-                 if (chatContainer) chatContainer.style.display = 'none';
-                 if (gameArea) gameArea.style.display = 'none';
-                 if (chatArea) chatArea.style.display = 'none';
-            }
-        }
+        function proceedToChat() { if (!chatContainer) return; chatContainer.style.display = 'flex'; switchToChatView(); const chatId = loadAllChats(); updateInputPlaceholder(); if (chatId) { loadChat(chatId); } else { startNewChat(true); } updateChatTitle(); updateHistoryDropdown(); if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred prompt in proceedToChat."); installPopup.style.display = 'flex'; } }
+        function checkNameAndProceed() { const name = loadUserName(); if (name) { currentUserName = name; if (namePopup) namePopup.style.display = 'none'; checkApiKeyAndProceed(); } else { if (namePopup && nameInput) { if(apiKeyPopup) apiKeyPopup.style.display = 'none'; if(disclaimerPopup) disclaimerPopup.style.display = 'none'; nameInput.value = "Study Buddy"; namePopup.style.display = 'flex'; nameInput.focus(); nameInput.select(); } } }
+        function checkApiKeyAndProceed() { const key = loadApiKey(); if (key) { currentApiKey = key; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; proceedToChat(); } else { if (apiKeyPopup && chatContainer && apiKeyInput) { if (namePopup) namePopup.style.display = 'none'; if(disclaimerPopup) disclaimerPopup.style.display = 'none'; chatContainer.style.display = 'none'; apiKeyPopup.style.display = 'flex'; disableChatInput("API Key needed!"); apiKeyInput.focus(); } } }
+        function initializeApp() { registerServiceWorker(); setupInstallPromptHandler(); const theme = loadThemePreference(); applyTheme(theme || 'light'); if (hasAgreedToDisclaimer()) { console.log("Disclaimer agreed."); checkNameAndProceed(); } else { console.log("Showing disclaimer."); if (disclaimerPopup) disclaimerPopup.style.display = 'flex'; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; if (namePopup) namePopup.style.display = 'none'; if (chatContainer) chatContainer.style.display = 'none'; if (gameArea) gameArea.style.display = 'none'; if (chatArea) chatArea.style.display = 'none'; } }
 
         // --- Event Listeners ---
-        if (disclaimerAgreeButton) {
-            disclaimerAgreeButton.addEventListener('click', () => {
-                saveDisclaimerAgreement(); if (disclaimerPopup) disclaimerPopup.style.display = 'none';
-                checkNameAndProceed();
-            });
-        }
-        if (saveApiKeyButton) {
-            saveApiKeyButton.addEventListener('click', () => {
-                if (!apiKeyInput) return; const key = apiKeyInput.value.trim();
-                if (key) {
-                    if (saveApiKey(key)) {
-                         currentApiKey = key;
-                         if (apiKeyPopup) apiKeyPopup.style.display = 'none';
-                         if (apiKeyError) apiKeyError.style.display = 'none';
-                         proceedToChat();
-                    }
-                    else { if (apiKeyError) { apiKeyError.textContent = "Mrow! Couldn't save the key... is storage full?"; apiKeyError.style.display = 'block'; } }
-                } else { if (apiKeyError) { apiKeyError.textContent = "Meeeow! You need to paste a key in here!"; apiKeyError.style.display = 'block'; } }
-            });
-        }
-        if (apiKeyInput) {
-            apiKeyInput.addEventListener('keypress', (event) => { if (event.key === 'Enter') saveApiKeyButton?.click(); if (apiKeyError && apiKeyError.style.display === 'block') apiKeyError.style.display = 'none'; });
-        }
-        if (saveNameButton) {
-             saveNameButton.addEventListener('click', () => {
-                if (!nameInput) return; const name = nameInput.value.trim();
-                if (name) {
-                    if (saveUserName(name)) {
-                        currentUserName = name;
-                        if (namePopup) namePopup.style.display = 'none';
-                        if (nameError) nameError.style.display = 'none';
-                        checkApiKeyAndProceed();
-                    }
-                    else { if (nameError) { nameError.textContent = "Mrow! Couldn't save the name... storage issue?"; nameError.style.display = 'block'; } }
-                } else { if (nameError) { nameError.textContent = "Please enter a name!"; nameError.style.display = 'block'; } }
-             });
-        }
-        if (nameInput) {
-             nameInput.addEventListener('keypress', (event) => { if (event.key === 'Enter') saveNameButton?.click(); if (nameError && nameError.style.display === 'block') nameError.style.display = 'none'; });
-        }
+        if (disclaimerAgreeButton) disclaimerAgreeButton.addEventListener('click', () => { saveDisclaimerAgreement(); if (disclaimerPopup) disclaimerPopup.style.display = 'none'; checkNameAndProceed(); });
+        if (saveApiKeyButton) saveApiKeyButton.addEventListener('click', () => { if (!apiKeyInput) return; const key = apiKeyInput.value.trim(); if (key) { if (saveApiKey(key)) { currentApiKey = key; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; if (apiKeyError) apiKeyError.style.display = 'none'; proceedToChat(); } else { if (apiKeyError) { apiKeyError.textContent = "Mrow! Save failed?"; apiKeyError.style.display = 'block'; } } } else { if (apiKeyError) { apiKeyError.textContent = "Meeeow! Key needed!"; apiKeyError.style.display = 'block'; } } });
+        if (apiKeyInput) apiKeyInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveApiKeyButton?.click(); if (apiKeyError) apiKeyError.style.display = 'none'; });
+        if (saveNameButton) saveNameButton.addEventListener('click', () => { if (!nameInput) return; const name = nameInput.value.trim(); if (name) { if (saveUserName(name)) { currentUserName = name; if (namePopup) namePopup.style.display = 'none'; if (nameError) nameError.style.display = 'none'; checkApiKeyAndProceed(); } else { if (nameError) { nameError.textContent = "Mrow! Save failed?"; nameError.style.display = 'block'; } } } else { if (nameError) { nameError.textContent = "Please enter a name!"; nameError.style.display = 'block'; } } });
+        if (nameInput) nameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveNameButton?.click(); if (nameError) nameError.style.display = 'none'; });
         if (sendButton) sendButton.addEventListener('click', handleSendMessage);
-        if (chatInput) {
-            chatInput.addEventListener('keypress', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleSendMessage(); } });
-        }
+        if (chatInput) chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } });
         if (newChatButton) newChatButton.addEventListener('click', () => startNewChat(true));
-        if (historyButton) {
-             historyButton.addEventListener('click', (event) => {
-                 event.stopPropagation(); toggleDropdown(historyDropdown);
-             });
-        }
-        if (gamesButton) {
-            gamesButton.addEventListener('click', (event) => {
-                event.stopPropagation(); toggleDropdown(gamesDropdown);
-            });
-        }
-        if (settingsButton) {
-            settingsButton.addEventListener('click', (event) => {
-                 event.stopPropagation(); toggleDropdown(settingsDropdown);
-            });
-        }
-        // Game Selection Button Listeners
-        if (gameTttButton) {
-            gameTttButton.addEventListener('click', () => {
-                closeAllDropdowns();
-                loadTicTacToe();
-            });
-        }
-        if (gameRpsButton) {
-            gameRpsButton.addEventListener('click', () => {
-                closeAllDropdowns();
-                loadRPS();
-            });
-        }
-        // Settings Dropdown Button Listeners
-        if (settingsInstallButton) {
-            settingsInstallButton.addEventListener('click', handleManualInstall);
-        }
-        if (settingsThemeButton) {
-            settingsThemeButton.addEventListener('click', toggleTheme);
-        }
-        if (settingsResetButton) {
-             settingsResetButton.addEventListener('click', () => {
-                 closeAllDropdowns();
-                 if (confirm(`⚠️ Reset Settings for ${currentUserName}? This clears API Key, Name, Disclaimer, Theme, and Install Prompt status, then reloads the page. Are you absolutely sure, Master?!`)) {
-                     clearApiKey(); clearUserName(); clearDisclaimerAgreement();
-                     clearInstallPromptShown(); clearThemePreference();
-                     clearFromLocalStorage('mikaHelper_allChats');
-                     window.location.reload();
-                 }
-             });
-        }
-        // Close dropdowns when clicking outside
-         document.addEventListener('click', (event) => {
-             if (historyDropdown && historyDropdown.style.display === 'block' && !historyDropdown.contains(event.target) && event.target !== historyButton) {
-                 historyDropdown.style.display = 'none';
-             }
-             if (settingsDropdown && settingsDropdown.style.display === 'block' && !settingsDropdown.contains(event.target) && event.target !== settingsButton) {
-                 settingsDropdown.style.display = 'none';
-             }
-             if (gamesDropdown && gamesDropdown.style.display === 'block' && !gamesDropdown.contains(event.target) && event.target !== gamesButton) {
-                 gamesDropdown.style.display = 'none';
-             }
-         });
+        if (historyButton) historyButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(historyDropdown); });
+        if (gamesButton) gamesButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(gamesDropdown); });
+        if (settingsButton) settingsButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(settingsDropdown); });
+        // Game Selection Listeners
+        if (gameTttButton) gameTttButton.addEventListener('click', () => { closeAllDropdowns(); loadTicTacToe(); });
+        if (gameRpsButton) gameRpsButton.addEventListener('click', () => { closeAllDropdowns(); loadRPS(); });
+        if (gameGtnButton) gameGtnButton.addEventListener('click', () => { closeAllDropdowns(); loadGuessTheNumber(); });
+        // Settings Dropdown Listeners
+        if (settingsInstallButton) settingsInstallButton.addEventListener('click', handleManualInstall);
+        if (settingsThemeButton) settingsThemeButton.addEventListener('click', toggleTheme);
+        if (settingsResetButton) settingsResetButton.addEventListener('click', () => { closeAllDropdowns(); if (confirm(`⚠️ Reset Settings for ${currentUserName}? Clears API Key, Name, Disclaimer, Theme, Install status & reloads. Sure, Master?!`)) { clearApiKey(); clearUserName(); clearDisclaimerAgreement(); clearInstallPromptShown(); clearThemePreference(); clearFromLocalStorage('mikaHelper_allChats'); window.location.reload(); } });
+        // Close dropdowns on outside click
+        document.addEventListener('click', (e) => { if (historyDropdown && historyDropdown.style.display === 'block' && !historyDropdown.contains(e.target) && e.target !== historyButton) { historyDropdown.style.display = 'none'; } if (settingsDropdown && settingsDropdown.style.display === 'block' && !settingsDropdown.contains(e.target) && e.target !== settingsButton) { settingsDropdown.style.display = 'none'; } if (gamesDropdown && gamesDropdown.style.display === 'block' && !gamesDropdown.contains(e.target) && e.target !== gamesButton) { gamesDropdown.style.display = 'none'; } });
 
         // --- Start the App ---
         initializeApp();
 
-        // Auto-save chats when the window is closed/reloaded
+        // Auto-save chats
         window.addEventListener('beforeunload', saveAllChats);
 
-        // Nyaa~! Ready for even MORE games, Master! ♡
-
+        // Nyaa~! Ready! ♡
     </script>
 
 </body>
