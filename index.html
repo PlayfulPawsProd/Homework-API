@@ -9,6 +9,9 @@
     <link rel="manifest" href="manifest.json">
     <!-- Theme Color for Browser UI (Will be updated by JS for theme changes) -->
     <meta name="theme-color" id="theme-color-meta" content="#d81b60">
+    <!-- ** NEW ** Add DOMPurify script FIRST -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.0/purify.min.js" integrity="sha512-SYy493affPOnekyryF+CeRmcM7JS0ZQifMRnbRGoAL1BX3+zwQMG5mygzSScpPA7MSQixX+j3gy7jMXKx6hIgw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <style>
         /* --- CSS Variables for Theming --- */
         :root {
@@ -159,6 +162,11 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes subtlePulse { 0%, 100% { box-shadow: 0 0 8px var(--input-focus-shadow); } 50% { box-shadow: 0 0 12px var(--input-focus-shadow); } }
 
+        html, body {
+            height: 100%; /* Ensure body takes full height */
+            overflow: hidden; /* Prevent scrolling on body */
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color); /* Use CSS var */
@@ -166,11 +174,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             margin: 0;
             padding: 15px;
             box-sizing: border-box;
-            overflow: hidden;
             transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition */
         }
 
@@ -365,121 +371,75 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start; /* Align items to the top */
-            padding: 20px;
+            padding: 10px; /* Reduced padding for more game space */
             width: 100%;
             height: 100%;
             box-sizing: border-box;
-            overflow-y: auto; /* Allow scrolling if content overflows */
+            overflow: hidden; /* Prevent scroll on game area itself, allow internal scroll */
             background-color: var(--chat-bg); /* Match chat background */
             color: var(--chat-text); /* Match chat text */
-            scrollbar-width: thin;
-            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
         }
 
         #game-title {
             color: var(--chat-header-text);
-            font-size: 1.4em;
-            margin-bottom: 15px;
+            font-size: 1.3em; /* Slightly smaller title */
+            margin-bottom: 10px; /* Reduced margin */
             text-shadow: 0 0 3px var(--chat-header-shadow);
-            flex-shrink: 0; /* Prevent title from shrinking */
+            flex-shrink: 0;
         }
 
         /* Container for the specific game's UI elements */
         #game-specific-ui {
              width: 100%;
+             height: auto; /* Let content determine height */
              display: flex;
              flex-direction: column;
-             align-items: center; /* Center game elements */
-             margin-bottom: 15px; /* Space between game ui and message log */
+             align-items: center;
+             margin-bottom: 10px; /* Reduced margin */
              flex-shrink: 0;
+             overflow-y: auto; /* Allow scroll if UI gets tall */
         }
+        /* Adjust diary's internal container */
+        #diary-chat-view, #diary-entries-view {
+            width: 100%;
+            height: 100%; /* Take full height of parent */
+            overflow: hidden; /* Prevent double scrollbars within diary view */
+            display: flex; /* Keep flex for internal layout */
+            flex-direction: column;
+        }
+        #diary-entries-view {
+            overflow-y: auto; /* Allow scrolling only for entries list */
+        }
+
 
         /* Tic Tac Toe Board Specifics */
         #ttt-board {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            width: 240px; /* Fixed size, adjust as needed */
-            height: 240px;
-            margin-bottom: 15px; /* Space below board */
+            width: 240px; height: 240px;
+            margin-bottom: 10px; /* Reduced margin */
             border: 3px solid var(--game-board-border);
             border-radius: 8px;
             background-color: var(--game-board-bg);
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        .ttt-cell {
-            border: 1px solid var(--game-cell-border);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2.5em; /* Make X/O bigger */
-            font-weight: bold;
-            cursor: pointer;
-            color: var(--game-cell-text);
-            transition: background-color 0.2s, color 0.2s;
-            user-select: none; /* Prevent text selection */
-        }
-        .ttt-cell:hover {
-            background-color: var(--game-cell-hover-bg);
-        }
-        .ttt-cell.taken {
-            cursor: not-allowed;
-            color: var(--game-cell-taken-text);
-        }
-        .ttt-cell.taken:hover {
-             background-color: transparent; /* Don't highlight taken cells on hover */
-        }
+        .ttt-cell { border: 1px solid var(--game-cell-border); display: flex; justify-content: center; align-items: center; font-size: 2.5em; font-weight: bold; cursor: pointer; color: var(--game-cell-text); transition: background-color 0.2s, color 0.2s; user-select: none; }
+        .ttt-cell:hover { background-color: var(--game-cell-hover-bg); }
+        .ttt-cell.taken { cursor: not-allowed; color: var(--game-cell-taken-text); }
+        .ttt-cell.taken:hover { background-color: transparent; }
 
         /* RPS Specific Styles */
-        .rps-choice-button {
-             font-family: inherit;
-             padding: 10px 20px;
-             font-size: 1.1em;
-             border-radius: 10px;
-             border: none;
-             cursor: pointer;
-             background: var(--header-button-bg, #f06292);
-             color: var(--header-button-text, #1a0d13);
-             transition: transform 0.1s ease, background-color 0.2s, color 0.2s;
-             flex-shrink: 0; /* Prevent buttons shrinking weirdly */
-        }
-        .rps-choice-button:hover {
-             transform: scale(1.05);
-             background: var(--header-button-hover-bg, #d81b60);
-        }
-        .rps-choice-button:active {
-             transform: scale(0.98);
-        }
-        #rps-result-display {
-            margin-top: 10px;
-            padding: 10px;
-            min-height: 30px; /* Ensure space */
-            text-align: center;
-            font-weight: bold;
-            border: 1px dashed var(--game-cell-border, #f06292);
-            border-radius: 5px;
-            background-color: rgba(0,0,0,0.1); /* Slight background */
-            opacity: 0.6; /* Start slightly faded */
-            transition: opacity 0.3s ease;
-            color: var(--game-cell-text); /* Use game text color */
-            width: 90%; /* Take up most of the width */
-            max-width: 350px; /* Max width */
-        }
+        .rps-choice-button { font-family: inherit; padding: 10px 20px; font-size: 1.1em; border-radius: 10px; border: none; cursor: pointer; background: var(--header-button-bg, #f06292); color: var(--header-button-text, #1a0d13); transition: transform 0.1s ease, background-color 0.2s, color 0.2s; flex-shrink: 0; }
+        .rps-choice-button:hover { transform: scale(1.05); background: var(--header-button-hover-bg, #d81b60); }
+        .rps-choice-button:active { transform: scale(0.98); }
+        .rps-choice-button.secondary { background: var(--secondary-button-bg); color: var(--secondary-button-text); border: 1px solid var(--secondary-button-border); } /* Add secondary style */
+        .rps-choice-button.secondary:hover { background: var(--secondary-button-hover-bg); }
+        #rps-result-display { margin-top: 10px; padding: 10px; min-height: 30px; text-align: center; font-weight: bold; border: 1px dashed var(--game-cell-border, #f06292); border-radius: 5px; background-color: rgba(0,0,0,0.1); opacity: 0.6; transition: opacity 0.3s ease; color: var(--game-cell-text); width: 90%; max-width: 350px; }
 
         /* Guess The Number Styles */
-        #gtn-input {
-             padding: 8px 12px;
-             border: 1px solid var(--input-border, #ccc);
-             border-radius: 5px;
-             width: 150px;
-             background-color: var(--input-bg); /* Match theme */
-             color: var(--text-color); /* Match theme */
-             text-align: center;
-             font-size: 1em;
-             margin-right: 5px; /* Space before button */
-        }
-        #gtn-input::-webkit-outer-spin-button,
-        #gtn-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        #gtn-input { padding: 8px 12px; border: 1px solid var(--input-border, #ccc); border-radius: 5px; width: 150px; background-color: var(--input-bg); color: var(--text-color); text-align: center; font-size: 1em; margin-right: 5px; }
+        #gtn-input::-webkit-outer-spin-button, #gtn-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         #gtn-input[type=number] { -moz-appearance: textfield; }
         #gtn-submit { padding: 8px 15px; }
         #gtn-feedback { min-height: 20px; font-weight: bold; margin-bottom: 5px; text-align: center; font-size: 1.1em; color: var(--game-cell-text); transition: color 0.3s ease; }
@@ -489,104 +449,77 @@
         .gtn-feedback-warn { color: orange; }
         .gtn-feedback-info { color: var(--game-cell-text); }
         #gtn-indicator { padding: 5px 15px; border-radius: 15px; color: white; font-weight: bold; text-align: center; display: inline-block; min-width: 160px; margin-bottom: 10px; transition: background-color 0.5s ease, opacity 0.5s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        #gtn-guesses-left { margin-bottom: 15px; text-align: center; color: var(--system-message-text); font-size: 0.9em; }
-        #gtn-new-game { margin-top: 10px; }
+        #gtn-guesses-left { margin-bottom: 10px; text-align: center; color: var(--system-message-text); font-size: 0.9em; }
+        #gtn-new-game { margin-top: 5px; }
 
-        /* ** NEW ** 20 Questions Styles */
-        #tq-question-input, #tq-guess-input {
-             padding: 8px 12px;
-             border: 1px solid var(--input-border, #ccc);
-             border-radius: 5px;
-             width: calc(80% - 70px); /* Adjust width based on button size */
-             max-width: 300px; /* Limit max width */
-             margin-right: 5px;
-             background-color: var(--input-bg);
-             color: var(--text-color);
-             font-size: 0.95em; /* Slightly smaller font */
-             display: inline-block; /* Align with button */
-             vertical-align: middle;
-        }
+        /* 20 Questions Styles */
+        #tq-question-input, #tq-guess-input { padding: 8px 12px; border: 1px solid var(--input-border, #ccc); border-radius: 5px; width: calc(80% - 70px); max-width: 300px; margin-right: 5px; background-color: var(--input-bg); color: var(--text-color); font-size: 0.95em; display: inline-block; vertical-align: middle; }
+        #tq-ask-button, #tq-guess-button { padding: 8px 10px; font-size: 0.9em; display: inline-block; vertical-align: middle; }
+        #tq-questions-left { margin-bottom: 10px; text-align: center; font-size: 1.1em; color: var(--system-message-text); transition: color 0.3s ease, font-weight 0.3s ease; }
+        #tq-new-game { margin-top: 5px; }
 
-        #tq-ask-button, #tq-guess-button {
-             /* Using .rps-choice-button class now */
-             padding: 8px 10px; /* Slightly less padding */
-             font-size: 0.9em;
-             display: inline-block;
-             vertical-align: middle;
-        }
+        /* ** NEW/UPDATED ** Diary Styles */
+        #diary-chat-view { /* Container for notes/chat */ display: flex; flex-direction: column; height: 100%; width: 100%; box-sizing: border-box; }
+        .diary-top-notes-area { flex-shrink: 0; height: 90px; /* Adjusted height */ overflow-y: auto; border-bottom: 1px solid var(--chat-input-border); padding: 5px; background-color: rgba(0,0,0, 0.1); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; }
+        .diary-notes-empty { color: var(--system-message-text); font-style: italic; text-align: center; margin-top: 15px; font-size: 0.9em;}
+        .diary-note-item { background-color: rgba(255, 255, 255, 0.1); padding: 4px 8px; margin-bottom: 3px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; }
+        .diary-note-item span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-right: 5px; }
+        .diary-note-remove { background: none; border: none; color: var(--error-color, red); font-size: 1.2em; cursor: pointer; padding: 0 5px; line-height: 1; }
+        .diary-controls-area { flex-shrink: 0; padding: 5px; text-align: center; border-bottom: 1px solid var(--chat-input-border); }
+        #diary-add-button, #diary-view-entries-button { margin: 0 5px; padding: 6px 12px; font-size: 0.85em; }
+        #diary-add-button:disabled { opacity: 0.5; cursor: not-allowed; background: var(--secondary-button-bg); color: var(--secondary-button-text); border-color: var(--secondary-button-border); }
+        #diary-view-entries-button { /* Using .secondary class */ }
+        .diary-chat-log-area { flex-grow: 1; overflow-y: auto; padding: 8px; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; }
+        .diary-chat-log-area p { margin: 4px 0 7px 0; line-height: 1.4; word-wrap: break-word; max-width: 100%; position: relative; padding-right: 25px; }
+        .diary-user-message { color: var(--user-message-text); text-align: right; margin-left: auto; max-width: 90%; } /* Allow slightly wider */
+        .diary-user-message strong { color: var(--user-message-name); }
+        .diary-mika-message { color: var(--mika-message-text); margin-right: auto; max-width: 90%; }
+        .diary-mika-message strong { color: var(--mika-message-name); }
+        .diary-heart-button { position: absolute; top: 1px; right: 1px; background: none; border: none; color: var(--system-message-text); cursor: pointer; font-size: 1em; padding: 0; line-height: 1; opacity: 0.3; transition: opacity 0.2s, color 0.2s; }
+        .diary-chat-log-area p:hover .diary-heart-button { opacity: 1; }
+        .diary-heart-button.active { color: var(--mika-message-name); opacity: 1; }
+        .diary-input-area { display: flex; padding: 8px; border-top: 1px solid var(--chat-input-border); background-color: var(--chat-input-area-bg); flex-shrink: 0; }
+        .diary-chat-input { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--chat-input-border); background-color: var(--chat-input-bg); color: var(--chat-input-text); border-radius: 15px 0 0 15px; font-size: 0.95em; outline: none; }
+        .diary-send-button { padding: 8px 15px; border: 1px solid var(--chat-input-border); background: linear-gradient(45deg, var(--send-button-bg-1), var(--send-button-bg-2)); color: white; font-weight: bold; cursor: pointer; border-radius: 0 15px 15px 0; transition: background 0.2s; }
+        .diary-send-button:hover { background: linear-gradient(45deg, var(--send-button-hover-1), var(--send-button-hover-2)); }
+        /* Entries View Styles */
+        #diary-entries-view { height: 100%; width: 100%; overflow-y: auto; padding: 10px; box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); }
+        .diary-view-back-button { margin-bottom: 10px; }
+        .diary-entries-title { text-align: center; color: var(--chat-header-text); margin-bottom: 10px; font-size: 1.1em; }
+        .diary-entries-empty { color: var(--system-message-text); font-style: italic; text-align: center; }
+        .diary-entry-item { background-color: rgba(255, 255, 255, 0.05); border: 1px solid var(--chat-input-border); padding: 8px 12px; margin-bottom: 8px; border-radius: 8px; }
+        .diary-entry-date { display: block; font-size: 0.75em; color: var(--system-message-text); margin-bottom: 4px; }
+        .diary-entry-item p { margin: 0; line-height: 1.4; color: var(--chat-log-text); font-size: 0.95em;}
 
-        #tq-questions-left {
-             margin-bottom: 20px;
-             text-align: center;
-             font-size: 1.1em;
-             color: var(--system-message-text); /* Default color */
-             transition: color 0.3s ease, font-weight 0.3s ease;
-        }
 
-        #tq-new-game {
-             /* Uses .rps-choice-button class */
-             margin-top: 10px;
-        }
-
-
-        /* Shared Game Message Log */
+        /* Shared Game Message Log (Used by TTT, RPS, GTN, 20Q - NOT Diary) */
         #game-message-log {
             width: 100%;
-            max-width: 450px; /* Limit width */
-            height: 120px; /* Slightly taller log */
+            max-width: 450px;
+            height: 100px; /* Reduced height for other games */
             overflow-y: auto;
             border: 1px solid var(--game-message-log-border);
             background: var(--game-message-log-bg);
-            padding: 10px;
-            margin-bottom: 15px; /* Space below log, above back button */
+            padding: 8px; /* Reduced padding */
+            margin-bottom: 10px; /* Reduced margin */
             border-radius: 5px;
             font-size: 0.9em;
             color: var(--game-message-log-text);
             scrollbar-width: thin;
             scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
             box-sizing: border-box;
-            flex-shrink: 0; /* Prevent shrinking */
-            margin-top: auto; /* Push log towards bottom if space allows */
+            flex-shrink: 0;
+            margin-top: auto; /* Push towards bottom */
         }
-        #game-message-log p {
-            margin: 3px 0;
-            line-height: 1.4;
-            word-wrap: break-word;
-        }
+        #game-message-log p { margin: 2px 0; line-height: 1.3; word-wrap: break-word; }
         #game-message-log .mika-gamemsg { color: var(--game-message-mika); }
         #game-message-log .user-gamemsg { color: var(--game-message-user); }
         #game-message-log .system-gamemsg { color: var(--game-message-system); font-style: italic; }
 
-        /* Shared Game Buttons (Reset added by specific games, Back is shared) */
-        #ttt-reset-button, /* Style TTT reset */
-        #back-to-chat-button { /* Style back button */
-             padding: 8px 20px;
-             font-size: 0.9em;
-             font-weight: bold;
-             border-radius: 15px;
-             cursor: pointer;
-             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-             transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
-             border: none;
-             color: var(--button-text);
-             background: linear-gradient(45deg, var(--button-gradient-1), var(--button-gradient-2));
-             margin-top: 10px; /* Adjusted margin */
-             flex-shrink: 0; /* Prevent shrinking */
-        }
-        #ttt-reset-button {
-            /* Specific placement might be needed in games.js or here */
-            /* Example: margin-top: 5px; margin-bottom: 10px; */
-        }
-        #ttt-reset-button:hover,
-        #back-to-chat-button:hover {
-             transform: scale(1.05);
-             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-             background: linear-gradient(45deg, var(--send-button-hover-1), var(--send-button-hover-2));
-        }
-        #ttt-reset-button:active,
-        #back-to-chat-button:active {
-             transform: scale(0.98);
-        }
+        /* Shared Game Buttons */
+        #ttt-reset-button, #back-to-chat-button { padding: 8px 20px; font-size: 0.9em; font-weight: bold; border-radius: 15px; cursor: pointer; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease; border: none; color: var(--button-text); background: linear-gradient(45deg, var(--button-gradient-1), var(--button-gradient-2)); margin-top: 5px; /* Reduced margin */ flex-shrink: 0; }
+        #ttt-reset-button:hover, #back-to-chat-button:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); background: linear-gradient(45deg, var(--send-button-hover-1), var(--send-button-hover-2)); }
+        #ttt-reset-button:active, #back-to-chat-button:active { transform: scale(0.98); }
 
         /* --- Scrollbar Styles --- */
         ::-webkit-scrollbar { width: 8px; }
@@ -597,7 +530,7 @@
         /* --- Responsive Styles --- */
          @media (max-width: 600px) {
              body { padding: 5px; }
-             .popup-modal { padding: 20px 25px; }
+             .popup-modal { padding: 20px 25px; max-width: 95%; }
              .popup-modal h2 { font-size: 1.4em; }
              .popup-modal p { font-size: 0.9em;}
              .popup-button { padding: 8px 20px; font-size: 0.9em; }
@@ -611,18 +544,30 @@
              .dropdown-menu { max-height: 150px; }
 
              /* Game specific responsive */
-             #game-area { padding: 10px; }
-             #game-title { font-size: 1.2em; margin-bottom: 10px; }
-             #ttt-board { width: 180px; height: 180px; } /* Smaller board */
+             #game-area { padding: 8px; }
+             #game-title { font-size: 1.1em; margin-bottom: 8px; }
+             #ttt-board { width: 180px; height: 180px; }
              .ttt-cell { font-size: 1.8em; }
              .rps-choice-button { font-size: 1em; padding: 8px 15px; }
-              #gtn-input { width: 100px; font-size: 0.9em; }
-              #gtn-submit { font-size: 0.9em; padding: 8px 10px; }
-              #gtn-indicator { min-width: 140px; font-size: 0.9em; }
+             #gtn-input { width: 100px; font-size: 0.9em; }
+             #gtn-submit { font-size: 0.9em; padding: 8px 10px; }
+             #gtn-indicator { min-width: 140px; font-size: 0.9em; }
              #tq-question-input, #tq-guess-input { width: calc(100% - 80px); max-width: 250px; font-size: 0.9em; }
              #tq-ask-button, #tq-guess-button { font-size: 0.85em; padding: 8px; }
-             #tq-questions-left { font-size: 1em; }
-             #game-message-log { max-width: 100%; height: 100px; } /* Adjust height */
+             #tq-questions-left { font-size: 1em; margin-bottom: 10px;}
+             /* Diary Responsive */
+             .diary-top-notes-area { height: 70px; padding: 4px; }
+             .diary-note-item { font-size: 0.8em; padding: 2px 5px; }
+             #diary-add-button, #diary-view-entries-button { font-size: 0.75em; padding: 4px 8px;}
+             .diary-chat-log-area { padding: 6px; }
+             .diary-input-area { padding: 6px; }
+             .diary-chat-input { font-size: 0.9em; padding: 5px 10px; }
+             .diary-send-button { font-size: 0.9em; padding: 5px 10px; }
+             .diary-entry-item { padding: 6px 10px; }
+             .diary-entry-date { font-size: 0.7em; }
+             .diary-entry-item p { font-size: 0.9em; }
+
+             #game-message-log { max-width: 100%; height: 80px; padding: 5px;} /* Shared log */
              #ttt-reset-button, #back-to-chat-button { font-size: 0.85em; padding: 6px 15px; }
          }
 
@@ -700,8 +645,9 @@
                    <button id="game-ttt-button" title="Play Tic-Tac-Toe with Mika!">Tic-Tac-Toe ♡</button>
                    <button id="game-rps-button" title="Play Rock Paper Scissors!">Rock Paper Scissors!</button>
                    <button id="game-gtn-button" title="Play Guess The Number!">Guess The Number~</button>
-                   <!-- ** NEW ** 20Q Button -->
                    <button id="game-20q-button" title="Play 20 Questions!">20 Questions? Hehe!</button>
+                   <!-- ** NEW ** Diary Button -->
+                   <button id="game-diary-button" title="Open Our Secret Diary ♡">Diary ♡</button>
                    <p class="no-items" style="display: none;">More games soon~!</p>
                </div>
               <!-- Settings Dropdown -->
@@ -714,8 +660,8 @@
 
          <!-- Main Content Area Wrapper -->
          <div id="main-content-area">
-             <!-- Chat Area -->
-             <div id="chat-area">
+             <!-- Chat Area (for main chat) -->
+             <div id="chat-area" style="display: none;"> <!-- Initially hidden, shown by JS -->
                 <div id="chat-log">
                      <!-- Messages appear here -->
                      <p class="system-message">Initializing...</p>
@@ -725,23 +671,24 @@
                      <button id="send-button" disabled>Send</button>
                  </div>
              </div>
-             <!-- Game Area -->
-             <div id="game-area">
+             <!-- Game Area (for all games/diary) -->
+             <div id="game-area" style="display: none;"> <!-- Initially hidden, shown by JS -->
                  <!-- Game content loaded here -->
              </div>
          </div>
     </div>
 
     <!-- Include the GAME scripts -->
-    <script src="games.js"></script> <!-- Tic Tac Toe -->
-    <script src="rps.js"></script> <!-- Rock Paper Scissors -->
-    <script src="guess_number.js"></script> <!-- Guess The Number -->
-    <script src="twenty_questions.js"></script> <!-- ** NEW ** 20 Questions -->
+    <script src="games.js"></script>
+    <script src="rps.js"></script>
+    <script src="guess_number.js"></script>
+    <script src="twenty_questions.js"></script>
+    <script src="diary.js"></script> <!-- ** NEW ** Diary -->
     <!-- Include the API script -->
     <script src="api.js"></script>
 
     <script>
-        // Nyaa~! Homework Helper Mika with ALL the Games! ♡
+        // Nyaa~! Homework Helper Mika with the Secret Diary! ♡
 
         // --- DOM Elements ---
         const bodyElement = document.body;
@@ -777,7 +724,8 @@
         const gameTttButton = document.getElementById('game-ttt-button');
         const gameRpsButton = document.getElementById('game-rps-button');
         const gameGtnButton = document.getElementById('game-gtn-button');
-        const game20qButton = document.getElementById('game-20q-button'); // ** NEW ** 20Q Button
+        const game20qButton = document.getElementById('game-20q-button');
+        const gameDiaryButton = document.getElementById('game-diary-button'); // ** NEW ** Diary Button
         const settingsInstallButton = document.getElementById('settings-install-button');
         const settingsThemeButton = document.getElementById('settings-theme-button');
         const settingsResetButton = document.getElementById('settings-reset-button');
@@ -801,14 +749,21 @@
 
         // --- Game State ---
         let isGameActive = false;
+        let currentActiveGameModule = null; // Keep track of which game module is active for exit handling
 
         // --- Utility Functions ---
         const getTimestamp = () => Date.now();
         const sanitizeHTML = (str) => {
-            const temp = document.createElement('div');
-            temp.textContent = str;
-            return temp.innerHTML.replace(/<script.*?>.*?<\/script>/gi, '');
+            if (typeof DOMPurify !== 'undefined') {
+                 // Allow basic formatting: <strong>, <em>, <code>, <br>, <del>
+                 return DOMPurify.sanitize(str, { USE_PROFILES: { html: true }, ALLOWED_TAGS: ['strong', 'em', 'code', 'br', 'del', 'pre'], KEEP_CONTENT: true });
+            } else {
+                // Extremely basic fallback if DOMPurify fails
+                console.warn("DOMPurify missing, using basic fallback sanitization.");
+                return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            }
         };
+
 
         // --- Local Storage Functions ---
         function saveToLocalStorage(key, value) { try { localStorage.setItem(key, value); console.log(`Saved ${key}`); return true; } catch (e) { console.error(`Failed to save ${key}:`, e); return false; } }
@@ -867,17 +822,108 @@
         function updateGamesDropdown() { console.log("Updating games dropdown."); }
 
         // --- View Switching ---
-        function switchToChatView() { if (!gameArea || !chatArea) return; gameArea.style.display = 'none'; chatArea.style.display = 'flex'; isGameActive = false; if (chatInput && !chatInput.disabled) { setTimeout(() => chatInput.focus(), 50); } clearGameAreaContent(); console.log("Switched to Chat View"); if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred install prompt."); installPopup.style.display = 'flex'; } }
-        function switchToGameView() { if (!gameArea || !chatArea) return; chatArea.style.display = 'none'; gameArea.style.display = 'flex'; isGameActive = true; closeAllDropdowns(); if (installPopup.style.display === 'flex') { installPopup.style.display = 'none'; console.log("Hiding install prompt for game."); } console.log("Switched to Game View"); }
+        async function switchToChatView() { // ** MODIFIED to handle async exit **
+             if (!gameArea || !chatArea) return;
+             if (isGameActive && currentActiveGameModule && typeof currentActiveGameModule.onExit === 'function') {
+                 console.log("Calling onExit for active game module...");
+                 try {
+                     await currentActiveGameModule.onExit(); // Wait for any cleanup/saving
+                     console.log("Game module onExit completed.");
+                 } catch (error) {
+                     console.error("Error during game module onExit:", error);
+                 }
+             }
+             currentActiveGameModule = null; // Clear the active module
+
+             gameArea.style.display = 'none';
+             chatArea.style.display = 'flex';
+             isGameActive = false;
+             if (chatInput && !chatInput.disabled) {
+                 setTimeout(() => chatInput.focus(), 50);
+             }
+             clearGameAreaContent(); // Clear AFTER exit handler
+             console.log("Switched to Chat View");
+             if (deferredInstallPrompt && !hasInstallPromptBeenShown()) {
+                 console.log("Showing deferred install prompt.");
+                 installPopup.style.display = 'flex';
+             }
+         }
+
+        function switchToGameView(gameModule = null) { // ** MODIFIED to accept game module **
+            if (!gameArea || !chatArea) return;
+            chatArea.style.display = 'none';
+            gameArea.style.display = 'flex';
+            isGameActive = true;
+            currentActiveGameModule = gameModule; // ** NEW ** Store active module
+            closeAllDropdowns();
+            if (installPopup.style.display === 'flex') {
+                 installPopup.style.display = 'none';
+                 console.log("Hiding install prompt for game.");
+            }
+            console.log("Switched to Game View");
+        }
+
 
         // --- Game Loading Logic ---
-        function setupGameAreaBase(gameTitleText) { if (!gameArea) return null; clearGameAreaContent(); const title = document.createElement('h2'); title.id = 'game-title'; title.textContent = gameTitleText; gameArea.appendChild(title); const uiContainer = document.createElement('div'); uiContainer.id = 'game-specific-ui'; uiContainer.style.cssText = 'width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; flex-shrink: 0;'; gameArea.appendChild(uiContainer); const msgLog = document.createElement('div'); msgLog.id = 'game-message-log'; gameArea.appendChild(msgLog); const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView; gameArea.appendChild(backBtn); return uiContainer; }
-        function displayGameMessage(sender, text) { const log = document.getElementById('game-message-log'); if (!log) return; const el = document.createElement('p'); let css = 'system-gamemsg'; let msg = sanitizeHTML(text); if (sender === 'Mika') { css = 'mika-gamemsg'; msg = msg.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>').replace(/~(\S.*?\S)~/g, '<del>$1</del>').replace(/(?<!<br>)\n/g, '<br>'); } el.innerHTML = msg; el.className = css; log.appendChild(el); log.scrollTop = log.scrollHeight; }
+        function setupGameAreaBase(gameTitleText) {
+             // This function is used by TTT, RPS, GTN, 20Q but NOT the Diary
+             if (!gameArea) return null;
+             clearGameAreaContent();
+             const title = document.createElement('h2'); title.id = 'game-title'; title.textContent = gameTitleText; gameArea.appendChild(title);
+             const uiContainer = document.createElement('div'); uiContainer.id = 'game-specific-ui'; uiContainer.style.cssText = 'width: 100%; height: auto; display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; flex-shrink: 0; overflow-y: auto;'; gameArea.appendChild(uiContainer);
+             const msgLog = document.createElement('div'); msgLog.id = 'game-message-log'; gameArea.appendChild(msgLog); // Shared log for simple games
+             const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView; gameArea.appendChild(backBtn);
+             return uiContainer;
+         }
+
+        function displayGameMessage(sender, text) {
+             // Used by TTT, RPS, GTN, 20Q, AND Diary
+             // Try to find the correct log (shared or diary's internal)
+             let log = document.getElementById('game-message-log'); // Shared log
+             if (currentActiveGameModule === MikaDiary) {
+                 log = document.getElementById('diary-chat-log'); // Diary's log
+             }
+             if (!log) {
+                 console.warn("Could not find appropriate message log for:", sender, text);
+                 return;
+             }
+
+             const el = document.createElement('p');
+             let css = 'system-gamemsg'; // Default for shared log
+             let msg = sanitizeHTML(text); // Sanitize first
+
+             if (currentActiveGameModule === MikaDiary) {
+                 // Diary handles its own message classes and heart button in its append function
+                 // We just call the diary's append function directly if possible?
+                 // For simplicity here, let's use the standard classes but target the diary log
+                 if (sender === 'User') { css = 'diary-user-message'; msg = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${msg}`; }
+                 else if (sender === 'Mika') { css = 'diary-mika-message'; msg = `<strong>Mika:</strong> ${msg.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/(?<!<br>)\n/g, '<br>')}`; }
+                 else { css = 'system-message'; } // Use system style within diary log for system messages
+                 el.className = css;
+                 el.innerHTML = msg;
+                 // Diary heart button is added by its own append function, not here
+             } else {
+                 // Standard games using the shared log
+                 if (sender === 'Mika') {
+                     css = 'mika-gamemsg';
+                     msg = msg.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>').replace(/~(\S.*?\S)~/g, '<del>$1</del>').replace(/(?<!<br>)\n/g, '<br>');
+                 }
+                 el.className = css;
+                 el.innerHTML = msg; // Use innerHTML for formatting
+             }
+
+             log.appendChild(el);
+             log.scrollTop = log.scrollHeight;
+         }
+
+
         async function callMikaApiForGame(prompt) { if (!currentApiKey) { console.error("API Key missing"); return Promise.reject("Mrow! API Key missing!"); } const user = currentUserName || "Study Buddy"; console.log(`API call for game: ${prompt.substring(0,100)}...`); try { const resp = await sendMessageToMika(prompt, [], currentApiKey, user); if (typeof resp === 'string' && resp.trim().length > 0) { return resp; } else { console.warn("API returned empty/invalid."); return null; } } catch (err) { console.error("API call error:", err); return Promise.reject(`Meeeow! API error: ${err}`); } }
-        function loadTicTacToe() { switchToGameView(); const ui = setupGameAreaBase('Tic-Tac-Toe with Mika! ♡'); if (ui && typeof TicTacToe !== 'undefined' && TicTacToe.init) { const board = document.createElement('div'); board.id = 'ttt-board'; ui.appendChild(board); TicTacToe.init(board, displayGameMessage); displayGameMessage('System', "Game loaded! You go first (X)!"); } else { console.error("TTT load failed"); displayGameMessage('System', 'Mrow! TTT Game failed...'); } }
-        function loadRPS() { switchToGameView(); const ui = setupGameAreaBase('Rock Paper Scissors! ♡'); if (ui && typeof RockPaperScissors !== 'undefined' && RockPaperScissors.init) { RockPaperScissors.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); displayGameMessage('System', "Rock Paper Scissors! Make your choice!"); } else { console.error("RPS load failed"); displayGameMessage('System', 'Mrow! RPS Game failed...'); } }
-        function loadGuessTheNumber() { switchToGameView(); const ui = setupGameAreaBase('Guess My Number~ ♡'); if (ui && typeof GuessTheNumber !== 'undefined' && GuessTheNumber.init) { GuessTheNumber.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("GTN load failed"); displayGameMessage('System', 'Mrow! GTN Game failed...'); } }
-        function loadTwentyQuestions() { switchToGameView(); const ui = setupGameAreaBase('20 Questions! ♡'); if (ui && typeof TwentyQuestions !== 'undefined' && TwentyQuestions.init) { TwentyQuestions.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("20Q load failed"); displayGameMessage('System', 'Mrow! 20 Questions Game failed...'); } }
+
+        function loadTicTacToe() { switchToGameView(TicTacToe); const ui = setupGameAreaBase('Tic-Tac-Toe with Mika! ♡'); if (ui && typeof TicTacToe !== 'undefined' && TicTacToe.init) { const board = document.createElement('div'); board.id = 'ttt-board'; ui.appendChild(board); TicTacToe.init(board, displayGameMessage); displayGameMessage('System', "Game loaded! You go first (X)!"); } else { console.error("TTT load failed"); displayGameMessage('System', 'Mrow! TTT Game failed...'); currentActiveGameModule = null; } }
+        function loadRPS() { switchToGameView(RockPaperScissors); const ui = setupGameAreaBase('Rock Paper Scissors! ♡'); if (ui && typeof RockPaperScissors !== 'undefined' && RockPaperScissors.init) { RockPaperScissors.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); displayGameMessage('System', "Rock Paper Scissors! Make your choice!"); } else { console.error("RPS load failed"); displayGameMessage('System', 'Mrow! RPS Game failed...'); currentActiveGameModule = null; } }
+        function loadGuessTheNumber() { switchToGameView(GuessTheNumber); const ui = setupGameAreaBase('Guess My Number~ ♡'); if (ui && typeof GuessTheNumber !== 'undefined' && GuessTheNumber.init) { GuessTheNumber.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("GTN load failed"); displayGameMessage('System', 'Mrow! GTN Game failed...'); currentActiveGameModule = null; } }
+        function loadTwentyQuestions() { switchToGameView(TwentyQuestions); const ui = setupGameAreaBase('20 Questions! ♡'); if (ui && typeof TwentyQuestions !== 'undefined' && TwentyQuestions.init) { TwentyQuestions.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("20Q load failed"); displayGameMessage('System', 'Mrow! 20 Questions Game failed...'); currentActiveGameModule = null; } }
+        function loadDiary() { if (!gameArea) return; clearGameAreaContent(); switchToGameView(MikaDiary); if (typeof MikaDiary !== 'undefined' && MikaDiary.init) { MikaDiary.init(gameArea, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("MikaDiary load failed"); gameArea.innerHTML = '<p class="system-message">Mrow! Diary failed to load...</p>'; const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView; gameArea.appendChild(backBtn); currentActiveGameModule = null; } }
         function clearGameAreaContent() { if (gameArea) gameArea.innerHTML = ''; }
 
         // --- API Call & Message Handling ---
@@ -905,7 +951,8 @@
         if (gameTttButton) gameTttButton.addEventListener('click', () => { closeAllDropdowns(); loadTicTacToe(); });
         if (gameRpsButton) gameRpsButton.addEventListener('click', () => { closeAllDropdowns(); loadRPS(); });
         if (gameGtnButton) gameGtnButton.addEventListener('click', () => { closeAllDropdowns(); loadGuessTheNumber(); });
-        if (game20qButton) game20qButton.addEventListener('click', () => { closeAllDropdowns(); loadTwentyQuestions(); }); // ** NEW **
+        if (game20qButton) game20qButton.addEventListener('click', () => { closeAllDropdowns(); loadTwentyQuestions(); });
+        if (gameDiaryButton) gameDiaryButton.addEventListener('click', () => { closeAllDropdowns(); loadDiary(); }); // ** NEW **
         // Settings Dropdown Listeners
         if (settingsInstallButton) settingsInstallButton.addEventListener('click', handleManualInstall);
         if (settingsThemeButton) settingsThemeButton.addEventListener('click', toggleTheme);
@@ -916,8 +963,12 @@
         // --- Start the App ---
         initializeApp();
 
-        // Auto-save chats
-        window.addEventListener('beforeunload', saveAllChats);
+        // Auto-save chats / Handle game exit potentially
+        window.addEventListener('beforeunload', (event) => {
+            saveAllChats();
+            // Note: Cannot reliably run async operations like saveStagedEntriesToDiary here.
+            // The onExit handler in switchToChatView is the better place for game-specific saving.
+        });
 
         // Nyaa~! ♡
     </script>
