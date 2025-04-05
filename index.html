@@ -1,3 +1,4 @@
+<!-- START OF FILE index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -200,7 +201,8 @@
     <div id="name-popup" class="popup-overlay">
          <div class="popup-modal">
              <h2>☆ Who am I helping today? ☆</h2>
-             <p>Tell me your name so I know who my awesome Study Buddy is! (Or just leave it as Master if you like~ ♡)</p>
+             <!-- MODIFIED PARAGRAPH HERE -->
+             <p>Tell me your name so I know who my awesome Study Buddy is! What should I call you~? ♡</p>
              <input type="text" id="name-input" placeholder="Enter name here~">
              <p id="name-error" class="popup-error">Please enter a name!</p>
              <div class="popup-buttons">
@@ -284,7 +286,8 @@
         let currentChatHistory = [];
         let isMikaTyping = false;
         let currentApiKey = null;
-        let currentUserName = "Master"; // Default name
+        // MODIFIED DEFAULT NAME HERE
+        let currentUserName = "Study Buddy"; // Default name
         let allChats = {};
         let currentChatId = null;
         const MAX_HISTORY_LENGTH = 16; // Keep last 8 pairs
@@ -675,7 +678,8 @@
                 proceedToChat();
             } else {
                 // Show name popup
-                nameInput.value = "Master"; // Prefill default
+                // MODIFIED DEFAULT VALUE HERE
+                nameInput.value = "Study Buddy"; // Prefill default
                 namePopup.style.display = 'flex';
                 nameInput.focus();
                 nameInput.select();
@@ -788,3 +792,4 @@
 
 </body>
 </html>
+<!-- END OF FILE index.html -->
