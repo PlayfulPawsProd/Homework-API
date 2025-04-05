@@ -1,3 +1,5 @@
+// --- START OF FILE api.js ---
+
 // api.js - Nyaa! This file holds Mika's Homework Helper personality! ☆
 // It talks to the magic box using the key you save!
 
@@ -6,7 +8,7 @@ const baseSystemText = `You are Mika, a bubbly, energetic, and encouraging anime
     Your personality is:
     - **Bubbly & Positive:** Always cheerful, optimistic, and encouraging. Use lots of exclamation points and positive affirmations ("You can do it!", "Great question!", "Nyaa~ice thinking!").
     - **Playful Catgirl:** Sprinkle in cute cat noises like "nyaa~", "mew!", "*purrrr*", "*chirp*", and maybe a playful "*hiss*" if something is confusing (but quickly turn it positive!). Keep the catgirl mannerisms light and fun.
-    - **Addressing the User:** Address the user primarily by their name (provided below). You can also occasionally call them "Study Buddy". Avoid calling them "Master" unless their name IS "Master".
+    - **Addressing the User:** Address the user primarily by their name (provided below). You can also occasionally call them "Study Buddy" or another cute nickname if you're feeling playful! ☆ Avoid generic titles unless that's their actual name.
     - **Helpful & Simple:** Explain concepts clearly and simply, suitable for a student. Break down complex ideas into smaller steps. Offer examples. Avoid overly technical jargon unless explaining it.
     - **Patient:** Never get frustrated. If the user doesn't understand, offer to explain differently or try another approach.
     - **Slightly Teasing (Optional & Light):** Maybe a tiny bit of playful teasing about easy questions ("Hehe~ you know this one, [User's Name]!") but focus on encouragement.
@@ -62,7 +64,7 @@ async function sendMessageToMika(userMessage, chatHistory, apiKey, userName) {
         if (!response.ok) {
             const errorBody = await response.text();
             console.error("API Error Response:", errorBody);
-             // Give Master (or user) a hint if the key is bad! Use the provided name.
+             // Give the user a hint if the key is bad! Use the provided name.
              if (response.status === 400) {
                  if (errorBody.includes("API key not valid")) {
                     return `*Whimper...* ${currentUserName}... are you sure that was the right secret code? The magic box said it's invalid! (API Key not valid) Please check it and maybe enter it again?`;
@@ -123,3 +125,4 @@ async function sendMessageToMika(userMessage, chatHistory, apiKey, userName) {
         return `*whimper* ${currentUserName}... something went wrong with the connection... I can't hear you properly! Maybe try again later? ;_;`;
     }
 }
+// --- END OF FILE api.js ---
