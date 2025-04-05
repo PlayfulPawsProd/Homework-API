@@ -45,7 +45,7 @@
             animation: fadeIn 0.4s ease-out 0.1s backwards;
         }
         .popup-modal h2 { color: #a32d37; margin-top: 0; margin-bottom: 15px; font-size: 1.6em; }
-        .popup-modal p { color: #555; margin-bottom: 20px; line-height: 1.5; font-size: 0.95em; }
+        .popup-modal p { color: #555; margin-bottom: 15px; /* Adjusted margin */ line-height: 1.5; font-size: 0.95em; }
         .popup-modal input[type="text"], .popup-modal input[type="password"] {
             width: 100%; padding: 12px 15px; margin-bottom: 15px;
             border: 2px solid #f06292; border-radius: 8px; font-size: 1em;
@@ -56,7 +56,7 @@
             box-shadow: 0 0 8px rgba(216, 27, 96, 0.5);
             animation: subtlePulse 1.5s infinite;
         }
-        .popup-buttons { display: flex; justify-content: space-around; margin-top: 10px; gap: 15px; }
+        .popup-buttons { display: flex; justify-content: center; /* Center single button */ margin-top: 20px; gap: 15px; }
         .popup-button {
             padding: 10px 25px; font-size: 1em; font-weight: bold; border-radius: 20px;
             cursor: pointer; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
@@ -79,7 +79,7 @@
             background-color: #1a0d13; color: #ffacd1;
             border: 3px solid #f06292; border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            display: none; /* Hidden until key and name are set */
+            display: none; /* Hidden until setup complete */
             flex-direction: column; justify-content: space-between; align-items: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 15px; line-height: 1.5; overflow: hidden; padding: 0;
@@ -184,7 +184,21 @@
 </head>
 <body>
 
-    <!-- API Key Popup (First) -->
+    <!-- ** NEW ** Disclaimer Popup (Zeroth?) -->
+    <div id="disclaimer-popup" class="popup-overlay">
+        <div class="popup-modal">
+            <h2>☆ Hold on a Sec, Study Buddy! (=^･ω･^=) ☆</h2>
+            <p>Hiii! Before we start the homework fun, just a few quick things, nyaa~!</p>
+            <p>☆ Your secret API code stays super safe! It only lives in *your* browser's storage, like a little secret between us. I don't send it anywhere else, promise! *pinky swear* ♡</p>
+            <p>☆ I'm powered by smarty-pants AI magic! ✨ I try my bestest to be helpful and safe, *purrrr*, but sometimes AI can say silly or unexpected things! The person who shared me can't be responsible for everything I might say, okay?</p>
+            <p>☆ **Important!** Could you please show this screen to a parent or guardian? They just need to tap the button below to say it's okay for you to chat with me! Teehee~ Thanks!</p>
+            <div class="popup-buttons">
+                <button id="disclaimer-agree-button" class="popup-button">Okay, Mika! We Understand! ♡</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Key Popup (First after Disclaimer) -->
     <div id="api-key-popup" class="popup-overlay">
         <div class="popup-modal">
             <h2>(=^･ω･^=) Mika needs the Secret Code!</h2>
@@ -197,11 +211,10 @@
         </div>
     </div>
 
-    <!-- Name Input Popup (Second) -->
+    <!-- Name Input Popup (Second after Disclaimer) -->
     <div id="name-popup" class="popup-overlay">
          <div class="popup-modal">
              <h2>☆ Who am I helping today? ☆</h2>
-             <!-- MODIFIED PARAGRAPH HERE -->
              <p>Tell me your name so I know who my awesome Study Buddy is! What should I call you~? ♡</p>
              <input type="text" id="name-input" placeholder="Enter name here~">
              <p id="name-error" class="popup-error">Please enter a name!</p>
@@ -211,7 +224,7 @@
          </div>
      </div>
 
-     <!-- PWA Install Popup (Optional, Third) -->
+     <!-- PWA Install Popup (Optional, Third after Disclaimer) -->
      <div id="install-popup" class="popup-overlay">
           <div class="popup-modal">
               <h2>☆ Install Mika Helper? ☆</h2>
@@ -256,6 +269,10 @@
         // Nyaa~! Homework Helper Mika with localStorage, PWA Install & Name!
 
         // --- DOM Elements ---
+        // ** NEW ** Disclaimer elements
+        const disclaimerPopup = document.getElementById('disclaimer-popup');
+        const disclaimerAgreeButton = document.getElementById('disclaimer-agree-button');
+
         const apiKeyPopup = document.getElementById('api-key-popup');
         const apiKeyInput = document.getElementById('api-key-input');
         const saveApiKeyButton = document.getElementById('save-api-key-button');
@@ -286,12 +303,13 @@
         let currentChatHistory = [];
         let isMikaTyping = false;
         let currentApiKey = null;
-        // MODIFIED DEFAULT NAME HERE
         let currentUserName = "Study Buddy"; // Default name
         let allChats = {};
         let currentChatId = null;
         const MAX_HISTORY_LENGTH = 16; // Keep last 8 pairs
         let deferredInstallPrompt = null;
+        // ** NEW ** Disclaimer agreement flag key
+        const DISCLAIMER_AGREED_KEY = 'mikaDisclaimerAgreed_v1'; // Added version in case text changes later
 
         // --- Utility Functions ---
         const getTimestamp = () => Date.now();
@@ -309,8 +327,6 @@
                 return true;
             } catch (e) {
                 console.error(`Failed to save ${key} to localStorage:`, e);
-                // Avoid showing alerts for storage errors unless critical
-                // appendMessage('system', `Mrow! Couldn't save ${key}... maybe your browser storage is full or disabled? ;_;`);
                 return false;
             }
         }
@@ -346,16 +362,20 @@
         const loadUserName = () => loadFromLocalStorage('mikaHelper_userName');
         const clearUserName = () => clearFromLocalStorage('mikaHelper_userName');
 
+        // ** NEW ** Disclaimer agreement functions
+        const saveDisclaimerAgreement = () => saveToLocalStorage(DISCLAIMER_AGREED_KEY, 'true');
+        const hasAgreedToDisclaimer = () => loadFromLocalStorage(DISCLAIMER_AGREED_KEY) === 'true';
+        const clearDisclaimerAgreement = () => clearFromLocalStorage(DISCLAIMER_AGREED_KEY);
+
+
         function saveAllChats() {
             try {
                 if (currentChatId && currentChatHistory.length > 0) {
                      allChats[currentChatId] = currentChatHistory;
                 }
-                // Only save if there's something to save
                 if (Object.keys(allChats).length > 0) {
                     saveToLocalStorage('mikaHelper_allChats', JSON.stringify(allChats));
                 } else {
-                    // If allChats is empty, clear it from storage too
                     clearFromLocalStorage('mikaHelper_allChats');
                 }
             } catch (e) { /* Error handled in saveToLocalStorage */ }
@@ -378,16 +398,14 @@
         }
 
          function deleteAllChats() {
-             // Use currentUserName in the confirmation dialog
              if (confirm(`Hey ${currentUserName}! Are you SURE you want to delete ALL our chat history forever?! (ฅΦωΦฅ);;`)) {
                  clearFromLocalStorage('mikaHelper_allChats');
                  allChats = {};
-                 startNewChat(false); // Start fresh without greeting
+                 startNewChat(false);
                  updateHistoryDropdown();
                  appendMessage('system', "All chat history deleted. It's like we just met again, nyaa~!");
                  console.log("All chat history deleted.");
              }
-             // Hide dropdown after action regardless of choice
              if (historyDropdown.style.display === 'block') historyDropdown.style.display = 'none';
          }
 
@@ -398,9 +416,13 @@
                 deferredInstallPrompt = event;
                 console.log('`beforeinstallprompt` event fired and stored.');
                 const installPromptShown = loadFromLocalStorage('mikaInstallPromptShown');
-                // Only show the custom prompt if the event exists AND we haven't shown it before (or user cleared storage)
                 if (!installPromptShown) {
-                    installPopup.style.display = 'flex';
+                     // Show install prompt only AFTER disclaimer, API, and name are set
+                     if (chatContainer.style.display === 'flex') {
+                         installPopup.style.display = 'flex';
+                     } else {
+                         console.log("Deferring install prompt until main chat is visible.");
+                     }
                 } else {
                     console.log('Install prompt already shown/dismissed this session.');
                 }
@@ -413,13 +435,13 @@
                      const { outcome } = await deferredInstallPrompt.userChoice;
                      console.log(`User response to the install prompt: ${outcome}`);
                      deferredInstallPrompt = null;
-                     saveToLocalStorage('mikaInstallPromptShown', 'true'); // Mark as shown/actioned
+                     saveToLocalStorage('mikaInstallPromptShown', 'true');
                  }
              });
 
              installLaterButton.addEventListener('click', () => {
                  installPopup.style.display = 'none';
-                 saveToLocalStorage('mikaInstallPromptShown', 'true'); // Mark as shown/actioned
+                 saveToLocalStorage('mikaInstallPromptShown', 'true');
                  console.log('User chose to install later.');
              });
 
@@ -427,8 +449,6 @@
                console.log('Mika PWA was installed!');
                installPopup.style.display = 'none';
                deferredInstallPrompt = null;
-               // Maybe remove the install prompt shown flag so it *could* appear again if uninstalled? Optional.
-               // clearFromLocalStorage('mikaInstallPromptShown');
              });
         }
 
@@ -444,11 +464,11 @@
 
 
         // --- Chat Interface Functions ---
-
         function appendMessage(sender, message, isHtml = false) {
              if (!chatLog || chatContainer.style.display === 'none') {
                  console.warn("Attempted to append message while chat log is hidden or missing.");
-                 return;
+                 // Don't return yet, system messages might need to appear before chat is fully "flex"
+                 // return;
              }
 
             const messageElement = document.createElement('p');
@@ -466,16 +486,22 @@
                      .replace(/```([\s\S]*?)```/g, (match, p1) => `<pre><code>${sanitizeHTML(p1.trim())}</code></pre>`)
                      .replace(/(?<!<br>)\n/g, '<br>');
                 messageElement.innerHTML = `<strong>Mika:</strong> ${processedMessage}`;
-            } else {
+            } else { // System message
                  messageElement.className = 'system-message';
                  messageElement.innerHTML = sanitizedMessage;
             }
-            chatLog.appendChild(messageElement);
-            scrollToBottom();
+            // Ensure chatLog exists before appending
+             if (chatLog) {
+                 chatLog.appendChild(messageElement);
+                 scrollToBottom();
+             } else {
+                 console.error("Chat log element not found when trying to append message.");
+             }
         }
 
          function showTypingIndicator() {
              removeTypingIndicator();
+             if (!chatLog) return; // Safety check
              const typingElement = document.createElement('p');
              typingElement.className = 'typing-indicator';
              typingElement.innerHTML = 'Mika is thinking... *purrrr*';
@@ -484,34 +510,40 @@
          }
 
          function removeTypingIndicator() {
+             if (!chatLog) return; // Safety check
              const typingIndicator = chatLog.querySelector('.typing-indicator');
              if (typingIndicator) typingIndicator.remove();
          }
 
         function scrollToBottom() {
-            setTimeout(() => { chatLog.scrollTop = chatLog.scrollHeight; }, 50);
+            // Added safety check for chatLog
+            if (chatLog) {
+                setTimeout(() => { chatLog.scrollTop = chatLog.scrollHeight; }, 50);
+            }
         }
 
-        function clearChatDisplay() { chatLog.innerHTML = ''; }
+        function clearChatDisplay() {
+            if (chatLog) chatLog.innerHTML = '';
+        }
 
          function enableChatInput() {
+             if (!chatInput || !sendButton) return; // Safety check
              chatInput.disabled = false;
              sendButton.disabled = false;
-             // Use the updated name here
              chatInput.placeholder = `Ask Mika about your homework, ${currentUserName || 'Study Buddy'}~ ♡`;
          }
 
          function disableChatInput(message = "Mika is thinking...") {
+             if (!chatInput || !sendButton) return; // Safety check
              chatInput.disabled = true;
              sendButton.disabled = true;
              chatInput.placeholder = message;
          }
 
         function updateChatTitle() {
-            chatTitle.textContent = `Study Time with ${sanitizeHTML(currentUserName)}! ♡`;
+             if (chatTitle) chatTitle.textContent = `Study Time with ${sanitizeHTML(currentUserName)}! ♡`;
         }
 
-         // Updates the placeholder text in the input field
          function updateInputPlaceholder() {
             if (chatInput) {
                  chatInput.placeholder = `Ask Mika about your homework, ${currentUserName || 'Study Buddy'}~ ♡`;
@@ -519,7 +551,6 @@
         }
 
         // --- Chat Management Functions ---
-
         function startNewChat(greet = true) {
              if (currentChatId && currentChatHistory.length > 0) {
                   allChats[currentChatId] = currentChatHistory;
@@ -533,10 +564,10 @@
              } else {
                  appendMessage('system', `Started a new chat.`);
              }
-             enableChatInput(); // Will use currentUserName in placeholder
+             enableChatInput();
              updateHistoryDropdown();
              console.log(`Started new chat with ID: ${currentChatId}`);
-             if (historyDropdown.style.display === 'block') historyDropdown.style.display = 'none';
+             if (historyDropdown && historyDropdown.style.display === 'block') historyDropdown.style.display = 'none';
         }
 
         function loadChat(chatId) {
@@ -556,13 +587,13 @@
                          appendMessage('Mika', msg.parts[0].text);
                      }
                  });
-                 enableChatInput(); // Will use currentUserName in placeholder
+                 enableChatInput();
                  console.log(`Loaded chat ID: ${chatId}`);
              } else {
                  console.error(`Chat ID ${chatId} not found.`);
                  appendMessage('system', "Mrow! Couldn't find that chat history!");
              }
-             if (historyDropdown.style.display === 'block') historyDropdown.style.display = 'none';
+             if (historyDropdown && historyDropdown.style.display === 'block') historyDropdown.style.display = 'none';
              saveAllChats();
         }
 
@@ -575,6 +606,9 @@
              if (chatIds.length === 0 && (!currentChatId || currentChatHistory.length === 0)) {
                 historyDropdown.innerHTML = '<p style="padding: 8px; color: #aaa; text-align: center; font-size: 0.9em;">No past chats yet!</p>';
              } else {
+                 // This logic might need adjustment if current chat isn't saved immediately
+                 // Consider if showing "Unsaved" is necessary if autosave works well
+                 /*
                  if (currentChatId && currentChatHistory.length > 0 && !allChats[currentChatId]) {
                     const currentBtn = document.createElement('button');
                     currentBtn.textContent = `Current Chat (Unsaved) - ${new Date(parseInt(currentChatId)).toLocaleTimeString()}`;
@@ -582,6 +616,7 @@
                     currentBtn.style.opacity = 0.7;
                     historyDropdown.appendChild(currentBtn);
                  }
+                 */
 
                 chatIds.forEach(id => {
                     const chat = allChats[id];
@@ -597,24 +632,33 @@
                 });
              }
 
-             const deleteAllBtn = document.createElement('button');
-             deleteAllBtn.textContent = 'Delete ALL History';
-             deleteAllBtn.className = 'delete-history';
-             deleteAllBtn.title = 'Permanently delete all saved chats!';
-             deleteAllBtn.onclick = deleteAllChats;
-             historyDropdown.appendChild(deleteAllBtn);
+             // Ensure the "Delete ALL" button always exists if the dropdown element itself exists
+             if (deleteAllHistoryButton) {
+                 historyDropdown.appendChild(deleteAllHistoryButton.cloneNode(true)); // Clone to avoid moving the original
+                 // Re-attach listener to the cloned button
+                 historyDropdown.querySelector('.delete-history').onclick = deleteAllChats;
+             } else { // Fallback: create it if ref is somehow lost
+                 const deleteAllBtn = document.createElement('button');
+                 deleteAllBtn.textContent = 'Delete ALL History';
+                 deleteAllBtn.className = 'delete-history';
+                 deleteAllBtn.title = 'Permanently delete all saved chats!';
+                 deleteAllBtn.onclick = deleteAllChats;
+                 historyDropdown.appendChild(deleteAllBtn);
+             }
         }
 
 
         // --- API Call & Message Handling ---
         async function handleSendMessage() {
+            // Added safety checks
+            if (!chatInput || !currentApiKey || isMikaTyping) return;
+
             const messageText = chatInput.value.trim();
-            // Ensure currentUserName has a value, default to 'Study Buddy' if somehow null/empty
             const userNameForApi = currentUserName || "Study Buddy";
 
-            if (!messageText || isMikaTyping || !currentApiKey) return;
+            if (!messageText) return;
 
-            appendMessage('user', messageText); // Uses currentUserName for display via its own logic
+            appendMessage('user', messageText);
             currentChatHistory.push({ role: 'user', parts: [{ text: messageText }] });
             chatInput.value = '';
             isMikaTyping = true;
@@ -627,9 +671,7 @@
              }
 
             try {
-                // Pass the current user's name to the API function
                 const mikaResponse = await sendMessageToMika(messageText, currentChatHistory, currentApiKey, userNameForApi);
-
                 removeTypingIndicator();
                 appendMessage('Mika', mikaResponse);
                 currentChatHistory.push({ role: 'model', parts: [{ text: mikaResponse }] });
@@ -638,13 +680,12 @@
             } catch (error) {
                 console.error("Error in handleSendMessage:", error);
                 removeTypingIndicator();
-                // Use the current user's name in the error message
                 appendMessage('system', error.message || `Mrow! Something went wrong, ${userNameForApi}... Mika can't talk right now. ;_;`);
             } finally {
                 isMikaTyping = false;
                 if (currentApiKey) {
-                    enableChatInput(); // Will use currentUserName in placeholder
-                    chatInput.focus();
+                    enableChatInput();
+                    if (chatInput) chatInput.focus(); // Added safety check
                  } else {
                      disableChatInput("API Key needed!");
                  }
@@ -654,128 +695,190 @@
 
         // --- Initialization Flow ---
         function proceedToChat() {
+            if (!chatContainer) return; // Safety check
             chatContainer.style.display = 'flex';
             const mostRecentChatId = loadAllChats();
             clearChatDisplay();
-            updateInputPlaceholder(); // Set placeholder correctly before loading/starting
+            updateInputPlaceholder();
             if (mostRecentChatId) {
                 loadChat(mostRecentChatId);
             } else {
-                startNewChat(true); // Start fresh with greeting
+                startNewChat(true);
             }
-            // enableChatInput(); // Already called within loadChat/startNewChat
             updateChatTitle();
             updateHistoryDropdown();
-            setupInstallPrompt(); // Check for PWA install prompt now UI is ready
+            // Delay PWA install prompt check slightly to ensure UI is fully ready
+            setTimeout(setupInstallPrompt, 500);
         }
 
         function checkNameAndProceed() {
             const storedName = loadUserName();
             if (storedName) {
                 currentUserName = storedName;
-                namePopup.style.display = 'none';
-                updateInputPlaceholder(); // Update placeholder now name is loaded
+                if (namePopup) namePopup.style.display = 'none'; // Safety check
+                updateInputPlaceholder();
                 proceedToChat();
             } else {
                 // Show name popup
-                // MODIFIED DEFAULT VALUE HERE
-                nameInput.value = "Study Buddy"; // Prefill default
-                namePopup.style.display = 'flex';
-                nameInput.focus();
-                nameInput.select();
+                if (namePopup && nameInput) { // Safety checks
+                    nameInput.value = "Study Buddy"; // Prefill default
+                    namePopup.style.display = 'flex';
+                    nameInput.focus();
+                    nameInput.select();
+                }
             }
         }
 
-        function initializeApp() {
-            registerServiceWorker(); // Register SW early
-
+        function checkApiKeyAndProceed() {
             const loadedKey = loadApiKey();
             if (loadedKey) {
                 currentApiKey = loadedKey;
-                apiKeyPopup.style.display = 'none';
+                if (apiKeyPopup) apiKeyPopup.style.display = 'none'; // Safety check
                 checkNameAndProceed(); // Key exists, check name next
             } else {
-                // Show API key popup first
-                apiKeyPopup.style.display = 'flex';
-                chatContainer.style.display = 'none';
-                disableChatInput("API Key needed!");
-                apiKeyInput.focus();
+                // Show API key popup
+                if (apiKeyPopup && chatContainer && apiKeyInput) { // Safety checks
+                    apiKeyPopup.style.display = 'flex';
+                    chatContainer.style.display = 'none';
+                    disableChatInput("API Key needed!");
+                    apiKeyInput.focus();
+                }
+            }
+        }
+
+        // ** MODIFIED ** Initialization starts here now
+        function initializeApp() {
+            registerServiceWorker();
+
+            // 1. Check if Disclaimer has been agreed to
+            if (hasAgreedToDisclaimer()) {
+                console.log("Disclaimer already agreed to.");
+                // 2. If yes, proceed to check API Key
+                checkApiKeyAndProceed();
+            } else {
+                // 3. If no, show Disclaimer popup
+                console.log("Showing disclaimer popup.");
+                if (disclaimerPopup) disclaimerPopup.style.display = 'flex'; // Safety check
+                // Ensure other popups/chat are hidden initially
+                if (apiKeyPopup) apiKeyPopup.style.display = 'none';
+                if (namePopup) namePopup.style.display = 'none';
+                if (chatContainer) chatContainer.style.display = 'none';
             }
         }
 
         // --- Event Listeners ---
-        saveApiKeyButton.addEventListener('click', () => {
-            const key = apiKeyInput.value.trim();
-            if (key) {
-                if (saveApiKey(key)) {
-                    currentApiKey = key;
-                    apiKeyPopup.style.display = 'none';
-                    apiKeyError.style.display = 'none';
-                    checkNameAndProceed(); // Key saved, check name next
+
+        // ** NEW ** Disclaimer Agreement Listener
+        if (disclaimerAgreeButton) {
+            disclaimerAgreeButton.addEventListener('click', () => {
+                saveDisclaimerAgreement();
+                if (disclaimerPopup) disclaimerPopup.style.display = 'none'; // Safety check
+                checkApiKeyAndProceed(); // Start the normal flow after agreement
+            });
+        }
+
+        if (saveApiKeyButton) {
+            saveApiKeyButton.addEventListener('click', () => {
+                if (!apiKeyInput) return; // Safety check
+                const key = apiKeyInput.value.trim();
+                if (key) {
+                    if (saveApiKey(key)) {
+                        currentApiKey = key;
+                        if (apiKeyPopup) apiKeyPopup.style.display = 'none'; // Safety check
+                        if (apiKeyError) apiKeyError.style.display = 'none'; // Safety check
+                        checkNameAndProceed(); // Key saved, check name next
+                    } else {
+                         // Handle potential storage error (optional, maybe log?)
+                         if (apiKeyError) {
+                             apiKeyError.textContent = "Mrow! Couldn't save the key... is storage full?";
+                             apiKeyError.style.display = 'block';
+                         }
+                    }
+                } else {
+                    if (apiKeyError) apiKeyError.style.display = 'block'; // Safety check
                 }
-            } else {
-                apiKeyError.style.display = 'block';
-            }
-        });
+            });
+        }
 
-         saveNameButton.addEventListener('click', () => {
-             const name = nameInput.value.trim();
-             if (name) {
-                 if (saveUserName(name)) {
-                     currentUserName = name; // Update state
-                     namePopup.style.display = 'none';
-                     nameError.style.display = 'none';
-                     updateInputPlaceholder(); // Update placeholder immediately
-                     proceedToChat(); // Name saved, proceed to chat
+        if (saveNameButton) {
+             saveNameButton.addEventListener('click', () => {
+                 if (!nameInput) return; // Safety check
+                 const name = nameInput.value.trim();
+                 if (name) {
+                     if (saveUserName(name)) {
+                         currentUserName = name; // Update state
+                         if (namePopup) namePopup.style.display = 'none'; // Safety check
+                         if (nameError) nameError.style.display = 'none'; // Safety check
+                         updateInputPlaceholder(); // Update placeholder immediately
+                         proceedToChat(); // Name saved, proceed to chat
+                     } else {
+                          // Handle potential storage error (optional)
+                          if (nameError) {
+                              nameError.textContent = "Mrow! Couldn't save the name... storage issue?";
+                              nameError.style.display = 'block';
+                          }
+                     }
+                 } else {
+                     if (nameError) nameError.style.display = 'block'; // Safety check
                  }
-             } else {
-                 nameError.style.display = 'block';
-             }
-         });
+             });
+        }
 
-        apiKeyInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') saveApiKeyButton.click();
-            if (apiKeyError.style.display === 'block') apiKeyError.style.display = 'none';
-        });
+        if (apiKeyInput) {
+            apiKeyInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') saveApiKeyButton?.click(); // Optional chaining
+                if (apiKeyError && apiKeyError.style.display === 'block') apiKeyError.style.display = 'none';
+            });
+        }
 
-         nameInput.addEventListener('keypress', (event) => {
-             if (event.key === 'Enter') saveNameButton.click();
-             if (nameError.style.display === 'block') nameError.style.display = 'none';
-         });
+        if (nameInput) {
+             nameInput.addEventListener('keypress', (event) => {
+                 if (event.key === 'Enter') saveNameButton?.click(); // Optional chaining
+                 if (nameError && nameError.style.display === 'block') nameError.style.display = 'none';
+             });
+        }
 
-        sendButton.addEventListener('click', handleSendMessage);
-        chatInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                handleSendMessage();
-            }
-        });
+        if (sendButton) sendButton.addEventListener('click', handleSendMessage);
+        if (chatInput) {
+            chatInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    handleSendMessage();
+                }
+            });
+        }
 
-        settingsButton.addEventListener('click', () => {
-             if (confirm(`Change API Key or Name for ${currentUserName}? This will clear current settings and reload the page.`)) {
-                 clearApiKey();
-                 clearUserName();
-                 // Clear install prompt shown flag so it might reappear
-                 clearFromLocalStorage('mikaInstallPromptShown');
-                 window.location.reload();
-             }
-        });
+        if (settingsButton) {
+            settingsButton.addEventListener('click', () => {
+                 // Included disclaimer agreement clear here too
+                 if (confirm(`Change Settings for ${currentUserName}? This will clear API Key, Name, and Disclaimer agreement, then reload.`)) {
+                     clearApiKey();
+                     clearUserName();
+                     clearDisclaimerAgreement(); // Clear disclaimer flag
+                     clearFromLocalStorage('mikaInstallPromptShown'); // Clear install prompt flag
+                     window.location.reload();
+                 }
+            });
+        }
 
-        newChatButton.addEventListener('click', () => startNewChat(true));
+        if (newChatButton) newChatButton.addEventListener('click', () => startNewChat(true));
 
-         historyButton.addEventListener('click', (event) => {
-             event.stopPropagation();
-             if (historyDropdown.style.display === 'block') {
-                 historyDropdown.style.display = 'none';
-             } else {
-                 updateHistoryDropdown();
-                 historyDropdown.style.display = 'block';
-             }
-         });
+        if (historyButton) {
+             historyButton.addEventListener('click', (event) => {
+                 event.stopPropagation();
+                 if (!historyDropdown) return; // Safety check
+                 if (historyDropdown.style.display === 'block') {
+                     historyDropdown.style.display = 'none';
+                 } else {
+                     updateHistoryDropdown();
+                     historyDropdown.style.display = 'block';
+                 }
+             });
+        }
 
+         // Close history dropdown logic
          document.addEventListener('click', (event) => {
-             // Close dropdown if clicking anywhere outside the dropdown itself AND outside the history button
-             if (historyDropdown.style.display === 'block' && !historyDropdown.contains(event.target) && event.target !== historyButton) {
+             if (historyDropdown && historyButton && historyDropdown.style.display === 'block' && !historyDropdown.contains(event.target) && event.target !== historyButton) {
                  historyDropdown.style.display = 'none';
              }
          });
