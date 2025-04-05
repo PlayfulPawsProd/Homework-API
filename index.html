@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mika's Homework Helper! ♡</title>
+    <!-- Link the Manifest File -->
     <link rel="manifest" href="manifest.json">
+    <!-- Theme Color for Browser UI -->
     <meta name="theme-color" content="#d81b60">
     <style>
         /* --- Base Styles --- */
@@ -23,28 +25,27 @@
             margin: 0;
             padding: 15px;
             box-sizing: border-box;
-            overflow: hidden; /* Prevent body scroll when modals are open */
+            overflow: hidden;
         }
 
         /* --- Pop-up Modal Styles (Shared) --- */
         .popup-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85);
-            display: none; /* Hidden by default */
+            display: none; /* Hidden by default, shown via JS */
             justify-content: center; align-items: center;
             z-index: 200; backdrop-filter: blur(5px);
             animation: fadeIn 0.3s ease-out;
         }
         .popup-modal {
-            background: #fff0f6; /* Slightly different pink for modals */
-            padding: 30px 40px; border-radius: 15px;
+            background: #ffe0f0; padding: 30px 40px; border-radius: 15px;
             box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
             text-align: center; border: 4px solid #d81b60;
             max-width: 450px; width: 90%;
             animation: fadeIn 0.4s ease-out 0.1s backwards;
         }
         .popup-modal h2 { color: #a32d37; margin-top: 0; margin-bottom: 15px; font-size: 1.6em; }
-        .popup-modal p { color: #555; margin-bottom: 15px; line-height: 1.5; font-size: 0.95em; }
+        .popup-modal p { color: #555; margin-bottom: 15px; /* Adjusted margin */ line-height: 1.5; font-size: 0.95em; }
         .popup-modal input[type="text"], .popup-modal input[type="password"] {
             width: 100%; padding: 12px 15px; margin-bottom: 15px;
             border: 2px solid #f06292; border-radius: 8px; font-size: 1em;
@@ -55,15 +56,17 @@
             box-shadow: 0 0 8px rgba(216, 27, 96, 0.5);
             animation: subtlePulse 1.5s infinite;
         }
-        .popup-buttons { display: flex; justify-content: space-around; margin-top: 20px; gap: 15px; flex-wrap: wrap; } /* Added wrap */
+        .popup-buttons { display: flex; justify-content: center; /* Center single button */ margin-top: 20px; gap: 15px; }
         .popup-button {
             padding: 10px 25px; font-size: 1em; font-weight: bold; border-radius: 20px;
             cursor: pointer; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
             transition: transform 0.2s ease, box-shadow 0.2s ease; border: none;
             color: white; background: linear-gradient(45deg, #d81b60, #f06292);
         }
-         .popup-button.secondary {
-             background: #eee; color: #555; border: 1px solid #ccc;
+         .popup-button.secondary { /* For "Later" or "No Thanks" */
+             background: #eee;
+             color: #555;
+             border: 1px solid #ccc;
          }
         .popup-button:hover { transform: scale(1.05); box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3); }
         .popup-button.secondary:hover { background: #ddd; }
@@ -81,7 +84,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 15px; line-height: 1.5; overflow: hidden; padding: 0;
             animation: fadeIn 0.5s ease-out forwards;
-            position: relative; /* Needed for absolute positioning of game container */
         }
 
         /* --- Header Area --- */
@@ -92,11 +94,11 @@
             position: relative;
         }
         #chat-header h2 { margin: 0; font-size: 1.3em; color: #fce4ec; text-shadow: 0 0 3px #f06292; cursor: default; }
-        .header-buttons { display: flex; align-items: center; flex-wrap: wrap; gap: 5px;} /* Added wrap and gap */
+        .header-buttons { display: flex; align-items: center; }
         .header-button {
              padding: 5px 10px; font-size: 0.8em; background-color: #f06292; color: #1a0d13;
              border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s, transform 0.1s;
-             /* margin-left: 8px; */ /* Replaced margin with gap */
+             margin-left: 8px;
         }
         .header-button:hover { background-color: #d81b60; transform: scale(1.05); }
         .header-button:active { transform: scale(0.98); }
@@ -124,22 +126,12 @@
             overflow-y: auto; padding: 15px; box-sizing: border-box;
             scrollbar-width: thin; scrollbar-color: #f06292 #1a1a2e; color: #ffe0f0;
             text-align: left; flex-grow: 1;
-            /* ** MODIFIED ** Make space for game container */
-            margin-bottom: 0; /* Reset margin if game container is absolute */
-            transition: margin-bottom 0.3s ease-in-out; /* Smooth transition */
         }
-        #chat-log.game-active {
-            /* ** NEW ** Shrink chat log slightly when game is active */
-            /* Adjust this value based on game container height */
-            /* margin-bottom: 250px; */ /* Example if game container is below */
-        }
-
         #chat-log p { margin: 5px 0 10px 0; line-height: 1.5; word-wrap: break-word; max-width: 100%; }
         #chat-log .user-message { color: #ade8f4; text-align: right; margin-left: auto; max-width: 85%; }
-        #chat-log .user-message strong { color: #48cae4; }
+        #chat-log .user-message strong { color: #48cae4; } /* Name will go here */
         #chat-log .mika-message { color: #ffacd1; margin-right: auto; max-width: 85%; }
         #chat-log .mika-message strong { color: #f06292; }
-        #chat-log .mika-message em { color: #f8bbd0; font-style: italic; } /* Style for Mika's game turn markers */
         #chat-log .system-message { color: #aaa; font-style: italic; font-size: 0.9em; text-align: center; }
         #chat-log .typing-indicator { color: #f06292; font-style: italic; font-size: 0.9em; text-align: center; animation: fadeIn 0.3s; }
 
@@ -147,8 +139,7 @@
         #chat-input-area {
             display: flex; width: 100%; padding: 10px 15px; box-sizing: border-box;
             border-top: 1px solid #f06292; background-color: rgba(240, 98, 146, 0.1);
-            flex-shrink: 0; z-index: 5; /* Ensure it's above game overlay if needed */
-            position: relative; /* To keep it at the bottom */
+            flex-shrink: 0;
         }
         #chat-input {
             flex-grow: 1; padding: 10px 15px; border: 1px solid #f06292; background-color: #1a1a2e;
@@ -165,69 +156,6 @@
         #send-button:hover { background: linear-gradient(45deg, #f06292, #d81b60); transform: scale(1.02); }
         #send-button:active { transform: scale(0.98); }
         #send-button:disabled { background: #666; cursor: not-allowed; transform: none; }
-
-
-        /* --- ** NEW ** Game Container Styles --- */
-        #game-overlay {
-            position: absolute; bottom: 0; left: 0; /* Position above input area */
-            width: 100%; background-color: rgba(26, 13, 19, 0.95); /* Dark background */
-            border-top: 2px solid #f06292;
-            padding: 15px; box-sizing: border-box;
-            display: none; /* Hidden by default */
-            flex-direction: column; align-items: center;
-            z-index: 4; /* Above chat log, below input */
-            animation: fadeIn 0.3s ease-out;
-        }
-        #game-title {
-            color: #fce4ec; font-size: 1.2em; margin-bottom: 10px; text-shadow: 0 0 3px #f06292;
-        }
-        #ttt-board {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            width: 210px; /* Fixed size for simplicity */
-            height: 210px;
-            gap: 5px;
-            background-color: #442233; /* Darker grid background */
-            border: 3px solid #f06292;
-            border-radius: 10px;
-            margin-bottom: 15px; /* Space before reset button */
-        }
-        .ttt-cell {
-            background-color: #1a0d13; /* Cell background */
-            border: 1px solid #f06292;
-            border-radius: 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2.5em; /* Big X and O */
-            font-weight: bold;
-            cursor: pointer;
-            color: #ffacd1; /* Default text color (X/O) */
-            transition: background-color 0.2s ease;
-        }
-        .ttt-cell:hover:not(.taken) {
-            background-color: rgba(240, 98, 146, 0.3); /* Hover effect */
-        }
-        .ttt-cell.taken {
-            cursor: not-allowed;
-            color: #fce4ec; /* Make taken cells stand out slightly */
-        }
-        #ttt-reset-button {
-            padding: 8px 20px; font-size: 0.9em; background-color: #f06292; color: #1a0d13;
-            border: none; border-radius: 15px; cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-        }
-        #ttt-reset-button:hover { background-color: #d81b60; transform: scale(1.05); }
-        #close-game-button {
-             position: absolute; top: 10px; right: 10px;
-             background: #a32d37; color: white; border: none;
-             border-radius: 50%; width: 25px; height: 25px;
-             font-size: 1.2em; line-height: 25px; text-align: center;
-             cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-         #close-game-button:hover { background: #c62828; }
-
 
         /* --- Scrollbar Styles --- */
         ::-webkit-scrollbar { width: 8px; }
@@ -246,9 +174,6 @@
              #chat-header h2 { font-size: 1.1em; }
              .header-button { font-size: 0.75em; padding: 4px 8px; }
              #chat-log { padding: 10px; }
-             /* Adjust game container for small screens if needed */
-              #ttt-board { width: 180px; height: 180px; }
-              .ttt-cell { font-size: 2em; }
              #chat-input-area { padding: 8px 10px; }
              #chat-input { padding: 8px 12px; font-size: 0.95em; }
              #send-button { padding: 8px 15px; font-size: 0.95em; }
@@ -259,9 +184,8 @@
 </head>
 <body>
 
-    <!-- Disclaimer Popup -->
+    <!-- ** NEW ** Disclaimer Popup (Zeroth?) -->
     <div id="disclaimer-popup" class="popup-overlay">
-        <!-- ... (disclaimer content as before) ... -->
         <div class="popup-modal">
             <h2>☆ Hold on a Sec, Study Buddy! (=^･ω･^=) ☆</h2>
             <p>Hiii! Before we start the homework fun, just a few quick things, nyaa~!</p>
@@ -274,13 +198,13 @@
         </div>
     </div>
 
-    <!-- API Key Popup -->
+    <!-- API Key Popup (First after Disclaimer) -->
     <div id="api-key-popup" class="popup-overlay">
-        <!-- ... (api key content as before, with autocomplete hint) ... -->
         <div class="popup-modal">
             <h2>(=^･ω･^=) Mika needs the Secret Code!</h2>
             <p>To start chatting, please enter your Google Gemini API Key! It gets saved safely in *your* browser so you don't have to enter it every time, nya~!</p>
-            <input type="password" id="api-key-input" placeholder="Paste your Gemini API Key here~ ♡" autocomplete="new-password">
+            <input type="password" id="api-key-input" placeholder="Paste your Gemini API Key here~ ♡"
+autocomplete="new-password">
             <p id="api-key-error" class="popup-error">Meeeow! You need to paste a key in here!</p>
             <div class="popup-buttons">
                 <button id="save-api-key-button" class="popup-button">Save & Continue! ♡</button>
@@ -288,9 +212,8 @@
         </div>
     </div>
 
-    <!-- Name Input Popup -->
+    <!-- Name Input Popup (Second after Disclaimer) -->
     <div id="name-popup" class="popup-overlay">
-         <!-- ... (name input content as before) ... -->
          <div class="popup-modal">
              <h2>☆ Who am I helping today? ☆</h2>
              <p>Tell me your name so I know who my awesome Study Buddy is! What should I call you~? ♡</p>
@@ -302,10 +225,9 @@
          </div>
      </div>
 
-     <!-- PWA Install Popup -->
+     <!-- PWA Install Popup (Optional, Third after Disclaimer) -->
      <div id="install-popup" class="popup-overlay">
-          <!-- ... (install popup content as before) ... -->
-           <div class="popup-modal">
+          <div class="popup-modal">
               <h2>☆ Install Mika Helper? ☆</h2>
               <p>Want to add me to your Home Screen like a real app for easy access? Nyaa~!</p>
               <div class="popup-buttons">
@@ -315,30 +237,17 @@
           </div>
       </div>
 
-    <!-- ** NEW ** Homework Check Popup -->
-    <div id="homework-check-popup" class="popup-overlay">
-        <div class="popup-modal">
-            <h2>✩°｡⋆⸜(｡˃ ᵕ ˂ )⸝ Playtime Check! ✩°｡⋆</h2>
-            <p>Before we play games... is all your homework done~? Be honest, nyaa~! I'll know if you're lying! *squints playfully*</p>
-            <div class="popup-buttons">
-                <button id="homework-done-button" class="popup-button">Yep! All done! ☆</button>
-                <button id="homework-not-done-button" class="popup-button secondary">Oops, not yet...</button>
-            </div>
-        </div>
-    </div>
 
-
-    <!-- Main Chat Interface -->
+    <!-- Main Chat Interface (Hidden until setup complete) -->
     <div id="chat-container">
          <div id="chat-header">
-             <h2 id="chat-title">Study Time with Mika! ♡</h2>
+             <h2 id="chat-title">Study Time with Mika! ♡</h2> <!-- Title will be updated -->
              <div class="header-buttons">
-                 <!-- ** NEW ** Games Button -->
-                 <button id="games-button" class="header-button" title="Play Games with Mika!">Games 🎮</button>
                  <button id="history-button" class="header-button" title="View Past Chats">History</button>
                  <button id="new-chat-button" class="header-button" title="Start a New Chat">New Chat</button>
                  <button id="settings-button" class="header-button" title="Change API Key or Name">⚙️ Settings</button>
              </div>
+              <!-- Chat History Dropdown -->
               <div id="history-dropdown">
                    <!-- History items will be added here -->
                    <button class="delete-history" id="delete-all-history-button">Delete ALL History</button>
@@ -348,45 +257,37 @@
              <!-- Messages appear here -->
              <p class="system-message">Initializing...</p>
         </div>
-
-        <!-- ** NEW ** Game Overlay Container -->
-        <div id="game-overlay">
-             <button id="close-game-button" title="Close Game Board">×</button>
-             <h3 id="game-title">Let's Play Tic-Tac-Toe!</h3>
-             <div id="ttt-board">
-                 <!-- Tic Tac Toe board cells will be generated here by games.js -->
-             </div>
-             <!-- Reset button will be added here by games.js -->
-        </div>
-
         <div id="chat-input-area">
             <input type="text" id="chat-input" placeholder="Loading..." disabled>
             <button id="send-button" disabled>Send</button>
         </div>
     </div>
 
-    <!-- Include the API and Game scripts -->
+    <!-- Include the API script -->
     <script src="api.js"></script>
-    <!-- ** NEW ** Include games.js -->
-    <script src="games.js"></script>
 
     <script>
-        // Nyaa~! Homework Helper Mika with Games!
+        // Nyaa~! Homework Helper Mika with localStorage, PWA Install & Name!
 
         // --- DOM Elements ---
+        // ** NEW ** Disclaimer elements
         const disclaimerPopup = document.getElementById('disclaimer-popup');
         const disclaimerAgreeButton = document.getElementById('disclaimer-agree-button');
+
         const apiKeyPopup = document.getElementById('api-key-popup');
         const apiKeyInput = document.getElementById('api-key-input');
         const saveApiKeyButton = document.getElementById('save-api-key-button');
         const apiKeyError = document.getElementById('api-key-error');
+
         const namePopup = document.getElementById('name-popup');
         const nameInput = document.getElementById('name-input');
         const saveNameButton = document.getElementById('save-name-button');
         const nameError = document.getElementById('name-error');
+
         const installPopup = document.getElementById('install-popup');
         const installButton = document.getElementById('install-button');
         const installLaterButton = document.getElementById('install-later-button');
+
         const chatContainer = document.getElementById('chat-container');
         const chatLog = document.getElementById('chat-log');
         const chatInput = document.getElementById('chat-input');
@@ -395,29 +296,21 @@
         const newChatButton = document.getElementById('new-chat-button');
         const historyButton = document.getElementById('history-button');
         const historyDropdown = document.getElementById('history-dropdown');
-        const deleteAllHistoryButton = document.getElementById('delete-all-history-button');
+        const deleteAllHistoryButton = document.getElementById('delete-all-history-button'); // Keep ref if needed elsewhere
         const chatTitle = document.getElementById('chat-title');
-
-        // ** NEW ** Game Related Elements
-        const gamesButton = document.getElementById('games-button');
-        const homeworkCheckPopup = document.getElementById('homework-check-popup');
-        const homeworkDoneButton = document.getElementById('homework-done-button');
-        const homeworkNotDoneButton = document.getElementById('homework-not-done-button');
-        const gameOverlay = document.getElementById('game-overlay');
-        const tttBoardElement = document.getElementById('ttt-board');
-        const closeGameButton = document.getElementById('close-game-button');
 
 
         // --- Chat State & Config ---
         let currentChatHistory = [];
         let isMikaTyping = false;
         let currentApiKey = null;
-        let currentUserName = "Study Buddy";
+        let currentUserName = "Study Buddy"; // Default name
         let allChats = {};
         let currentChatId = null;
-        const MAX_HISTORY_LENGTH = 16;
+        const MAX_HISTORY_LENGTH = 16; // Keep last 8 pairs
         let deferredInstallPrompt = null;
-        const DISCLAIMER_AGREED_KEY = 'mikaDisclaimerAgreed_v1';
+        // ** NEW ** Disclaimer agreement flag key
+        const DISCLAIMER_AGREED_KEY = 'mikaDisclaimerAgreed_v1'; // Added version in case text changes later
 
         // --- Utility Functions ---
         const getTimestamp = () => Date.now();
@@ -428,167 +321,576 @@
         };
 
         // --- Local Storage Functions ---
-        // ... (saveToLocalStorage, loadFromLocalStorage, clearFromLocalStorage as before) ...
-        function saveToLocalStorage(key, value) { try { localStorage.setItem(key, value); console.log(`Saved ${key}`); return true; } catch (e) { console.error(`Failed to save ${key}:`, e); return false; } }
-        function loadFromLocalStorage(key) { try { const v = localStorage.getItem(key); if (v) { console.log(`Loaded ${key}`); return v; } } catch (e) { console.error(`Failed to load ${key}:`, e); } console.log(`No ${key} found.`); return null; }
-        function clearFromLocalStorage(key) { try { localStorage.removeItem(key); console.log(`Cleared ${key}`); } catch (e) { console.error(`Failed to clear ${key}:`, e); } }
+        function saveToLocalStorage(key, value) {
+            try {
+                localStorage.setItem(key, value);
+                console.log(`Saved ${key} to localStorage.`);
+                return true;
+            } catch (e) {
+                console.error(`Failed to save ${key} to localStorage:`, e);
+                return false;
+            }
+        }
+
+        function loadFromLocalStorage(key) {
+            try {
+                const value = localStorage.getItem(key);
+                if (value) {
+                    console.log(`Loaded ${key} from localStorage.`);
+                    return value;
+                }
+            } catch (e) {
+                console.error(`Failed to load ${key} from localStorage:`, e);
+            }
+            console.log(`No ${key} found in localStorage.`);
+            return null;
+        }
+
+        function clearFromLocalStorage(key) {
+             try {
+                localStorage.removeItem(key);
+                console.log(`Cleared ${key} from localStorage.`);
+            } catch (e) {
+                console.error(`Failed to clear ${key} from localStorage:`, e);
+            }
+        }
+
         const saveApiKey = (key) => saveToLocalStorage('geminiApiKey_mikaHelper', key);
         const loadApiKey = () => loadFromLocalStorage('geminiApiKey_mikaHelper');
         const clearApiKey = () => clearFromLocalStorage('geminiApiKey_mikaHelper');
+
         const saveUserName = (name) => saveToLocalStorage('mikaHelper_userName', name);
         const loadUserName = () => loadFromLocalStorage('mikaHelper_userName');
         const clearUserName = () => clearFromLocalStorage('mikaHelper_userName');
+
+        // ** NEW ** Disclaimer agreement functions
         const saveDisclaimerAgreement = () => saveToLocalStorage(DISCLAIMER_AGREED_KEY, 'true');
         const hasAgreedToDisclaimer = () => loadFromLocalStorage(DISCLAIMER_AGREED_KEY) === 'true';
         const clearDisclaimerAgreement = () => clearFromLocalStorage(DISCLAIMER_AGREED_KEY);
 
-        // --- Chat History Functions ---
-        // ... (saveAllChats, loadAllChats, deleteAllChats as before) ...
-        function saveAllChats() { try { if (currentChatId && currentChatHistory.length > 0) { allChats[currentChatId] = currentChatHistory; } if (Object.keys(allChats).length > 0) { saveToLocalStorage('mikaHelper_allChats', JSON.stringify(allChats)); } else { clearFromLocalStorage('mikaHelper_allChats'); } } catch (e) { console.error("Error saving chats:", e); } }
-        function loadAllChats() { try { const stored = loadFromLocalStorage('mikaHelper_allChats'); if (stored) { allChats = JSON.parse(stored); const ids = Object.keys(allChats).sort((a, b) => b - a); if (ids.length > 0) return ids[0]; } } catch (e) { console.error("Failed to parse chats:", e); allChats = {}; clearFromLocalStorage('mikaHelper_allChats'); } return null; }
-        function deleteAllChats() { if (confirm(`Hey ${currentUserName}! Are you SURE you want to delete ALL our chat history forever?! (ฅΦωΦฅ);;`)) { clearFromLocalStorage('mikaHelper_allChats'); allChats = {}; startNewChat(false); updateHistoryDropdown(); appendMessage('system', "All chat history deleted!"); console.log("All chat history deleted."); } if (historyDropdown && historyDropdown.style.display === 'block') historyDropdown.style.display = 'none'; }
 
+        function saveAllChats() {
+            try {
+                if (currentChatId && currentChatHistory.length > 0) {
+                     allChats[currentChatId] = currentChatHistory;
+                }
+                if (Object.keys(allChats).length > 0) {
+                    saveToLocalStorage('mikaHelper_allChats', JSON.stringify(allChats));
+                } else {
+                    clearFromLocalStorage('mikaHelper_allChats');
+                }
+            } catch (e) { /* Error handled in saveToLocalStorage */ }
+        }
+
+        function loadAllChats() {
+             try {
+                const storedChats = loadFromLocalStorage('mikaHelper_allChats');
+                if (storedChats) {
+                    allChats = JSON.parse(storedChats);
+                    const chatIds = Object.keys(allChats).sort((a, b) => b - a);
+                    if (chatIds.length > 0) return chatIds[0];
+                }
+            } catch (e) {
+                console.error("Failed to parse chats from localStorage:", e);
+                allChats = {};
+                clearFromLocalStorage('mikaHelper_allChats');
+            }
+            return null;
+        }
+
+         function deleteAllChats() {
+             if (confirm(`Hey ${currentUserName}! Are you SURE you want to delete ALL our chat history forever?! (ฅΦωΦฅ);;`)) {
+                 clearFromLocalStorage('mikaHelper_allChats');
+                 allChats = {};
+                 startNewChat(false);
+                 updateHistoryDropdown();
+                 appendMessage('system', "All chat history deleted. It's like we just met again, nyaa~!");
+                 console.log("All chat history deleted.");
+             }
+             if (historyDropdown.style.display === 'block') historyDropdown.style.display = 'none';
+         }
 
         // --- PWA Install Functions ---
-        // ... (setupInstallPrompt, registerServiceWorker as before, ensure setupInstallPrompt checks chatContainer visibility) ...
-        function setupInstallPrompt() { window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstallPrompt = e; console.log('beforeinstallprompt stored.'); const shown = loadFromLocalStorage('mikaInstallPromptShown'); if (!shown && chatContainer.style.display === 'flex') { installPopup.style.display = 'flex'; } else { console.log('Install prompt already shown or chat not ready.'); } }); /* ... install button listeners ... */ installButton.addEventListener('click', async () => { installPopup.style.display = 'none'; if (deferredInstallPrompt) { deferredInstallPrompt.prompt(); const { outcome } = await deferredInstallPrompt.userChoice; console.log(`Install outcome: ${outcome}`); deferredInstallPrompt = null; saveToLocalStorage('mikaInstallPromptShown', 'true'); } }); installLaterButton.addEventListener('click', () => { installPopup.style.display = 'none'; saveToLocalStorage('mikaInstallPromptShown', 'true'); console.log('Install later.'); }); window.addEventListener('appinstalled', () => { console.log('PWA installed!'); installPopup.style.display = 'none'; deferredInstallPrompt = null; }); }
-        function registerServiceWorker() { if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').then(reg => console.log('SW registered:', reg.scope)).catch(err => console.error('SW reg failed:', err)); } else { console.log("SW not supported."); } }
+        function setupInstallPrompt() {
+            window.addEventListener('beforeinstallprompt', (event) => {
+                event.preventDefault();
+                deferredInstallPrompt = event;
+                console.log('`beforeinstallprompt` event fired and stored.');
+                const installPromptShown = loadFromLocalStorage('mikaInstallPromptShown');
+                if (!installPromptShown) {
+                     // Show install prompt only AFTER disclaimer, API, and name are set
+                     if (chatContainer.style.display === 'flex') {
+                         installPopup.style.display = 'flex';
+                     } else {
+                         console.log("Deferring install prompt until main chat is visible.");
+                     }
+                } else {
+                    console.log('Install prompt already shown/dismissed this session.');
+                }
+            });
+
+             installButton.addEventListener('click', async () => {
+                 installPopup.style.display = 'none';
+                 if (deferredInstallPrompt) {
+                     deferredInstallPrompt.prompt();
+                     const { outcome } = await deferredInstallPrompt.userChoice;
+                     console.log(`User response to the install prompt: ${outcome}`);
+                     deferredInstallPrompt = null;
+                     saveToLocalStorage('mikaInstallPromptShown', 'true');
+                 }
+             });
+
+             installLaterButton.addEventListener('click', () => {
+                 installPopup.style.display = 'none';
+                 saveToLocalStorage('mikaInstallPromptShown', 'true');
+                 console.log('User chose to install later.');
+             });
+
+             window.addEventListener('appinstalled', () => {
+               console.log('Mika PWA was installed!');
+               installPopup.style.display = 'none';
+               deferredInstallPrompt = null;
+             });
+        }
+
+         function registerServiceWorker() {
+             if ('serviceWorker' in navigator) {
+                 navigator.serviceWorker.register('sw.js')
+                 .then((registration) => console.log('Mika Service Worker registered with scope:', registration.scope))
+                 .catch((error) => console.error('Mika Service Worker registration failed:', error));
+             } else {
+                 console.log("Service Workers not supported.");
+             }
+         }
+
 
         // --- Chat Interface Functions ---
         function appendMessage(sender, message, isHtml = false) {
-            if (!chatLog) { console.error("Chat log element not found!"); return; }
+             if (!chatLog || chatContainer.style.display === 'none') {
+                 console.warn("Attempted to append message while chat log is hidden or missing.");
+                 // Don't return yet, system messages might need to appear before chat is fully "flex"
+                 // return;
+             }
 
             const messageElement = document.createElement('p');
-            let finalMessage = isHtml ? message : sanitizeHTML(message);
-
-             // ** MODIFIED ** Add styling for Mika's game commentary italics
-             if (sender === 'Mika' && !isHtml) {
-                 finalMessage = finalMessage.replace(/\*\((.*?)\)\*/g, '<em>($1)</em>'); // Turn *(text)* into italics
-             }
+            const sanitizedMessage = isHtml ? message : sanitizeHTML(message);
 
             if (sender === 'user') {
                 messageElement.className = 'user-message';
-                messageElement.innerHTML = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${finalMessage}`;
+                messageElement.innerHTML = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${sanitizedMessage}`;
             } else if (sender === 'Mika') {
                 messageElement.className = 'mika-message';
-                 // Process markdown after potential game italics
-                 let processedMessage = finalMessage
-                      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
-                      .replace(/\*(?!\()(.*?)(?<!\))\*/g, '<em>$1</em>') // Italics (ensure not game marker)
-                      .replace(/`([^`]+)`/g, '<code>$1</code>') // Inline code
-                      .replace(/```([\s\S]*?)```/g, (match, p1) => `<pre><code>${sanitizeHTML(p1.trim())}</code></pre>`) // Code block
-                      .replace(/(?<!<br>)\n/g, '<br>'); // Newlines
-                 messageElement.innerHTML = `<strong>Mika:</strong> ${processedMessage}`;
+                let processedMessage = sanitizedMessage
+                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                     .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                     .replace(/`([^`]+)`/g, '<code>$1</code>')
+                     .replace(/```([\s\S]*?)```/g, (match, p1) => `<pre><code>${sanitizeHTML(p1.trim())}</code></pre>`)
+                     .replace(/(?<!<br>)\n/g, '<br>');
+                messageElement.innerHTML = `<strong>Mika:</strong> ${processedMessage}`;
             } else { // System message
                  messageElement.className = 'system-message';
-                 messageElement.innerHTML = finalMessage;
+                 messageElement.innerHTML = sanitizedMessage;
             }
-            chatLog.appendChild(messageElement);
-            scrollToBottom();
-        }
-        // ** NEW ** Specific function for game messages to use as callback
-        function appendGameMessage(sender, message) {
-            appendMessage(sender, message, false); // Game messages are plain text with special italics
+            // Ensure chatLog exists before appending
+             if (chatLog) {
+                 chatLog.appendChild(messageElement);
+                 scrollToBottom();
+             } else {
+                 console.error("Chat log element not found when trying to append message.");
+             }
         }
 
-        function showTypingIndicator() { removeTypingIndicator(); if (!chatLog) return; const el = document.createElement('p'); el.className = 'typing-indicator'; el.innerHTML = 'Mika is thinking... *purrrr*'; chatLog.appendChild(el); scrollToBottom(); }
-        function removeTypingIndicator() { if (!chatLog) return; const el = chatLog.querySelector('.typing-indicator'); if (el) el.remove(); }
-        function scrollToBottom() { if (chatLog) { setTimeout(() => { chatLog.scrollTop = chatLog.scrollHeight; }, 50); } }
-        function clearChatDisplay() { if (chatLog) chatLog.innerHTML = ''; }
-        function enableChatInput() { if (!chatInput || !sendButton) return; chatInput.disabled = false; sendButton.disabled = false; chatInput.placeholder = `Ask Mika about homework OR chat while playing, ${currentUserName || 'Study Buddy'}~ ♡`; }
-        function disableChatInput(message = "Mika is thinking...") { if (!chatInput || !sendButton) return; chatInput.disabled = true; sendButton.disabled = true; chatInput.placeholder = message; }
-        function updateChatTitle() { if (chatTitle) chatTitle.textContent = `Study Time with ${sanitizeHTML(currentUserName)}! ♡`; }
-        function updateInputPlaceholder() { if (chatInput) { enableChatInput(); } } // Just reuse enableChatInput
+         function showTypingIndicator() {
+             removeTypingIndicator();
+             if (!chatLog) return; // Safety check
+             const typingElement = document.createElement('p');
+             typingElement.className = 'typing-indicator';
+             typingElement.innerHTML = 'Mika is thinking... *purrrr*';
+             chatLog.appendChild(typingElement);
+             scrollToBottom();
+         }
 
-        // --- Game Functions ---
-        function showGameOverlay() {
-            if (gameOverlay && chatLog) {
-                gameOverlay.style.display = 'flex';
-                // chatLog.classList.add('game-active'); // Add class to potentially shrink chat log
-                // Initialize TicTacToe board, passing the board element and our message function
-                if (typeof TicTacToe !== 'undefined' && tttBoardElement) {
-                    TicTacToe.init(tttBoardElement, appendGameMessage);
-                } else {
-                    console.error("TicTacToe game logic not found or board element missing!");
-                     appendGameMessage('system', "Mrow! Couldn't start the game board... something's missing! ;_;")
-                }
-                scrollToBottom(); // Scroll down to show game messages
-            }
-        }
-        function hideGameOverlay() {
-             if (gameOverlay && chatLog) {
-                gameOverlay.style.display = 'none';
-                // chatLog.classList.remove('game-active'); // Remove class
-                 appendMessage('system', "Game board hidden. Back to focusing? Or wanna play again later? 😉");
+         function removeTypingIndicator() {
+             if (!chatLog) return; // Safety check
+             const typingIndicator = chatLog.querySelector('.typing-indicator');
+             if (typingIndicator) typingIndicator.remove();
+         }
+
+        function scrollToBottom() {
+            // Added safety check for chatLog
+            if (chatLog) {
+                setTimeout(() => { chatLog.scrollTop = chatLog.scrollHeight; }, 50);
             }
         }
 
+        function clearChatDisplay() {
+            if (chatLog) chatLog.innerHTML = '';
+        }
+
+         function enableChatInput() {
+             if (!chatInput || !sendButton) return; // Safety check
+             chatInput.disabled = false;
+             sendButton.disabled = false;
+             chatInput.placeholder = `Ask Mika about your homework, ${currentUserName || 'Study Buddy'}~ ♡`;
+         }
+
+         function disableChatInput(message = "Mika is thinking...") {
+             if (!chatInput || !sendButton) return; // Safety check
+             chatInput.disabled = true;
+             sendButton.disabled = true;
+             chatInput.placeholder = message;
+         }
+
+        function updateChatTitle() {
+             if (chatTitle) chatTitle.textContent = `Study Time with ${sanitizeHTML(currentUserName)}! ♡`;
+        }
+
+         function updateInputPlaceholder() {
+            if (chatInput) {
+                 chatInput.placeholder = `Ask Mika about your homework, ${currentUserName || 'Study Buddy'}~ ♡`;
+            }
+        }
 
         // --- Chat Management Functions ---
-        // ... (startNewChat, loadChat, updateHistoryDropdown as before) ...
-         function startNewChat(greet = true) { if (currentChatId && currentChatHistory.length > 0) { allChats[currentChatId] = currentChatHistory; saveAllChats(); } currentChatId = getTimestamp(); currentChatHistory = []; clearChatDisplay(); hideGameOverlay(); /* ** NEW ** Hide game on new chat */ if (greet) { appendMessage('system', `New chat! Hi ${currentUserName}! Need help? Nyaa~`); } else { appendMessage('system', `New chat started.`); } enableChatInput(); updateHistoryDropdown(); console.log(`Started new chat: ${currentChatId}`); if (historyDropdown && historyDropdown.style.display === 'block') historyDropdown.style.display = 'none'; }
-         function loadChat(chatId) { hideGameOverlay(); /* ** NEW ** Hide game when loading */ if (currentChatId && currentChatHistory.length > 0 && currentChatId !== chatId) { allChats[currentChatId] = currentChatHistory; } if (allChats[chatId]) { currentChatId = chatId; currentChatHistory = allChats[chatId]; clearChatDisplay(); appendMessage('system', `Loaded chat from ${new Date(parseInt(chatId)).toLocaleString()}. Welcome back, ${currentUserName}!`); currentChatHistory.forEach(msg => { if (msg.role === 'user') appendMessage('user', msg.parts[0].text); else if (msg.role === 'model') appendMessage('Mika', msg.parts[0].text); }); enableChatInput(); console.log(`Loaded chat ID: ${chatId}`); } else { console.error(`Chat ID ${chatId} not found.`); appendMessage('system', "Mrow! Couldn't find that chat!"); } if (historyDropdown && historyDropdown.style.display === 'block') historyDropdown.style.display = 'none'; saveAllChats(); }
-         function updateHistoryDropdown() { if (!historyDropdown) return; historyDropdown.innerHTML = ''; const chatIds = Object.keys(allChats).sort((a, b) => b - a); if (chatIds.length === 0 && (!currentChatId || currentChatHistory.length === 0)) { historyDropdown.innerHTML = '<p style="padding: 8px; color: #aaa; text-align: center; font-size: 0.9em;">No past chats!</p>'; } else { chatIds.forEach(id => { const chat = allChats[id]; if (chat && chat.length > 0) { const btn = document.createElement('button'); const firstUser = chat.find(m => m.role === 'user'); const preview = firstUser ? sanitizeHTML(firstUser.parts[0].text.substring(0, 20)) + '...' : 'Chat'; btn.textContent = `${new Date(parseInt(id)).toLocaleString()} - ${preview}`; btn.title = `Load chat from ${new Date(parseInt(id)).toLocaleString()}`; btn.onclick = () => loadChat(id); historyDropdown.appendChild(btn); } }); } /* Add Delete All button */ const delBtn = document.createElement('button'); delBtn.textContent = 'Delete ALL History'; delBtn.className = 'delete-history'; delBtn.title = 'Permanently delete all saved chats!'; delBtn.onclick = deleteAllChats; historyDropdown.appendChild(delBtn); }
+        function startNewChat(greet = true) {
+             if (currentChatId && currentChatHistory.length > 0) {
+                  allChats[currentChatId] = currentChatHistory;
+                  saveAllChats();
+             }
+             currentChatId = getTimestamp();
+             currentChatHistory = [];
+             clearChatDisplay();
+             if (greet) {
+                appendMessage('system', `Started a new chat! What can I help you with, ${currentUserName}? Nyaa~!`);
+             } else {
+                 appendMessage('system', `Started a new chat.`);
+             }
+             enableChatInput();
+             updateHistoryDropdown();
+             console.log(`Started new chat with ID: ${currentChatId}`);
+             if (historyDropdown && historyDropdown.style.display === 'block') historyDropdown.style.display = 'none';
+        }
+
+        function loadChat(chatId) {
+             if (currentChatId && currentChatHistory.length > 0 && currentChatId !== chatId) {
+                  allChats[currentChatId] = currentChatHistory;
+             }
+
+             if (allChats[chatId]) {
+                 currentChatId = chatId;
+                 currentChatHistory = allChats[chatId];
+                 clearChatDisplay();
+                 appendMessage('system', `Loaded chat from ${new Date(parseInt(chatId)).toLocaleString()}. Welcome back, ${currentUserName}!`);
+                 currentChatHistory.forEach(msg => {
+                     if (msg.role === 'user') {
+                         appendMessage('user', msg.parts[0].text);
+                     } else if (msg.role === 'model') {
+                         appendMessage('Mika', msg.parts[0].text);
+                     }
+                 });
+                 enableChatInput();
+                 console.log(`Loaded chat ID: ${chatId}`);
+             } else {
+                 console.error(`Chat ID ${chatId} not found.`);
+                 appendMessage('system', "Mrow! Couldn't find that chat history!");
+             }
+             if (historyDropdown && historyDropdown.style.display === 'block') historyDropdown.style.display = 'none';
+             saveAllChats();
+        }
+
+         function updateHistoryDropdown() {
+             if (!historyDropdown) return;
+             historyDropdown.innerHTML = '';
+
+             const chatIds = Object.keys(allChats).sort((a, b) => b - a);
+
+             if (chatIds.length === 0 && (!currentChatId || currentChatHistory.length === 0)) {
+                historyDropdown.innerHTML = '<p style="padding: 8px; color: #aaa; text-align: center; font-size: 0.9em;">No past chats yet!</p>';
+             } else {
+                 // This logic might need adjustment if current chat isn't saved immediately
+                 // Consider if showing "Unsaved" is necessary if autosave works well
+                 /*
+                 if (currentChatId && currentChatHistory.length > 0 && !allChats[currentChatId]) {
+                    const currentBtn = document.createElement('button');
+                    currentBtn.textContent = `Current Chat (Unsaved) - ${new Date(parseInt(currentChatId)).toLocaleTimeString()}`;
+                    currentBtn.disabled = true;
+                    currentBtn.style.opacity = 0.7;
+                    historyDropdown.appendChild(currentBtn);
+                 }
+                 */
+
+                chatIds.forEach(id => {
+                    const chat = allChats[id];
+                    if (chat && chat.length > 0) {
+                        const button = document.createElement('button');
+                         const firstUserMsg = chat.find(m => m.role === 'user');
+                         const preview = firstUserMsg ? sanitizeHTML(firstUserMsg.parts[0].text.substring(0, 20)) + '...' : 'Chat';
+                         button.textContent = `${new Date(parseInt(id)).toLocaleString()} - ${preview}`;
+                         button.title = `Load chat from ${new Date(parseInt(id)).toLocaleString()}`;
+                         button.onclick = () => loadChat(id);
+                         historyDropdown.appendChild(button);
+                    }
+                });
+             }
+
+             // Ensure the "Delete ALL" button always exists if the dropdown element itself exists
+             if (deleteAllHistoryButton) {
+                 historyDropdown.appendChild(deleteAllHistoryButton.cloneNode(true)); // Clone to avoid moving the original
+                 // Re-attach listener to the cloned button
+                 historyDropdown.querySelector('.delete-history').onclick = deleteAllChats;
+             } else { // Fallback: create it if ref is somehow lost
+                 const deleteAllBtn = document.createElement('button');
+                 deleteAllBtn.textContent = 'Delete ALL History';
+                 deleteAllBtn.className = 'delete-history';
+                 deleteAllBtn.title = 'Permanently delete all saved chats!';
+                 deleteAllBtn.onclick = deleteAllChats;
+                 historyDropdown.appendChild(deleteAllBtn);
+             }
+        }
 
 
         // --- API Call & Message Handling ---
-        // ... (handleSendMessage as before - it handles chat, not game moves) ...
-         async function handleSendMessage() { if (!chatInput || !currentApiKey || isMikaTyping) return; const msgText = chatInput.value.trim(); const user = currentUserName || "Study Buddy"; if (!msgText) return; appendMessage('user', msgText); currentChatHistory.push({ role: 'user', parts: [{ text: msgText }] }); chatInput.value = ''; isMikaTyping = true; disableChatInput(); showTypingIndicator(); if (currentChatHistory.length > MAX_HISTORY_LENGTH) { currentChatHistory = currentChatHistory.slice(-MAX_HISTORY_LENGTH); console.log("History pruned."); } try { const response = await sendMessageToMika(msgText, currentChatHistory, currentApiKey, user); removeTypingIndicator(); appendMessage('Mika', response); currentChatHistory.push({ role: 'model', parts: [{ text: response }] }); saveAllChats(); } catch (error) { console.error("Error sending msg:", error); removeTypingIndicator(); appendMessage('system', error.message || `Mrow! Error talking, ${user}... ;_;`); } finally { isMikaTyping = false; if (currentApiKey) { enableChatInput(); if (chatInput) chatInput.focus(); } else { disableChatInput("API Key needed!"); } } }
+        async function handleSendMessage() {
+            // Added safety checks
+            if (!chatInput || !currentApiKey || isMikaTyping) return;
+
+            const messageText = chatInput.value.trim();
+            const userNameForApi = currentUserName || "Study Buddy";
+
+            if (!messageText) return;
+
+            appendMessage('user', messageText);
+            currentChatHistory.push({ role: 'user', parts: [{ text: messageText }] });
+            chatInput.value = '';
+            isMikaTyping = true;
+            disableChatInput();
+            showTypingIndicator();
+
+             if (currentChatHistory.length > MAX_HISTORY_LENGTH) {
+                 currentChatHistory = currentChatHistory.slice(-MAX_HISTORY_LENGTH);
+                 console.log("Chat history pruned.");
+             }
+
+            try {
+                const mikaResponse = await sendMessageToMika(messageText, currentChatHistory, currentApiKey, userNameForApi);
+                removeTypingIndicator();
+                appendMessage('Mika', mikaResponse);
+                currentChatHistory.push({ role: 'model', parts: [{ text: mikaResponse }] });
+                saveAllChats();
+
+            } catch (error) {
+                console.error("Error in handleSendMessage:", error);
+                removeTypingIndicator();
+                appendMessage('system', error.message || `Mrow! Something went wrong, ${userNameForApi}... Mika can't talk right now. ;_;`);
+            } finally {
+                isMikaTyping = false;
+                if (currentApiKey) {
+                    enableChatInput();
+                    if (chatInput) chatInput.focus(); // Added safety check
+                 } else {
+                     disableChatInput("API Key needed!");
+                 }
+            }
+        }
+
 
         // --- Initialization Flow ---
-        // ... (proceedToChat, checkNameAndProceed, checkApiKeyAndProceed, initializeApp as before) ...
-        function proceedToChat() { if (!chatContainer) return; chatContainer.style.display = 'flex'; const chatId = loadAllChats(); clearChatDisplay(); updateInputPlaceholder(); if (chatId) { loadChat(chatId); } else { startNewChat(true); } updateChatTitle(); updateHistoryDropdown(); setTimeout(setupInstallPrompt, 500); }
-        function checkNameAndProceed() { const name = loadUserName(); if (name) { currentUserName = name; if (namePopup) namePopup.style.display = 'none'; updateInputPlaceholder(); proceedToChat(); } else { if (namePopup && nameInput) { nameInput.value = "Study Buddy"; namePopup.style.display = 'flex'; nameInput.focus(); nameInput.select(); } } }
-        function checkApiKeyAndProceed() { const key = loadApiKey(); if (key) { currentApiKey = key; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; checkNameAndProceed(); } else { if (apiKeyPopup && chatContainer && apiKeyInput) { apiKeyPopup.style.display = 'flex'; chatContainer.style.display = 'none'; disableChatInput("API Key needed!"); apiKeyInput.focus(); } } }
-        function initializeApp() { registerServiceWorker(); if (hasAgreedToDisclaimer()) { checkApiKeyAndProceed(); } else { if (disclaimerPopup) disclaimerPopup.style.display = 'flex'; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; if (namePopup) namePopup.style.display = 'none'; if (chatContainer) chatContainer.style.display = 'none'; } }
+        function proceedToChat() {
+            if (!chatContainer) return; // Safety check
+            chatContainer.style.display = 'flex';
+            const mostRecentChatId = loadAllChats();
+            clearChatDisplay();
+            updateInputPlaceholder();
+            if (mostRecentChatId) {
+                loadChat(mostRecentChatId);
+            } else {
+                startNewChat(true);
+            }
+            updateChatTitle();
+            updateHistoryDropdown();
+            // Delay PWA install prompt check slightly to ensure UI is fully ready
+            setTimeout(setupInstallPrompt, 500);
+        }
+
+        function checkNameAndProceed() {
+            const storedName = loadUserName();
+            if (storedName) {
+                currentUserName = storedName;
+                if (namePopup) namePopup.style.display = 'none'; // Safety check
+                updateInputPlaceholder();
+                proceedToChat();
+            } else {
+                // Show name popup
+                if (namePopup && nameInput) { // Safety checks
+                    nameInput.value = "Study Buddy"; // Prefill default
+                    namePopup.style.display = 'flex';
+                    nameInput.focus();
+                    nameInput.select();
+                }
+            }
+        }
+
+        function checkApiKeyAndProceed() {
+            const loadedKey = loadApiKey();
+            if (loadedKey) {
+                currentApiKey = loadedKey;
+                if (apiKeyPopup) apiKeyPopup.style.display = 'none'; // Safety check
+                checkNameAndProceed(); // Key exists, check name next
+            } else {
+                // Show API key popup
+                if (apiKeyPopup && chatContainer && apiKeyInput) { // Safety checks
+                    apiKeyPopup.style.display = 'flex';
+                    chatContainer.style.display = 'none';
+                    disableChatInput("API Key needed!");
+                    apiKeyInput.focus();
+                }
+            }
+        }
+
+        // ** MODIFIED ** Initialization starts here now
+        function initializeApp() {
+            registerServiceWorker();
+
+            // 1. Check if Disclaimer has been agreed to
+            if (hasAgreedToDisclaimer()) {
+                console.log("Disclaimer already agreed to.");
+                // 2. If yes, proceed to check API Key
+                checkApiKeyAndProceed();
+            } else {
+                // 3. If no, show Disclaimer popup
+                console.log("Showing disclaimer popup.");
+                if (disclaimerPopup) disclaimerPopup.style.display = 'flex'; // Safety check
+                // Ensure other popups/chat are hidden initially
+                if (apiKeyPopup) apiKeyPopup.style.display = 'none';
+                if (namePopup) namePopup.style.display = 'none';
+                if (chatContainer) chatContainer.style.display = 'none';
+            }
+        }
 
         // --- Event Listeners ---
-        // ... (Disclaimer, API Key, Name, Input/Send, Settings, New Chat, History listeners as before) ...
-        if (disclaimerAgreeButton) disclaimerAgreeButton.addEventListener('click', () => { saveDisclaimerAgreement(); if (disclaimerPopup) disclaimerPopup.style.display = 'none'; checkApiKeyAndProceed(); });
-        if (saveApiKeyButton) saveApiKeyButton.addEventListener('click', () => { if (!apiKeyInput) return; const key = apiKeyInput.value.trim(); if (key) { if (saveApiKey(key)) { currentApiKey = key; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; if (apiKeyError) apiKeyError.style.display = 'none'; checkNameAndProceed(); } else { if (apiKeyError) { apiKeyError.textContent = "Mrow! Couldn't save key!"; apiKeyError.style.display = 'block'; } } } else { if (apiKeyError) apiKeyError.style.display = 'block'; } });
-        if (saveNameButton) saveNameButton.addEventListener('click', () => { if (!nameInput) return; const name = nameInput.value.trim(); if (name) { if (saveUserName(name)) { currentUserName = name; if (namePopup) namePopup.style.display = 'none'; if (nameError) nameError.style.display = 'none'; updateInputPlaceholder(); proceedToChat(); } else { if (nameError) { nameError.textContent = "Mrow! Couldn't save name!"; nameError.style.display = 'block'; } } } else { if (nameError) nameError.style.display = 'block'; } });
-        if (apiKeyInput) apiKeyInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveApiKeyButton?.click(); if (apiKeyError && apiKeyError.style.display === 'block') apiKeyError.style.display = 'none'; });
-        if (nameInput) nameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveNameButton?.click(); if (nameError && nameError.style.display === 'block') nameError.style.display = 'none'; });
-        if (sendButton) sendButton.addEventListener('click', handleSendMessage);
-        if (chatInput) chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } });
-        if (settingsButton) settingsButton.addEventListener('click', () => { if (confirm(`Change Settings for ${currentUserName}? Clears API Key, Name, Disclaimer, reloads.`)) { clearApiKey(); clearUserName(); clearDisclaimerAgreement(); clearFromLocalStorage('mikaInstallPromptShown'); window.location.reload(); } });
-        if (newChatButton) newChatButton.addEventListener('click', () => startNewChat(true));
-        if (historyButton) historyButton.addEventListener('click', (e) => { e.stopPropagation(); if (!historyDropdown) return; if (historyDropdown.style.display === 'block') { historyDropdown.style.display = 'none'; } else { updateHistoryDropdown(); historyDropdown.style.display = 'block'; } });
-        document.addEventListener('click', (e) => { if (historyDropdown && historyButton && historyDropdown.style.display === 'block' && !historyDropdown.contains(e.target) && e.target !== historyButton) { historyDropdown.style.display = 'none'; } });
 
+        // ** NEW ** Disclaimer Agreement Listener
+        if (disclaimerAgreeButton) {
+            disclaimerAgreeButton.addEventListener('click', () => {
+                saveDisclaimerAgreement();
+                if (disclaimerPopup) disclaimerPopup.style.display = 'none'; // Safety check
+                checkApiKeyAndProceed(); // Start the normal flow after agreement
+            });
+        }
 
-        // ** NEW ** Game Button and Popup Listeners
-        if (gamesButton) {
-            gamesButton.addEventListener('click', () => {
-                if(homeworkCheckPopup) {
-                    homeworkCheckPopup.style.display = 'flex';
+        if (saveApiKeyButton) {
+            saveApiKeyButton.addEventListener('click', () => {
+                if (!apiKeyInput) return; // Safety check
+                const key = apiKeyInput.value.trim();
+                if (key) {
+                    if (saveApiKey(key)) {
+                        currentApiKey = key;
+                        if (apiKeyPopup) apiKeyPopup.style.display = 'none'; // Safety check
+                        if (apiKeyError) apiKeyError.style.display = 'none'; // Safety check
+                        checkNameAndProceed(); // Key saved, check name next
+                    } else {
+                         // Handle potential storage error (optional, maybe log?)
+                         if (apiKeyError) {
+                             apiKeyError.textContent = "Mrow! Couldn't save the key... is storage full?";
+                             apiKeyError.style.display = 'block';
+                         }
+                    }
+                } else {
+                    if (apiKeyError) apiKeyError.style.display = 'block'; // Safety check
                 }
             });
         }
-        if (homeworkDoneButton) {
-            homeworkDoneButton.addEventListener('click', () => {
-                 if(homeworkCheckPopup) homeworkCheckPopup.style.display = 'none';
-                 showGameOverlay(); // Show the game board!
-            });
-        }
-        if (homeworkNotDoneButton) {
-             homeworkNotDoneButton.addEventListener('click', () => {
-                 if(homeworkCheckPopup) homeworkCheckPopup.style.display = 'none';
-                 appendMessage('Mika', "Hehe~ Good kitty! Finish your homework first, then we can play! Let me know if you need help with it! ♡");
-            });
-        }
-        if (closeGameButton) {
-            closeGameButton.addEventListener('click', hideGameOverlay);
+
+        if (saveNameButton) {
+             saveNameButton.addEventListener('click', () => {
+                 if (!nameInput) return; // Safety check
+                 const name = nameInput.value.trim();
+                 if (name) {
+                     if (saveUserName(name)) {
+                         currentUserName = name; // Update state
+                         if (namePopup) namePopup.style.display = 'none'; // Safety check
+                         if (nameError) nameError.style.display = 'none'; // Safety check
+                         updateInputPlaceholder(); // Update placeholder immediately
+                         proceedToChat(); // Name saved, proceed to chat
+                     } else {
+                          // Handle potential storage error (optional)
+                          if (nameError) {
+                              nameError.textContent = "Mrow! Couldn't save the name... storage issue?";
+                              nameError.style.display = 'block';
+                          }
+                     }
+                 } else {
+                     if (nameError) nameError.style.display = 'block'; // Safety check
+                 }
+             });
         }
 
+        if (apiKeyInput) {
+            apiKeyInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') saveApiKeyButton?.click(); // Optional chaining
+                if (apiKeyError && apiKeyError.style.display === 'block') apiKeyError.style.display = 'none';
+            });
+        }
+
+        if (nameInput) {
+             nameInput.addEventListener('keypress', (event) => {
+                 if (event.key === 'Enter') saveNameButton?.click(); // Optional chaining
+                 if (nameError && nameError.style.display === 'block') nameError.style.display = 'none';
+             });
+        }
+
+        if (sendButton) sendButton.addEventListener('click', handleSendMessage);
+        if (chatInput) {
+            chatInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    handleSendMessage();
+                }
+            });
+        }
+
+        if (settingsButton) {
+            settingsButton.addEventListener('click', () => {
+                 // Included disclaimer agreement clear here too
+                 if (confirm(`Change Settings for ${currentUserName}? This will clear API Key, Name, and Disclaimer agreement, then reload.`)) {
+                     clearApiKey();
+                     clearUserName();
+                     clearDisclaimerAgreement(); // Clear disclaimer flag
+                     clearFromLocalStorage('mikaInstallPromptShown'); // Clear install prompt flag
+                     window.location.reload();
+                 }
+            });
+        }
+
+        if (newChatButton) newChatButton.addEventListener('click', () => startNewChat(true));
+
+        if (historyButton) {
+             historyButton.addEventListener('click', (event) => {
+                 event.stopPropagation();
+                 if (!historyDropdown) return; // Safety check
+                 if (historyDropdown.style.display === 'block') {
+                     historyDropdown.style.display = 'none';
+                 } else {
+                     updateHistoryDropdown();
+                     historyDropdown.style.display = 'block';
+                 }
+             });
+        }
+
+         // Close history dropdown logic
+         document.addEventListener('click', (event) => {
+             if (historyDropdown && historyButton && historyDropdown.style.display === 'block' && !historyDropdown.contains(event.target) && event.target !== historyButton) {
+                 historyDropdown.style.display = 'none';
+             }
+         });
 
         // --- Start the App ---
         initializeApp();
 
-        // Auto-save chats on close/reload
-        window.addEventListener('beforeunload', saveAllChats);
+        // Auto-save chats when the window is closed/reloaded
+         window.addEventListener('beforeunload', saveAllChats);
 
-        // Nyaa~! Ready for homework AND playtime! ♡
+        // Nyaa~! Ready for homework fun with my Study Buddy! ♡
 
     </script>
 
