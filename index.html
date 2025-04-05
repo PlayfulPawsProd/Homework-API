@@ -5,11 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mika's Homework Helper! ♡</title>
-    <!-- Link the Manifest File -->
     <link rel="manifest" href="manifest.json">
-    <!-- Theme Color for Browser UI -->
     <meta name="theme-color" id="theme-color-meta" content="#d81b60">
-    <!-- DOMPurify script FIRST -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.0/purify.min.js" integrity="sha512-SYy493affPOnekyryF+CeRmcM7JS0ZQifMRnbRGoAL1BX3+zwQMG5mygzSScpPA7MSQixX+j3gy7jMXKx6hIgw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <style>
@@ -30,6 +27,7 @@
             --game-board-bg: var(--chat-input-bg); --game-board-border: var(--chat-border); --game-cell-border: var(--chat-input-border); --game-cell-hover-bg: var(--chat-header-bg);
             --game-cell-text: var(--chat-text); --game-cell-taken-text: var(--mika-message-name); --game-message-log-bg: var(--chat-log-bg); --game-message-log-border: var(--chat-input-border);
             --game-message-log-text: var(--chat-log-text); --game-message-mika: var(--mika-message-text); --game-message-user: var(--user-message-text); --game-message-system: var(--system-message-text);
+            --user-message-text-rgb: 173, 232, 244; /* Define RGB for user message text */
         }
         body.dark-mode {
             --bg-color: #1f1a24; --text-color: #e0e0e0; --popup-bg: #3a2f41; --popup-border: #f48fb1; --popup-header: #f8bbd0; --popup-text: #c7c0cc;
@@ -45,6 +43,7 @@
             --game-board-bg: var(--chat-input-bg); --game-board-border: var(--chat-border); --game-cell-border: var(--chat-input-border); --game-cell-hover-bg: var(--chat-header-bg);
             --game-cell-text: var(--chat-text); --game-cell-taken-text: var(--mika-message-name); --game-message-log-bg: var(--chat-log-bg); --game-message-log-border: var(--chat-input-border);
             --game-message-log-text: var(--chat-log-text); --game-message-mika: var(--mika-message-text); --game-message-user: var(--user-message-text); --game-message-system: var(--system-message-text);
+            --user-message-text-rgb: 179, 229, 252; /* Define RGB for user message text in dark mode */
         }
         /* Base Styles */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -110,8 +109,8 @@
         /* Game Area Styles */
         #game-area { display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px; width: 100%; height: 100%; box-sizing: border-box; overflow: hidden; background-color: var(--chat-bg); color: var(--chat-text); }
         #game-title { color: var(--chat-header-text); font-size: 1.3em; margin-bottom: 10px; text-shadow: 0 0 3px var(--chat-header-shadow); flex-shrink: 0; text-align: center;}
-        #game-specific-ui { width: 100%; height: auto; display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; flex-shrink: 0; overflow-y: auto; padding-bottom: 5px; max-height: calc(100% - 100px); /* Adjust max-height if needed */ }
-        #game-specific-ui > #diary-chat-view, #game-specific-ui > #diary-entries-view { width: 100%; height: 100%; } /* Let diary UI fill its container */
+        #game-specific-ui { width: 100%; height: auto; display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; flex-shrink: 0; overflow-y: auto; padding-bottom: 5px; max-height: calc(100% - 100px); }
+        #game-specific-ui > #diary-chat-view, #game-specific-ui > #diary-entries-view { width: 100%; height: 100%; }
         #diary-chat-view, #diary-entries-view { width: 100%; height: 100%; overflow: hidden; display: flex; flex-direction: column; }
         #diary-entries-view { overflow-y: auto; }
         /* Game Styles (TTT, RPS, GTN, 20Q, Diary, StoryTime) */
@@ -158,23 +157,48 @@
         .diary-entry-item { background-color: rgba(255, 255, 255, 0.05); border: 1px solid var(--chat-input-border); padding: 8px 12px; margin-bottom: 8px; border-radius: 8px; }
         .diary-entry-date { display: block; font-size: 0.75em; color: var(--system-message-text); margin-bottom: 4px; }
         .diary-entry-item p { margin: 0; line-height: 1.4; color: var(--chat-log-text); font-size: 0.95em;}
-        /* Story Time Styles */
+
+        /* --- Story Time Styles --- */
         #story-wrapper { display: flex; flex-direction: column; height: 100%; width: 100%; box-sizing: border-box; }
         .story-display-area { flex-grow: 1; overflow-y: auto; padding: 10px 15px; margin-bottom: 5px; background-color: rgba(0,0,0, 0.1); border-radius: 8px; border: 1px solid var(--chat-input-border); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; color: var(--chat-log-text); }
         .story-display-area p { margin: 0 0 10px 0; line-height: 1.5; white-space: pre-wrap; } .story-display-area p:last-child { margin-bottom: 0; }
         .story-display-area p > strong:first-child { color: var(--mika-message-name); } .story-display-area p > strong { font-weight: bold; } .story-display-area p > em { font-style: italic; }
-        .story-display-area p.user-action { /* Style user action display */ text-align: right; color: var(--user-message-text); font-style: italic; opacity: 0.9; margin: 5px 0; }
+        .story-display-area p.user-action { text-align: right; color: var(--user-message-text); font-style: italic; opacity: 0.9; margin: 5px 0; border-top: 1px dashed rgba(var(--user-message-text-rgb), 0.3); padding-top: 5px; margin-top: 5px; }
         .story-status-area { flex-shrink: 0; text-align: center; padding: 3px; font-style: italic; font-size: 0.9em; color: var(--typing-indicator-text); min-height: 1.2em; display: none; }
         .story-interaction-area { flex-shrink: 0; padding: 5px 0; border-top: 1px solid var(--chat-input-border); background-color: var(--chat-input-area-bg); }
         .story-choices-area { text-align: center; margin-bottom: 8px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0 5px; }
-        .story-choice { font-size: 0.9em; padding: 6px 12px; }
+        /* --- Story Choice Button Auto-Scroll --- */
+        .story-choice { overflow: hidden; white-space: nowrap; position: relative; text-align: left; max-width: 90%; justify-content: flex-start; box-sizing: border-box; }
+        .story-choice span.scrollable-text { display: inline-block; white-space: nowrap; padding: 0; margin: 0; vertical-align: middle; will-change: transform; transform: translateX(0); }
+        @keyframes scroll-left-right { 0%   { transform: translateX(0); } 15%  { transform: translateX(0); } 65%  { transform: translateX(var(--scroll-distance, -50px)); } 80%  { transform: translateX(var(--scroll-distance, -50px)); } 100% { transform: translateX(0); } }
+        .story-choice.text-overflow-scroll span.scrollable-text { animation: scroll-left-right 10s linear infinite; }
+        @media (prefers-reduced-motion: reduce) { .story-choice.text-overflow-scroll span.scrollable-text { animation: none; transform: translateX(0) !important; text-overflow: ellipsis; overflow: hidden; max-width: 100%; } .story-choice.text-overflow-scroll { text-overflow: initial; } }
+        /* --- End Story Choice Button Auto-Scroll --- */
+        .story-choice { font-size: 0.9em; padding: 6px 12px; } /* Existing style */
         .story-input-area { display: flex; justify-content: center; align-items: center; padding: 0 10px; }
         .story-text-input { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--chat-input-border); background-color: var(--chat-input-bg); color: var(--chat-input-text); border-radius: 15px 0 0 15px; font-size: 0.95em; outline: none; }
         .story-send-button { padding: 8px 15px; border-radius: 0 15px 15px 0; font-size: 0.95em; margin-left: -1px; }
-        /* Initial Story Prompt */
-        #story-initial-prompt { text-align: center; padding: 20px; } #story-initial-prompt h3 { color: var(--chat-header-text); margin-bottom: 10px; } #story-initial-prompt p { color: var(--chat-text); font-size: 1em; margin-bottom: 20px;} #story-initial-prompt > div { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        /* Initial Story Prompt & Custom Input */
+        #story-initial-prompt { text-align: center; padding: 20px; }
+        #story-initial-prompt h3 { color: var(--chat-header-text); margin-bottom: 10px; }
+        #story-initial-prompt p { color: var(--chat-text); font-size: 1em; margin-bottom: 20px;}
+        #story-initial-prompt > div { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        #story-custom-prompt-input { margin-top: 15px; padding: 8px 12px; border: 1px solid var(--input-border, #ccc); border-radius: 5px; width: 80%; max-width: 400px; background-color: var(--input-bg); color: var(--text-color); font-size: 0.95em; display: block; margin-left: auto; margin-right: auto; margin-bottom: 10px; }
+        /* Library Styles */
+        .library-view, .story-detail-view { width: 100%; height: 100%; overflow-y: auto; padding: 10px; box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); }
+        .library-title { text-align: center; color: var(--chat-header-text); margin-bottom: 15px; font-size: 1.2em; }
+        .library-item { background-color: rgba(255, 255, 255, 0.05); border: 1px solid var(--chat-input-border); padding: 10px 15px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; transition: background-color 0.2s ease; }
+        .library-item:hover { background-color: rgba(255, 255, 255, 0.1); }
+        .library-item-title { display: block; font-weight: bold; color: var(--chat-text); margin-bottom: 5px; }
+        .library-item-date { display: block; font-size: 0.8em; color: var(--system-message-text); }
+        .story-detail-view h3 { text-align: center; color: var(--chat-header-text); margin-bottom: 10px; }
+        .story-detail-view p { margin: 0 0 10px 0; line-height: 1.5; white-space: pre-wrap; color: var(--chat-log-text); }
+        .story-detail-view p.detail-user-action { text-align: right; color: var(--user-message-text); font-style: italic; opacity: 0.8; border-top: 1px dashed rgba(var(--user-message-text-rgb), 0.3); padding-top: 5px; margin-top: 5px;}
+        .library-back-button { margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; }
+        /* End Library Styles */
+
         /* Shared Game Message Log */
-        #game-message-log { width: 100%; max-width: 450px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin-bottom: 10px; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0; margin-top: auto; display: none; /* Hidden by default, only shown by specific games */ }
+        #game-message-log { width: 100%; max-width: 450px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin-bottom: 10px; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0; margin-top: auto; display: none; }
         #game-message-log p { margin: 2px 0; line-height: 1.3; word-wrap: break-word; }
         #game-message-log .mika-gamemsg { color: var(--game-message-mika); } #game-message-log .user-gamemsg { color: var(--game-message-user); } #game-message-log .system-gamemsg { color: var(--game-message-system); font-style: italic; }
         /* Shared Game Buttons */
@@ -184,38 +208,37 @@
         /* Scrollbar Styles */
         ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: var(--scrollbar-track); border-radius: 10px; } ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; } ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
         /* Responsive Styles */
-        @media (max-width: 600px) {
-            body { padding: 5px; }
-            .popup-modal { padding: 20px 25px; max-width: 95%; } .popup-modal h2 { font-size: 1.4em; } .popup-modal p { font-size: 0.9em;} .popup-button { padding: 8px 20px; font-size: 0.9em; }
-            #chat-container { height: 95vh; border-radius: 10px; font-size: 14px; }
-            #chat-header h2 { font-size: 1.1em; } .header-button { font-size: 0.75em; padding: 4px 8px; }
-            #chat-log { padding: 10px; } #chat-input-area { padding: 6px 8px; } #image-upload-button { font-size: 1.4em; padding: 4px 6px; }
-            #chat-input { padding: 8px 12px; font-size: 0.9em; } #send-button { padding: 8px 12px; font-size: 0.9em; }
-            #image-preview-area img { max-height: 30px; } #remove-image-button { width: 14px; height: 14px; font-size: 9px; line-height: 14px; top: -4px; right: -4px; }
-            .dropdown-menu { max-height: 150px; }
-            /* Game Responsive */
-            #game-area { padding: 8px; } #game-title { font-size: 1.1em; margin-bottom: 8px; }
-            #ttt-board { width: 180px; height: 180px; } .ttt-cell { font-size: 1.8em; }
-            .rps-choice-button { font-size: 1em; padding: 8px 15px; }
-            #gtn-input { width: 100px; font-size: 0.9em; } #gtn-submit { font-size: 0.9em; padding: 8px 10px; } #gtn-indicator { min-width: 140px; font-size: 0.9em; }
-            #tq-question-input, #tq-guess-input { width: calc(100% - 70px); max-width: 220px; font-size: 0.9em; } /* Adjusted */
-            #tq-ask-button, #tq-guess-button { font-size: 0.85em; padding: 7px; } /* Adjusted */
-            #tq-questions-left { font-size: 1em; margin-bottom: 10px;}
-            /* Diary Responsive */
-            .diary-top-notes-area { height: 70px; padding: 4px; } .diary-note-item { font-size: 0.8em; padding: 2px 5px;}
-            #diary-add-button, #diary-view-entries-button { font-size: 0.75em; padding: 4px 8px;}
-            .diary-chat-log-area { padding: 6px; } .diary-chat-log-area p { padding-right: 20px; } .diary-heart-button { font-size: 0.9em; }
-            .diary-input-area { padding: 6px; } .diary-chat-input { font-size: 0.9em; padding: 5px 10px; } .diary-send-button { font-size: 0.9em; padding: 5px 10px; }
-            .diary-entry-item { padding: 6px 10px; } .diary-entry-date { font-size: 0.7em; } .diary-entry-item p { font-size: 0.9em; }
-            /* Story Time Responsive */
-            .story-display-area { padding: 8px 10px; font-size: 0.95em; } .story-choice { font-size: 0.85em; padding: 5px 10px;}
-            .story-text-input { font-size: 0.9em; padding: 6px 10px; } .story-send-button { font-size: 0.9em; padding: 6px 10px; }
-            #story-initial-prompt h3 { font-size: 1.1em; } #story-initial-prompt p { font-size: 0.9em; }
-            /* Shared log/buttons Responsive */
-            #game-message-log { max-width: 100%; height: 80px; padding: 5px;}
-            #ttt-reset-button, #back-to-chat-button { font-size: 0.85em; padding: 6px 15px; }
+        @media (max-width: 600px) { /* Apply common responsive styles */
+             body { padding: 5px; }
+             .popup-modal { padding: 20px 25px; max-width: 95%; } .popup-modal h2 { font-size: 1.4em; } .popup-modal p { font-size: 0.9em;} .popup-button { padding: 8px 20px; font-size: 0.9em; }
+             #chat-container { height: 95vh; border-radius: 10px; font-size: 14px; }
+             #chat-header h2 { font-size: 1.1em; } .header-button { font-size: 0.75em; padding: 4px 8px; }
+             #chat-log { padding: 10px; } #chat-input-area { padding: 6px 8px; } #image-upload-button { font-size: 1.4em; padding: 4px 6px; }
+             #chat-input { padding: 8px 12px; font-size: 0.9em; } #send-button { padding: 8px 12px; font-size: 0.9em; }
+             #image-preview-area img { max-height: 30px; } #remove-image-button { width: 14px; height: 14px; font-size: 9px; line-height: 14px; top: -4px; right: -4px; }
+             .dropdown-menu { max-height: 150px; }
+             #game-area { padding: 8px; } #game-title { font-size: 1.1em; margin-bottom: 8px; }
+             #ttt-board { width: 180px; height: 180px; } .ttt-cell { font-size: 1.8em; }
+             .rps-choice-button { font-size: 1em; padding: 8px 15px; }
+             #gtn-input { width: 100px; font-size: 0.9em; } #gtn-submit { font-size: 0.9em; padding: 8px 10px; } #gtn-indicator { min-width: 140px; font-size: 0.9em; }
+             #tq-question-input, #tq-guess-input { width: calc(100% - 70px); max-width: 220px; font-size: 0.9em; }
+             #tq-ask-button, #tq-guess-button { font-size: 0.85em; padding: 7px; }
+             #tq-questions-left { font-size: 1em; margin-bottom: 10px;}
+             .diary-top-notes-area { height: 70px; padding: 4px; } .diary-note-item { font-size: 0.8em; padding: 2px 5px;}
+             #diary-add-button, #diary-view-entries-button { font-size: 0.75em; padding: 4px 8px;}
+             .diary-chat-log-area { padding: 6px; } .diary-chat-log-area p { padding-right: 20px; } .diary-heart-button { font-size: 0.9em; }
+             .diary-input-area { padding: 6px; } .diary-chat-input { font-size: 0.9em; padding: 5px 10px; } .diary-send-button { font-size: 0.9em; padding: 5px 10px; }
+             .diary-entry-item { padding: 6px 10px; } .diary-entry-date { font-size: 0.7em; } .diary-entry-item p { font-size: 0.9em; }
+             .story-display-area { padding: 8px 10px; font-size: 0.95em; }
+             .story-choice { font-size: 0.85em; padding: 5px 10px;}
+             .story-text-input { font-size: 0.9em; padding: 6px 10px; }
+             .story-send-button { font-size: 0.9em; padding: 6px 10px; }
+             #story-initial-prompt h3 { font-size: 1.1em; } #story-initial-prompt p { font-size: 0.9em; }
+             #story-custom-prompt-input { font-size: 0.9em; }
+             .library-item { padding: 8px 12px; } .library-item-title { font-size: 0.95em; } .library-item-date { font-size: 0.75em; }
+             #game-message-log { max-width: 100%; height: 80px; padding: 5px;}
+             #ttt-reset-button, #back-to-chat-button { font-size: 0.85em; padding: 6px 15px; }
         }
-
     </style>
 </head>
 <body>
@@ -232,7 +255,8 @@
             <h2 id="chat-title">Study Time with Mika! ♡</h2>
             <div class="header-buttons">
                 <button id="history-button" class="header-button" title="View Past Chats">History</button>
-                <button id="new-chat-button" class="header-button" title="Start a New Chat">New Chat</button>
+                <!-- Adaptive Button: Text/Action set by JS -->
+                <button id="home-button" class="header-button">Loading...</button>
                 <button id="games-button" class="header-button" title="Play Games!">🎮 Games</button>
                 <button id="settings-button" class="header-button" title="Settings">⚙️ Settings</button>
             </div>
@@ -256,7 +280,6 @@
 
         <!-- Main Content Area -->
         <div id="main-content-area">
-            <!-- Chat Area (for main homework chat) -->
             <div id="chat-area" style="display: none;">
                <div id="chat-log"> <p class="system-message">Initializing...</p> </div>
                 <div id="chat-input-area">
@@ -270,10 +293,7 @@
                     <button id="send-button" disabled>Send</button>
                 </div>
             </div>
-            <!-- Game Area (for all games/diary/story) -->
-            <div id="game-area" style="display: none;">
-                <!-- Game/Diary/Story content loaded here -->
-            </div>
+            <div id="game-area" style="display: none;"> <!-- Game content --> </div>
         </div>
     </div>
 
@@ -299,7 +319,9 @@
         const chatContainer = document.getElementById('chat-container'); const chatTitle = document.getElementById('chat-title');
         const mainContentArea = document.getElementById('main-content-area'); const chatArea = document.getElementById('chat-area'); const gameArea = document.getElementById('game-area');
         const chatLog = document.getElementById('chat-log'); const chatInput = document.getElementById('chat-input'); const sendButton = document.getElementById('send-button');
-        const settingsButton = document.getElementById('settings-button'); const newChatButton = document.getElementById('new-chat-button'); const historyButton = document.getElementById('history-button'); const gamesButton = document.getElementById('games-button');
+        const settingsButton = document.getElementById('settings-button');
+        const homeButton = document.getElementById('home-button'); // <<< Reference to the adaptive button
+        const historyButton = document.getElementById('history-button'); const gamesButton = document.getElementById('games-button');
         const historyDropdown = document.getElementById('history-dropdown'); const settingsDropdown = document.getElementById('settings-dropdown'); const gamesDropdown = document.getElementById('games-dropdown');
         const gameTttButton = document.getElementById('game-ttt-button'); const gameRpsButton = document.getElementById('game-rps-button'); const gameGtnButton = document.getElementById('game-gtn-button'); const game20qButton = document.getElementById('game-20q-button'); const gameDiaryButton = document.getElementById('game-diary-button'); const gameStoryButton = document.getElementById('game-story-button');
         const settingsInstallButton = document.getElementById('settings-install-button'); const settingsThemeButton = document.getElementById('settings-theme-button'); const settingsResetButton = document.getElementById('settings-reset-button');
@@ -344,31 +366,10 @@
         function appendMessage(sender, message, isHtml = false, imageUrl = null) {
             if (!chatLog || !chatArea || chatArea.style.display === 'none') { console.log("Skipped msg:", sender); return; }
             const msgId = `msg-${Date.now()}-${Math.random().toString(16).slice(2)}`; const el = document.createElement('p'); el.id = msgId;
-            const contentSpan = document.createElement('span'); contentSpan.className = 'message-content';
-            // Sanitize text content ONLY if not already HTML
-            const msgText = isHtml ? message : sanitizeHTML(message);
-
-            if (sender === 'user') {
-                el.className = 'user-message';
-                contentSpan.innerHTML = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${msgText}`; // Sanitize name just in case
-                if (imageUrl && imageUrl !== "[Image Placeholder]") { // Check if it's a real URL
-                    const img = document.createElement('img'); img.src = imageUrl; img.alt = "Uploaded image"; img.className = "thumbnail";
-                    contentSpan.appendChild(document.createElement('br')); contentSpan.appendChild(img);
-                } else if (imageUrl === "[Image Placeholder]") {
-                     // Optionally display text placeholder if image URL isn't available (e.g., loading history)
-                     const placeholder = document.createElement('em'); placeholder.textContent = ' [Image Attached]';
-                     placeholder.style.fontSize = '0.9em';
-                     contentSpan.appendChild(placeholder);
-                }
-            } else if (sender === 'Mika') {
-                el.className = 'mika-message';
-                // Let sanitize handle allowed tags, process markdown after
-                let proc = msgText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>').replace(/```([\s\S]*?)```/g, (m, p1) => `<pre><code>${sanitizeHTML(p1.trim())}</code></pre>`).replace(/(?<!<br>)\n/g, '<br>');
-                contentSpan.innerHTML = `<strong>Mika:</strong> ${proc}`;
-            } else {
-                el.className = 'system-message';
-                contentSpan.innerHTML = msgText; // Already sanitized or system message
-            }
+            const contentSpan = document.createElement('span'); contentSpan.className = 'message-content'; const msgText = isHtml ? message : sanitizeHTML(message);
+            if (sender === 'user') { el.className = 'user-message'; contentSpan.innerHTML = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${msgText}`; if (imageUrl && imageUrl !== "[Image Placeholder]") { const img = document.createElement('img'); img.src = imageUrl; img.alt = "Uploaded image"; img.className = "thumbnail"; contentSpan.appendChild(document.createElement('br')); contentSpan.appendChild(img); } else if (imageUrl === "[Image Placeholder]") { const placeholder = document.createElement('em'); placeholder.textContent = ' [Image Attached]'; placeholder.style.fontSize = '0.9em'; contentSpan.appendChild(placeholder); } }
+            else if (sender === 'Mika') { el.className = 'mika-message'; let proc = msgText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>').replace(/```([\s\S]*?)```/g, (m, p1) => `<pre><code>${sanitizeHTML(p1.trim())}</code></pre>`).replace(/(?<!<br>)\n/g, '<br>'); contentSpan.innerHTML = `<strong>Mika:</strong> ${proc}`; }
+            else { el.className = 'system-message'; contentSpan.innerHTML = msgText; }
             el.appendChild(contentSpan); chatLog.appendChild(el); scrollToBottom();
         }
         function showTypingIndicator() { if (!chatLog || !chatArea || chatArea.style.display === 'none') return; removeTypingIndicator(); const el = document.createElement('p'); el.className = 'typing-indicator'; el.innerHTML = 'Mika is thinking... *purrrr*'; chatLog.appendChild(el); scrollToBottom(); }
@@ -381,17 +382,21 @@
         function updateInputPlaceholder() { if (chatInput && !chatInput.disabled) { chatInput.placeholder = `Ask Mika about homework, ${currentUserName || 'Study Buddy'}~ ♡`; } }
 
         // --- Chat Management ---
-        function startNewChat(greet = true) { switchToChatView(); if (currentChatId && currentChatHistory.length > 0) { allChats[currentChatId] = currentChatHistory; saveAllChats(); } currentChatId = getTimestamp(); currentChatHistory = []; clearChatDisplay(); if (greet) { appendMessage('system', `Started new chat with ${currentUserName}!`); } else { appendMessage('system', `Started a new chat.`); } removeSelectedImage(); enableChatInput(); updateHistoryDropdown(); console.log(`New chat: ${currentChatId}`); closeAllDropdowns(); }
+        function startNewChat(greet = true) {
+            // Assumes we are already in chat view. Button state managed by switchToChatView.
+            if (currentChatId && currentChatHistory.length > 0) { allChats[currentChatId] = currentChatHistory; saveAllChats(); }
+            currentChatId = getTimestamp(); currentChatHistory = []; clearChatDisplay();
+            if (greet) { appendMessage('system', `Started new chat with ${currentUserName}!`); } else { appendMessage('system', `Started a new chat.`); }
+            removeSelectedImage(); enableChatInput(); updateHistoryDropdown(); console.log(`New chat started: ${currentChatId}`); closeAllDropdowns();
+        }
         function loadChat(chatId) {
-            switchToChatView();
+            switchToChatView(); // Ensures correct view and button state
             if (currentChatId && currentChatHistory.length > 0 && currentChatId !== chatId) { allChats[currentChatId] = currentChatHistory; }
             if (allChats[chatId]) {
                 currentChatId = chatId; currentChatHistory = allChats[chatId]; clearChatDisplay();
                 appendMessage('system', `Loaded chat from ${new Date(parseInt(chatId)).toLocaleString()}. Welcome back, ${currentUserName}!`);
                 currentChatHistory.forEach(msg => {
-                     let displayMsg = msg.parts.find(p => p.text)?.text || "";
-                     let displayImgPlaceholder = msg.parts.some(p => p.placeholder === "[Image Sent]");
-                     // Pass placeholder indicator instead of null/URL for history
+                     let displayMsg = msg.parts.find(p => p.text)?.text || ""; let displayImgPlaceholder = msg.parts.some(p => p.placeholder === "[Image Sent]");
                      appendMessage(msg.role === 'user' ? 'user' : 'Mika', displayMsg, false, displayImgPlaceholder ? "[Image Placeholder]" : null);
                 });
                  removeSelectedImage(); enableChatInput(); console.log(`Loaded chat: ${chatId}`);
@@ -406,21 +411,54 @@
         function updateSettingsDropdown() { if (!settingsInstallButton) return; settingsInstallButton.disabled = !deferredInstallPrompt; applyTheme(loadThemePreference() || 'light'); }
         function updateGamesDropdown() { /* Placeholder */ }
 
-        // --- View Switching ---
-        async function switchToChatView() { if (!gameArea || !chatArea) return; if (isGameActive && currentActiveGameModule?.onExit) { console.log("Calling game onExit..."); try { await currentActiveGameModule.onExit(); console.log("Game onExit done."); } catch (err) { console.error("Game onExit error:", err); } } currentActiveGameModule = null; gameArea.style.display = 'none'; chatArea.style.display = 'flex'; isGameActive = false; if (chatInput && !chatInput.disabled) { setTimeout(() => chatInput.focus(), 50); } clearGameAreaContent(); console.log("View: Chat"); if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred install prompt."); installPopup.style.display = 'flex'; } }
-        function switchToGameView(module = null) { if (!gameArea || !chatArea) return; chatArea.style.display = 'none'; gameArea.style.display = 'flex'; isGameActive = true; currentActiveGameModule = module; closeAllDropdowns(); if (installPopup.style.display === 'flex') { installPopup.style.display = 'none'; console.log("Hiding install prompt for game."); } console.log("View: Game"); }
+        // --- View Switching (UPDATED for Adaptive Button) ---
+        async function switchToChatView() {
+            if (!gameArea || !chatArea) return;
+            console.log(`Switching to Chat. isGameActive: ${isGameActive}, currentModule: ${currentActiveGameModule?.constructor?.name}`);
+            if (isGameActive && currentActiveGameModule?.onExit) {
+                console.log("Calling game onExit...");
+                try { await Promise.race([ currentActiveGameModule.onExit(), new Promise((_, reject) => setTimeout(() => reject(new Error("Game onExit timed out")), 2000)) ]); console.log("Game onExit completed or timed out safely."); }
+                catch (err) { console.error("Game onExit error or timeout:", err); }
+            } else if (isGameActive) { console.warn("Game was active but no onExit function found on module."); }
+            currentActiveGameModule = null; isGameActive = false;
+            gameArea.style.display = 'none'; chatArea.style.display = 'flex';
+            clearGameAreaContent(); console.log("View switched to: Chat");
+            // <<< ADAPTIVE BUTTON: Set to 'New Chat' >>>
+            if (homeButton) {
+                homeButton.textContent = '➕ New Chat';
+                homeButton.title = 'Start a New Chat';
+                homeButton.onclick = () => startNewChat(true);
+            }
+            if (chatInput && !chatInput.disabled) { setTimeout(() => chatInput.focus(), 50); }
+            if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred install prompt after returning to chat."); installPopup.style.display = 'flex'; }
+        }
+        function switchToGameView(module = null) {
+            if (!gameArea || !chatArea) return;
+            chatArea.style.display = 'none'; gameArea.style.display = 'flex';
+            isGameActive = true; currentActiveGameModule = module;
+            closeAllDropdowns();
+            if (installPopup.style.display === 'flex') { installPopup.style.display = 'none'; console.log("Hiding install prompt for game."); }
+            console.log(`View switched to: Game (${module?.constructor?.name || 'Unknown'})`);
+            // <<< ADAPTIVE BUTTON: Set to 'Home' >>>
+            if (homeButton) {
+                homeButton.textContent = '🏠 Home';
+                homeButton.title = 'Back to Main Chat';
+                homeButton.onclick = switchToChatView;
+            }
+        }
 
         // --- Game Loading ---
-        function setupGameAreaBase(titleText) { if (!gameArea) return null; clearGameAreaContent(); const title = document.createElement('h2'); title.id = 'game-title'; title.textContent = titleText; gameArea.appendChild(title); const ui = document.createElement('div'); ui.id = 'game-specific-ui'; ui.style.cssText = 'width:100%; height:auto; display:flex; flex-direction:column; align-items:center; margin-bottom:10px; flex-shrink:0; overflow-y:auto; padding-bottom:5px; max-height: calc(100% - 100px);'; gameArea.appendChild(ui); const log = document.createElement('div'); log.id = 'game-message-log'; log.style.display = 'block'; /* Make sure shared log is visible for games using it */ gameArea.appendChild(log); const back = document.createElement('button'); back.id = 'back-to-chat-button'; back.textContent = 'Back to Chat ♡'; back.onclick = switchToChatView; gameArea.appendChild(back); return ui; }
-        function displayGameMessage(sender, text) { let log = document.getElementById('game-message-log'); let useDiaryLayout = false; if (currentActiveGameModule === MikaDiary || currentActiveGameModule === StoryTime) { log = document.getElementById(currentActiveGameModule === MikaDiary ? 'diary-chat-log' : 'story-display-area'); useDiaryLayout = (currentActiveGameModule === MikaDiary); } if (!log) { /* console.warn("No log found for:", sender); */ return; } const el = document.createElement('p'); let css = 'system-gamemsg'; let msg = sanitizeHTML(text); if (useDiaryLayout) { if (sender === 'User') { css = 'diary-user-message'; msg = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${msg}`; } else if (sender === 'Mika') { css = 'diary-mika-message'; msg = `<strong>Mika:</strong> ${msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/(?<!<br>)\n/g,'<br>')}`; } else css = 'system-message'; el.className = css; el.innerHTML = msg; } else if (currentActiveGameModule === StoryTime) { if (sender === 'User') { css = 'user-action'; msg = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${msg}`; } else { msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); } el.className = css; el.innerHTML = msg; } else { if (sender === 'Mika') { css = 'mika-gamemsg'; msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); } el.className = css; el.innerHTML = msg; } log.appendChild(el); log.scrollTop = log.scrollHeight; }
+        function setupGameAreaBase(titleText) { if (!gameArea) return null; clearGameAreaContent(); const title = document.createElement('h2'); title.id = 'game-title'; title.textContent = titleText; gameArea.appendChild(title); return gameArea; }
+        function displayGameMessage(sender, text) { let log = null; let useDiaryLayout = false; let useStoryLayout = false; if (currentActiveGameModule === MikaDiary && document.getElementById('diary-chat-log')) { log = document.getElementById('diary-chat-log'); useDiaryLayout = true; } else if (currentActiveGameModule === StoryTime && document.getElementById('story-display-area')) { log = document.getElementById('story-display-area'); useStoryLayout = true; } else if (document.getElementById('game-message-log')) { log = document.getElementById('game-message-log'); log.style.display = 'block'; } if (!log) { console.warn("Game message target log not found for:", sender); return; } const el = document.createElement('p'); let msg = sanitizeHTML(text); if (useDiaryLayout) { /* Diary handles formatting */ } else if (useStoryLayout) { if (sender === 'User') { el.className = 'user-action'; msg = `> ${sanitizeHTML(currentUserName)}: ${msg}`; } else { msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); } el.innerHTML = msg; } else { let css = 'system-gamemsg'; if (sender === 'Mika') { css = 'mika-gamemsg'; msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); } else if (sender === 'User') { css = 'user-gamemsg'; } el.className = css; el.innerHTML = msg; } log.appendChild(el); setTimeout(() => { log.scrollTop = log.scrollHeight; }, 0); }
         async function callMikaApiForGame(prompt, context = []) { if (!currentApiKey) return Promise.reject("API Key missing!"); const user = currentUserName || "Study Buddy"; console.log(`API game call: ${prompt.substring(0,60)}...`); try { const resp = await sendMessageToMika(prompt, context, currentApiKey, user); return (typeof resp === 'string' && resp.trim()) ? resp : null; } catch (err) { console.error("API game error:", err); return Promise.reject(`API error: ${err}`); } }
-        function loadTicTacToe() { switchToGameView(TicTacToe); const ui = setupGameAreaBase('Tic-Tac-Toe ♡'); if (ui && TicTacToe?.init) { const b = document.createElement('div'); b.id = 'ttt-board'; ui.appendChild(b); TicTacToe.init(b, displayGameMessage); displayGameMessage('System', "Game loaded! You (X) go first!"); } else { console.error("TTT load fail"); displayGameMessage('System', 'Mrow! TTT failed...'); currentActiveGameModule = null; } }
-        function loadRPS() { switchToGameView(RockPaperScissors); const ui = setupGameAreaBase('Rock Paper Scissors!'); if (ui && RockPaperScissors?.init) { RockPaperScissors.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); displayGameMessage('System', "Make your choice!"); } else { console.error("RPS load fail"); displayGameMessage('System', 'Mrow! RPS failed...'); currentActiveGameModule = null; } }
-        function loadGuessTheNumber() { switchToGameView(GuessTheNumber); const ui = setupGameAreaBase('Guess My Number~'); if (ui && GuessTheNumber?.init) { GuessTheNumber.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("GTN load fail"); displayGameMessage('System', 'Mrow! GTN failed...'); currentActiveGameModule = null; } }
-        function loadTwentyQuestions() { switchToGameView(TwentyQuestions); const ui = setupGameAreaBase('20 Questions!'); if (ui && TwentyQuestions?.init) { TwentyQuestions.init(ui, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("20Q load fail"); displayGameMessage('System', 'Mrow! 20Q failed...'); currentActiveGameModule = null; } }
-        function loadDiary() { if (!gameArea) return; clearGameAreaContent(); switchToGameView(MikaDiary); if (MikaDiary?.init) { MikaDiary.init(gameArea, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("Diary load fail"); gameArea.innerHTML = '<p class="system-message">Mrow! Diary failed...</p>'; const b = document.createElement('button'); b.id='back-to-chat-button'; b.textContent='Back ♡'; b.onclick=switchToChatView; gameArea.appendChild(b); currentActiveGameModule = null; } }
-        function loadStoryTime() { if (!gameArea) return; clearGameAreaContent(); switchToGameView(StoryTime); if (StoryTime?.init) { StoryTime.init(gameArea, displayGameMessage, callMikaApiForGame, currentUserName); const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView; gameArea.appendChild(backBtn); } else { console.error("StoryTime load fail"); gameArea.innerHTML = '<p class="system-message">Mrow! Story Time failed...</p>'; const b = document.createElement('button'); b.id='back-to-chat-button'; b.textContent='Back ♡'; b.onclick=switchToChatView; gameArea.appendChild(b); currentActiveGameModule = null; } }
-        function clearGameAreaContent() { if (gameArea) gameArea.innerHTML = ''; }
+        // --- Load Specific Games ---
+         function loadTicTacToe() { const module = TicTacToe; switchToGameView(module); const container = setupGameAreaBase('Tic-Tac-Toe ♡'); if (container && module?.init) { const uiArea = document.createElement('div'); uiArea.id = 'game-specific-ui'; const boardElement = document.createElement('div'); boardElement.id = 'ttt-board'; uiArea.appendChild(boardElement); container.insertBefore(uiArea, container.querySelector('#game-message-log')); module.init(boardElement, displayGameMessage); if (!container.querySelector('#back-to-chat-button')) { const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView; container.appendChild(backBtn); }} else { console.error("TTT load fail"); displayGameMessage('System', 'Mrow! TTT failed...'); currentActiveGameModule = null; }}
+         function loadRPS() { const module = RockPaperScissors; switchToGameView(module); const container = setupGameAreaBase('Rock Paper Scissors!'); if (container && module?.init) { const uiArea = document.createElement('div'); uiArea.id = 'game-specific-ui'; container.insertBefore(uiArea, container.querySelector('#game-message-log')); module.init(uiArea, displayGameMessage, callMikaApiForGame, currentUserName); if (!container.querySelector('#back-to-chat-button')) { const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView; container.appendChild(backBtn); }} else { console.error("RPS load fail"); displayGameMessage('System', 'Mrow! RPS failed...'); currentActiveGameModule = null; }}
+         function loadGuessTheNumber() { const module = GuessTheNumber; switchToGameView(module); const container = setupGameAreaBase('Guess My Number~'); if (container && module?.init) { const uiArea = document.createElement('div'); uiArea.id = 'game-specific-ui'; container.insertBefore(uiArea, container.querySelector('#game-message-log')); module.init(uiArea, displayGameMessage, callMikaApiForGame, currentUserName); if (!container.querySelector('#back-to-chat-button')) { const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView; container.appendChild(backBtn); }} else { console.error("GTN load fail"); displayGameMessage('System', 'Mrow! GTN failed...'); currentActiveGameModule = null; }}
+         function loadTwentyQuestions() { const module = TwentyQuestions; switchToGameView(module); const container = setupGameAreaBase('20 Questions!'); if (container && module?.init) { const uiArea = document.createElement('div'); uiArea.id = 'game-specific-ui'; container.insertBefore(uiArea, container.querySelector('#game-message-log')); module.init(uiArea, displayGameMessage, callMikaApiForGame, currentUserName); if (!container.querySelector('#back-to-chat-button')) { const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView; container.appendChild(backBtn); }} else { console.error("20Q load fail"); displayGameMessage('System', 'Mrow! 20Q failed...'); currentActiveGameModule = null; }}
+         function loadDiary() { const module = MikaDiary; switchToGameView(module); clearGameAreaContent(); if (gameArea && module?.init) { module.init(gameArea, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("Diary load fail"); gameArea.innerHTML = '<p class="system-message">Mrow! Diary failed...</p>'; const b = document.createElement('button'); b.id='back-to-chat-button'; b.textContent='Back ♡'; b.onclick=switchToChatView; gameArea.appendChild(b); currentActiveGameModule = null; }}
+         function loadStoryTime() { const module = StoryTime; switchToGameView(module); clearGameAreaContent(); if (gameArea && module?.init) { module.init(gameArea, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("StoryTime load fail"); gameArea.innerHTML = '<p class="system-message">Mrow! Story Time failed...</p>'; const b = document.createElement('button'); b.id='back-to-chat-button'; b.textContent='Back ♡'; b.onclick=switchToChatView; gameArea.appendChild(b); currentActiveGameModule = null; }}
+         function clearGameAreaContent() { if (gameArea) gameArea.innerHTML = ''; }
 
         // --- Image Handling ---
         function handleImageSelection(event) { const file = event.target.files[0]; if (!file) { removeSelectedImage(); return; } if (!file.type.startsWith('image/')) { appendMessage('system', "Mrow! Not an image file!"); removeSelectedImage(); return; } if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) { appendMessage('system', `Eek! Image too big! (Max ${MAX_IMAGE_SIZE_MB}MB)`); removeSelectedImage(); return; } const reader = new FileReader(); reader.onload = (e) => { imagePreview.src = e.target.result; imagePreviewArea.style.display = 'inline-block'; selectedImageData = e.target.result.split(',')[1]; selectedImageMimeType = file.type; console.log(`Selected: ${file.name}, Type: ${selectedImageMimeType}`); enableChatInput(); }; reader.onerror = (e) => { console.error("File read error:", e); appendMessage('system', "Meeeow! Error reading image..."); removeSelectedImage(); }; reader.readAsDataURL(file); }
@@ -431,41 +469,44 @@
             if (isGameActive || isMikaTyping || !currentApiKey) return;
             const txt = chatInput.value.trim(); const hasTxt = txt.length > 0; const hasImg = !!selectedImageData;
             if (!hasTxt && !hasImg) return;
-
             const imgData = selectedImageData; const imgMime = selectedImageMimeType; const imgPreviewUrl = hasImg ? imagePreview.src : null;
-            removeSelectedImage(); // Clear selection state immediately
-
-            appendMessage('user', txt || "[Image Attached]", false, imgPreviewUrl); // Show message/placeholder and thumbnail
-             const userParts = [];
-             if (hasTxt) userParts.push({ text: txt });
-             // Store placeholder in history, not actual data URL
-             if (hasImg) userParts.push({ placeholder: "[Image Sent]", mimeType: imgMime });
-             currentChatHistory.push({ role: 'user', parts: userParts });
-
+            removeSelectedImage();
+            appendMessage('user', txt || "[Image Attached]", false, imgPreviewUrl);
+            const userParts = []; if (hasTxt) userParts.push({ text: txt }); if (hasImg) userParts.push({ placeholder: "[Image Sent]", mimeType: imgMime });
+            currentChatHistory.push({ role: 'user', parts: userParts });
             chatInput.value = ''; isMikaTyping = true; disableChatInput(); showTypingIndicator();
-            // Prepare history for API call, excluding placeholders
-            const historyContext = currentChatHistory.slice(0, -1).map(msg => ({
-                role: msg.role,
-                parts: msg.parts.filter(p => p.text) // Only send parts with text
-            })).filter(msg => msg.parts.length > 0); // Ensure message has text parts
-
-            if (historyContext.length > MAX_HISTORY_LENGTH) {
-                 historyContext = historyContext.slice(-MAX_HISTORY_LENGTH);
-                 console.log("Chat history pruned for API context.");
-            }
-
-            try {
-                const user = currentUserName || "Study Buddy";
-                const resp = await sendMessageToMika(txt, historyContext, currentApiKey, user, imgData, imgMime);
-                 removeTypingIndicator(); appendMessage('Mika', resp);
-                 currentChatHistory.push({ role: 'model', parts: [{ text: resp }] });
-                 saveAllChats();
-            } catch (err) { console.error("Send error:", err); removeTypingIndicator(); appendMessage('system', err.message || `Mrow! Error talking...`); }
+            const historyContext = currentChatHistory.slice(0, -1).map(msg => ({ role: msg.role, parts: msg.parts.filter(p => p.text || p.inlineData) })).filter(msg => msg.parts.length > 0);
+            const trimmedHistoryContext = historyContext.length > MAX_HISTORY_LENGTH ? historyContext.slice(-MAX_HISTORY_LENGTH) : historyContext;
+            if (historyContext.length > MAX_HISTORY_LENGTH) { console.log("Chat history pruned for API context."); }
+            try { const user = currentUserName || "Study Buddy"; const resp = await sendMessageToMika(txt, trimmedHistoryContext, currentApiKey, user, imgData, imgMime); removeTypingIndicator(); appendMessage('Mika', resp); currentChatHistory.push({ role: 'model', parts: [{ text: resp }] }); saveAllChats(); }
+            catch (err) { console.error("Send error:", err); removeTypingIndicator(); appendMessage('system', err.message || `Mrow! Error talking...`); }
              finally { isMikaTyping = false; if (currentApiKey) enableChatInput(); else disableChatInput("API Key needed!"); }
         }
 
-        // --- Initialization Flow ---
-        function proceedToChat() { if (!chatContainer) return; chatContainer.style.display = 'flex'; switchToChatView(); const chatId = loadAllChats(); updateInputPlaceholder(); if (chatId) loadChat(chatId); else startNewChat(true); updateChatTitle(); updateHistoryDropdown(); if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred prompt."); installPopup.style.display = 'flex'; } }
+        // --- Initialization Flow (UPDATED for Adaptive Button) ---
+        function proceedToChat() {
+            if (!chatContainer) return;
+            chatContainer.style.display = 'flex';
+            // Set initial view state without calling full switchToChatView yet
+            chatArea.style.display = 'flex'; gameArea.style.display = 'none';
+            isGameActive = false; currentActiveGameModule = null;
+            // <<< SET INITIAL ADAPTIVE BUTTON STATE >>>
+            if (homeButton) {
+                homeButton.textContent = '➕ New Chat';
+                homeButton.title = 'Start a New Chat';
+                homeButton.onclick = () => startNewChat(true); // Default action is new chat
+            }
+            const chatId = loadAllChats(); updateInputPlaceholder();
+            if (chatId) { loadChat(chatId); } // Loads chat, implicitly calls switchToChatView which sets button correctly
+            else {
+                // If no chat loaded, explicitly clear display and show welcome
+                clearChatDisplay();
+                appendMessage('system', `Ready for your homework, ${currentUserName}!`);
+                enableChatInput(); // Ensure input is enabled
+            }
+            updateChatTitle(); updateHistoryDropdown();
+            if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred install prompt."); installPopup.style.display = 'flex'; }
+        }
         function checkNameAndProceed() { const name = loadUserName(); if (name) { currentUserName = name; if (namePopup) namePopup.style.display = 'none'; checkApiKeyAndProceed(); } else { if (namePopup && nameInput) { if(apiKeyPopup) apiKeyPopup.style.display = 'none'; if(disclaimerPopup) disclaimerPopup.style.display = 'none'; nameInput.value = "Study Buddy"; namePopup.style.display = 'flex'; nameInput.focus(); nameInput.select(); } } }
         function checkApiKeyAndProceed() { const key = loadApiKey(); if (key) { currentApiKey = key; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; proceedToChat(); } else { if (apiKeyPopup && chatContainer && apiKeyInput) { if (namePopup) namePopup.style.display = 'none'; if(disclaimerPopup) disclaimerPopup.style.display = 'none'; chatContainer.style.display = 'none'; apiKeyPopup.style.display = 'flex'; disableChatInput("API Key needed!"); apiKeyInput.focus(); } } }
         function initializeApp() { console.log("Initializing Mika App..."); registerServiceWorker(); setupInstallPromptHandler(); const theme = loadThemePreference(); applyTheme(theme || 'light'); if (hasAgreedToDisclaimer()) { console.log("Disclaimer agreed."); checkNameAndProceed(); } else { console.log("Showing disclaimer."); if (disclaimerPopup) disclaimerPopup.style.display = 'flex'; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; if (namePopup) namePopup.style.display = 'none'; if (chatContainer) chatContainer.style.display = 'none'; if (gameArea) gameArea.style.display = 'none'; if (chatArea) chatArea.style.display = 'none'; } }
@@ -481,7 +522,7 @@
         if (imageUploadButton) imageUploadButton.addEventListener('click', () => imageUploadInput?.click());
         if (imageUploadInput) imageUploadInput.addEventListener('change', handleImageSelection);
         if (removeImageButton) removeImageButton.addEventListener('click', removeSelectedImage);
-        if (newChatButton) newChatButton.addEventListener('click', () => startNewChat(true));
+        // <<< Adaptive button's listener is set dynamically in view switching functions >>>
         if (historyButton) historyButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(historyDropdown); });
         if (gamesButton) gamesButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(gamesDropdown); });
         if (settingsButton) settingsButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(settingsDropdown); });
@@ -500,9 +541,9 @@
         document.addEventListener('click', (e) => { if (historyDropdown?.style.display === 'block' && !historyDropdown.contains(e.target) && e.target !== historyButton) historyDropdown.style.display = 'none'; if (settingsDropdown?.style.display === 'block' && !settingsDropdown.contains(e.target) && e.target !== settingsButton) settingsDropdown.style.display = 'none'; if (gamesDropdown?.style.display === 'block' && !gamesDropdown.contains(e.target) && e.target !== gamesButton) gamesDropdown.style.display = 'none'; });
 
         // --- Start the App ---
-        document.addEventListener('DOMContentLoaded', initializeApp); // Wait for DOM
+        document.addEventListener('DOMContentLoaded', initializeApp);
 
-        // Auto-save chats
+        // --- Auto-save chats ---
         window.addEventListener('beforeunload', saveAllChats);
 
         // Nyaa~! ♡
