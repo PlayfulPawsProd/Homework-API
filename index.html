@@ -1,3 +1,4 @@
+<!-- START OF FILE index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -183,21 +184,8 @@
 </head>
 <body>
 
-    <!-- Disclaimer Popup (Very First!) -->
-    <div id="disclaimer-popup" class="popup-overlay" style="display: flex;"> <!-- Start visible -->
-         <div class="popup-modal">
-             <h2>☆ Important Kitty Notes! ☆</h2>
-             <p>Hiii~! Quick heads-up before we play! Your secret API key stays safe right here in <strong>your browser</strong>, nya~! I don't share it!</p>
-             <p>Also, while I have safety filters (*purrr*), AI can be unpredictable sometimes. The awesome person who shared me isn't responsible for what I might say, okay?</p>
-             <p style="font-weight: bold;">If you're young, please show this to your parent before clicking 'Okay!' ♡</p>
-             <div class="popup-buttons">
-                 <button id="agree-disclaimer-button" class="popup-button">Okay, I Understand!</button>
-             </div>
-         </div>
-     </div>
-
-    <!-- API Key Popup (Now Second) -->
-    <div id="api-key-popup" class="popup-overlay"> <!-- Starts hidden -->
+    <!-- API Key Popup (First) -->
+    <div id="api-key-popup" class="popup-overlay">
         <div class="popup-modal">
             <h2>(=^･ω･^=) Mika needs the Secret Code!</h2>
             <p>To start chatting, please enter your Google Gemini API Key! It gets saved safely in *your* browser so you don't have to enter it every time, nya~!</p>
@@ -209,10 +197,11 @@
         </div>
     </div>
 
-    <!-- Name Input Popup (Third) -->
-    <div id="name-popup" class="popup-overlay"> <!-- Starts hidden -->
+    <!-- Name Input Popup (Second) -->
+    <div id="name-popup" class="popup-overlay">
          <div class="popup-modal">
              <h2>☆ Who am I helping today? ☆</h2>
+             <!-- MODIFIED PARAGRAPH HERE -->
              <p>Tell me your name so I know who my awesome Study Buddy is! What should I call you~? ♡</p>
              <input type="text" id="name-input" placeholder="Enter name here~">
              <p id="name-error" class="popup-error">Please enter a name!</p>
@@ -222,8 +211,8 @@
          </div>
      </div>
 
-     <!-- PWA Install Popup (Optional, Fourth) -->
-     <div id="install-popup" class="popup-overlay"> <!-- Starts hidden -->
+     <!-- PWA Install Popup (Optional, Third) -->
+     <div id="install-popup" class="popup-overlay">
           <div class="popup-modal">
               <h2>☆ Install Mika Helper? ☆</h2>
               <p>Want to add me to your Home Screen like a real app for easy access? Nyaa~!</p>
@@ -267,9 +256,6 @@
         // Nyaa~! Homework Helper Mika with localStorage, PWA Install & Name!
 
         // --- DOM Elements ---
-        const disclaimerPopup = document.getElementById('disclaimer-popup'); // NEW
-        const agreeDisclaimerButton = document.getElementById('agree-disclaimer-button'); // NEW
-
         const apiKeyPopup = document.getElementById('api-key-popup');
         const apiKeyInput = document.getElementById('api-key-input');
         const saveApiKeyButton = document.getElementById('save-api-key-button');
@@ -300,6 +286,7 @@
         let currentChatHistory = [];
         let isMikaTyping = false;
         let currentApiKey = null;
+        // MODIFIED DEFAULT NAME HERE
         let currentUserName = "Study Buddy"; // Default name
         let allChats = {};
         let currentChatId = null;
@@ -322,6 +309,7 @@
                 return true;
             } catch (e) {
                 console.error(`Failed to save ${key} to localStorage:`, e);
+                // Avoid showing alerts for storage errors unless critical
                 // appendMessage('system', `Mrow! Couldn't save ${key}... maybe your browser storage is full or disabled? ;_;`);
                 return false;
             }
@@ -363,9 +351,11 @@
                 if (currentChatId && currentChatHistory.length > 0) {
                      allChats[currentChatId] = currentChatHistory;
                 }
+                // Only save if there's something to save
                 if (Object.keys(allChats).length > 0) {
                     saveToLocalStorage('mikaHelper_allChats', JSON.stringify(allChats));
                 } else {
+                    // If allChats is empty, clear it from storage too
                     clearFromLocalStorage('mikaHelper_allChats');
                 }
             } catch (e) { /* Error handled in saveToLocalStorage */ }
@@ -388,14 +378,16 @@
         }
 
          function deleteAllChats() {
+             // Use currentUserName in the confirmation dialog
              if (confirm(`Hey ${currentUserName}! Are you SURE you want to delete ALL our chat history forever?! (ฅΦωΦฅ);;`)) {
                  clearFromLocalStorage('mikaHelper_allChats');
                  allChats = {};
-                 startNewChat(false);
+                 startNewChat(false); // Start fresh without greeting
                  updateHistoryDropdown();
                  appendMessage('system', "All chat history deleted. It's like we just met again, nyaa~!");
                  console.log("All chat history deleted.");
              }
+             // Hide dropdown after action regardless of choice
              if (historyDropdown.style.display === 'block') historyDropdown.style.display = 'none';
          }
 
@@ -406,6 +398,7 @@
                 deferredInstallPrompt = event;
                 console.log('`beforeinstallprompt` event fired and stored.');
                 const installPromptShown = loadFromLocalStorage('mikaInstallPromptShown');
+                // Only show the custom prompt if the event exists AND we haven't shown it before (or user cleared storage)
                 if (!installPromptShown) {
                     installPopup.style.display = 'flex';
                 } else {
@@ -420,13 +413,13 @@
                      const { outcome } = await deferredInstallPrompt.userChoice;
                      console.log(`User response to the install prompt: ${outcome}`);
                      deferredInstallPrompt = null;
-                     saveToLocalStorage('mikaInstallPromptShown', 'true');
+                     saveToLocalStorage('mikaInstallPromptShown', 'true'); // Mark as shown/actioned
                  }
              });
 
              installLaterButton.addEventListener('click', () => {
                  installPopup.style.display = 'none';
-                 saveToLocalStorage('mikaInstallPromptShown', 'true');
+                 saveToLocalStorage('mikaInstallPromptShown', 'true'); // Mark as shown/actioned
                  console.log('User chose to install later.');
              });
 
@@ -434,7 +427,8 @@
                console.log('Mika PWA was installed!');
                installPopup.style.display = 'none';
                deferredInstallPrompt = null;
-               // clearFromLocalStorage('mikaInstallPromptShown'); // Optional: Allow reprompt if uninstalled
+               // Maybe remove the install prompt shown flag so it *could* appear again if uninstalled? Optional.
+               // clearFromLocalStorage('mikaInstallPromptShown');
              });
         }
 
@@ -503,6 +497,7 @@
          function enableChatInput() {
              chatInput.disabled = false;
              sendButton.disabled = false;
+             // Use the updated name here
              chatInput.placeholder = `Ask Mika about your homework, ${currentUserName || 'Study Buddy'}~ ♡`;
          }
 
@@ -516,6 +511,7 @@
             chatTitle.textContent = `Study Time with ${sanitizeHTML(currentUserName)}! ♡`;
         }
 
+         // Updates the placeholder text in the input field
          function updateInputPlaceholder() {
             if (chatInput) {
                  chatInput.placeholder = `Ask Mika about your homework, ${currentUserName || 'Study Buddy'}~ ♡`;
@@ -537,7 +533,7 @@
              } else {
                  appendMessage('system', `Started a new chat.`);
              }
-             enableChatInput();
+             enableChatInput(); // Will use currentUserName in placeholder
              updateHistoryDropdown();
              console.log(`Started new chat with ID: ${currentChatId}`);
              if (historyDropdown.style.display === 'block') historyDropdown.style.display = 'none';
@@ -560,7 +556,7 @@
                          appendMessage('Mika', msg.parts[0].text);
                      }
                  });
-                 enableChatInput();
+                 enableChatInput(); // Will use currentUserName in placeholder
                  console.log(`Loaded chat ID: ${chatId}`);
              } else {
                  console.error(`Chat ID ${chatId} not found.`);
@@ -613,11 +609,12 @@
         // --- API Call & Message Handling ---
         async function handleSendMessage() {
             const messageText = chatInput.value.trim();
+            // Ensure currentUserName has a value, default to 'Study Buddy' if somehow null/empty
             const userNameForApi = currentUserName || "Study Buddy";
 
             if (!messageText || isMikaTyping || !currentApiKey) return;
 
-            appendMessage('user', messageText);
+            appendMessage('user', messageText); // Uses currentUserName for display via its own logic
             currentChatHistory.push({ role: 'user', parts: [{ text: messageText }] });
             chatInput.value = '';
             isMikaTyping = true;
@@ -630,6 +627,7 @@
              }
 
             try {
+                // Pass the current user's name to the API function
                 const mikaResponse = await sendMessageToMika(messageText, currentChatHistory, currentApiKey, userNameForApi);
 
                 removeTypingIndicator();
@@ -640,11 +638,12 @@
             } catch (error) {
                 console.error("Error in handleSendMessage:", error);
                 removeTypingIndicator();
+                // Use the current user's name in the error message
                 appendMessage('system', error.message || `Mrow! Something went wrong, ${userNameForApi}... Mika can't talk right now. ;_;`);
             } finally {
                 isMikaTyping = false;
                 if (currentApiKey) {
-                    enableChatInput();
+                    enableChatInput(); // Will use currentUserName in placeholder
                     chatInput.focus();
                  } else {
                      disableChatInput("API Key needed!");
@@ -658,12 +657,13 @@
             chatContainer.style.display = 'flex';
             const mostRecentChatId = loadAllChats();
             clearChatDisplay();
-            updateInputPlaceholder();
+            updateInputPlaceholder(); // Set placeholder correctly before loading/starting
             if (mostRecentChatId) {
                 loadChat(mostRecentChatId);
             } else {
-                startNewChat(true);
+                startNewChat(true); // Start fresh with greeting
             }
+            // enableChatInput(); // Already called within loadChat/startNewChat
             updateChatTitle();
             updateHistoryDropdown();
             setupInstallPrompt(); // Check for PWA install prompt now UI is ready
@@ -674,9 +674,11 @@
             if (storedName) {
                 currentUserName = storedName;
                 namePopup.style.display = 'none';
-                updateInputPlaceholder();
+                updateInputPlaceholder(); // Update placeholder now name is loaded
                 proceedToChat();
             } else {
+                // Show name popup
+                // MODIFIED DEFAULT VALUE HERE
                 nameInput.value = "Study Buddy"; // Prefill default
                 namePopup.style.display = 'flex';
                 nameInput.focus();
@@ -684,43 +686,24 @@
             }
         }
 
-        // MODIFIED: This function now JUST sets up the initial disclaimer agreement step.
         function initializeApp() {
             registerServiceWorker(); // Register SW early
 
-            // Make sure the disclaimer is visible IF it hasn't been agreed to yet
-            disclaimerPopup.style.display = 'flex'; // Starts visible
-
-            // Disable chat input initially until everything is set up
-            chatContainer.style.display = 'none';
-            disableChatInput("Waiting for setup...");
-
-            // The rest of the app logic (checking API key, name etc.)
-            // will only run AFTER the disclaimer is agreed to via its event listener.
-        }
-
-
-        // --- Event Listeners ---
-
-        // NEW Listener for the Disclaimer Button
-        agreeDisclaimerButton.addEventListener('click', () => {
-            disclaimerPopup.style.display = 'none'; // Hide the disclaimer
-
-            // NOW we start the original setup flow: Check API Key -> Check Name -> Chat
             const loadedKey = loadApiKey();
             if (loadedKey) {
                 currentApiKey = loadedKey;
                 apiKeyPopup.style.display = 'none';
                 checkNameAndProceed(); // Key exists, check name next
             } else {
-                // Show API key popup
+                // Show API key popup first
                 apiKeyPopup.style.display = 'flex';
                 chatContainer.style.display = 'none';
                 disableChatInput("API Key needed!");
                 apiKeyInput.focus();
             }
-        });
+        }
 
+        // --- Event Listeners ---
         saveApiKeyButton.addEventListener('click', () => {
             const key = apiKeyInput.value.trim();
             if (key) {
@@ -742,7 +725,7 @@
                      currentUserName = name; // Update state
                      namePopup.style.display = 'none';
                      nameError.style.display = 'none';
-                     updateInputPlaceholder();
+                     updateInputPlaceholder(); // Update placeholder immediately
                      proceedToChat(); // Name saved, proceed to chat
                  }
              } else {
@@ -772,6 +755,7 @@
              if (confirm(`Change API Key or Name for ${currentUserName}? This will clear current settings and reload the page.`)) {
                  clearApiKey();
                  clearUserName();
+                 // Clear install prompt shown flag so it might reappear
                  clearFromLocalStorage('mikaInstallPromptShown');
                  window.location.reload();
              }
@@ -790,13 +774,14 @@
          });
 
          document.addEventListener('click', (event) => {
+             // Close dropdown if clicking anywhere outside the dropdown itself AND outside the history button
              if (historyDropdown.style.display === 'block' && !historyDropdown.contains(event.target) && event.target !== historyButton) {
                  historyDropdown.style.display = 'none';
              }
          });
 
         // --- Start the App ---
-        initializeApp(); // This now just shows the disclaimer
+        initializeApp();
 
         // Auto-save chats when the window is closed/reloaded
          window.addEventListener('beforeunload', saveAllChats);
@@ -807,3 +792,4 @@
 
 </body>
 </html>
+<!-- END OF FILE index.html -->
