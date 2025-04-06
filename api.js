@@ -86,7 +86,7 @@ async function sendMessageToMika(userMessage, chatHistory, apiKey, userName, cur
 
     // Use the Flash model which supports multimodal input
     // NOTE: Ensure the correct model name is used if deploying or changing versions.
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`; // Using latest flash
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`; // Using latest flash
 
     const requestBody = {
         contents: [...chatHistory, { role: "user", parts: userParts }],
