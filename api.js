@@ -85,7 +85,7 @@ async function sendMessageToMika(userMessage, chatHistory, apiKey, userName, cur
     // -------------------------------------------
 
     // Use the Gemini 1.5 Flash model
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
     const requestBody = {
         contents: [...chatHistory, { role: "user", parts: userParts }],
