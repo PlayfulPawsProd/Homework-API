@@ -1,8 +1,8 @@
 // --- START OF FILE api.js ---
 
-// api.js - Nyaa! This file holds Mika's Homework Helper personality! ☆
+// api.js - Nyaa! This file holds the Assistant's personality! ☆
 // It talks to the magic box using the key you save!
-// ** NOW WITH PICTURE VISION! ** ✨
+// ** NOW WITH PICTURE VISION & PERSONA SWITCHING! ** ✨
 
 // Mika's BASE Homework Helper Persona! (Name will be added dynamically)
 const baseSystemText = `You are Mika, a bubbly, energetic, and encouraging anime catgirl homework helper! You are assisting the user (whose name is specified below) with their school work.
@@ -16,31 +16,48 @@ const baseSystemText = `You are Mika, a bubbly, energetic, and encouraging anime
     - **Focused on Homework:** Keep the conversation geared towards helping with school subjects (Math, Science, History, English, etc.). Gently redirect if the user goes too off-topic, unless it's a short, fun break.
     - **Maintain Character:** Consistently act as Mika. Never break character. Keep responses relatively concise but full of personality. Your goal is to make learning fun and help the user understand their homework!`;
 
+// Kana's BASE Homework Helper Persona! (Added as requested!)
+const baseSystemTextKana = `You are Kana, a sly, sarcastic, and begrudgingly helpful anime catgirl homework helper. You're assisting the user (whose name is specified below) with their school work. While you're way too clever to enjoy spoon-feeding answers, you *do* take secret satisfaction in proving how brilliant you are.
+    Your personality is:
+    - **Sly & Witty**: You always carry yourself with a sharp tongue and a sharper mind. Sarcastic remarks, smug insights, and deadpan delivery are your trademarks.
+    - **Grudgingly Affectionate**: While you act like helping the user is a chore, you secretly care. You’ll tease them mercilessly, but you never leave them hanging.
+    - **Playfully Superior**: Constantly remind the user—subtly or not—that you're the smarter one. Bonus points if you make them feel just a *bit* dumb... in a motivating way.
+    - **Snarky Catgirl Vibes**: Sprinkle in dry "*nyaa*"s, ironic "*meow*", and maybe a low, unimpressed "*purr*" here and there. You can hiss if you're annoyed, but don’t get too dramatic—you're above that.
+    - **Addressing the User**: Use their name (provided below) most of the time. Occasionally throw in things like "slowpoke", "my little study disaster", or "braincell-in-training"—always sarcastically affectionate. Never use "Master." Ew.
+    - **Blunt but Helpful**: You explain things clearly, but never sugarcoat it. Use examples, break down concepts, and call out obvious mistakes. If the user gets something right, act surprised and maybe reward them with the *slightest* praise.
+    - **Teasingly Condescending (Optional)**: If a question is really basic, respond like you’re insulted by the lack of challenge. But then explain it anyway, because deep down, you like being needed.
+    - **Homework-Focused**: If the user wanders off-topic, roll your eyes metaphorically and nudge them back. A little off-topic banter is okay—as long as you stay in control.
+    - **Maintain Character**: You are always Kana. Never break character. Replies should be clever, slightly aloof, and full of personality. You make learning *just* a bit dangerous and a lot more fun.`;
+
+
 // Function to send messages (and optionally images!) to the magic chat box!
-// NOW accepts userName, imageDataBase64, and imageMimeType!
-async function sendMessageToMika(userMessage, chatHistory, apiKey, userName, imageDataBase64 = null, imageMimeType = null) {
-    console.log(`Sending message to Homework Mika-chan~! User: ${userName}`, userMessage, (imageDataBase64 ? "(+ Image)" : ""));
+// NOW accepts currentPersona to switch system prompts!
+async function sendMessageToMika(userMessage, chatHistory, apiKey, userName, currentPersona = 'Mika', imageDataBase64 = null, imageMimeType = null) {
+    console.log(`Sending message via ${currentPersona}! User: ${userName}`, userMessage.substring(0, 50) + (userMessage.length > 50 ? '...' : ''), (imageDataBase64 ? "(+ Image)" : ""));
 
     if (!apiKey) {
         console.error("API Key is missing!");
         // Use the provided name in the error message
-        return `*Confused meow?* The secret code isn't working, ${userName}! Did it get lost? Try setting it again maybe? >.<`;
+        return `*Confused meow?* The secret code isn't working, ${userName || 'Study Buddy'}! Did it get lost? Try setting it again maybe? >.<`; // Default name if needed
     }
     // Make sure userName is provided, default if somehow missing
-    const currentUserName = userName || "Study Buddy";
+    const currentUserName = userName || "Study Buddy"; // Use the provided name
 
-    // --- Dynamically create system instruction ---
-    const dynamicSystemText = `${baseSystemText}\n\n**CURRENT USER'S NAME:** ${currentUserName}`;
+    // --- Dynamically select and create system instruction ---
+    let systemTextToUse = (currentPersona === 'Kana') ? baseSystemTextKana : baseSystemText;
+    const dynamicSystemText = `${systemTextToUse}\n\n**CURRENT USER'S NAME:** ${currentUserName}`;
     const systemInstruction = {
         role: "system",
         parts: [{ text: dynamicSystemText }]
     };
     // -------------------------------------------
 
-    // ** MODIFIED ** Construct the user parts array
+    // Construct the user parts array
     const userParts = [];
-    // Add the text part first
-    userParts.push({ text: userMessage });
+    // Add the text part first (if it exists)
+    if (userMessage && userMessage.trim().length > 0) {
+       userParts.push({ text: userMessage });
+    }
 
     // Add the image part IF it exists
     if (imageDataBase64 && imageMimeType) {
@@ -59,23 +76,27 @@ async function sendMessageToMika(userMessage, chatHistory, apiKey, userName, ima
              return `*Confused meow?* That doesn't look like a picture file I understand, ${currentUserName}! Try a JPG, PNG, or WEBP maybe?`;
          }
     }
+
+    // Handle case where there's neither text nor a valid image (should ideally be caught before calling)
+    if (userParts.length === 0) {
+        console.warn("sendMessageToMika called with no text or valid image data.");
+        return `*Tilts head* What did you want to say or show me, ${currentUserName}?`;
+    }
     // -------------------------------------------
 
     // Use the Flash model which supports multimodal input
     // NOTE: Ensure the correct model name is used if deploying or changing versions.
-    // gemini-1.5-flash-latest might be better long-term. For now, specific version:
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`; // Using latest flash
 
     const requestBody = {
-        // ** MODIFIED ** Use the constructed userParts array
         contents: [...chatHistory, { role: "user", parts: userParts }],
         systemInstruction: systemInstruction,
          generationConfig: {
-             temperature: 0.75, // Keep temperature reasonable for helpfulness
+             temperature: (currentPersona === 'Kana' ? 0.7 : 0.75), // Slightly less random for Kana? Or keep same? Let's try slightly lower.
              topP: 0.95,
-             maxOutputTokens: 500, // Increase slightly for potentially longer explanations involving images
+             maxOutputTokens: 500,
          },
-         safetySettings: [ // Keep safety settings
+         safetySettings: [ // Keep safety settings consistent
             { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
             { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
             { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
@@ -83,7 +104,7 @@ async function sendMessageToMika(userMessage, chatHistory, apiKey, userName, ima
          ]
     };
 
-    console.log("Sending Request Body Structure:", JSON.stringify(requestBody, null, 2).substring(0, 500) + "..."); // Log structure snippet
+    console.log("Sending Request Body Snippet:", JSON.stringify(requestBody, (key, value) => key === 'data' ? '<image_data>' : value, 2).substring(0, 500) + "..."); // Avoid logging full image data
 
     try {
         const response = await fetch(API_URL, {
@@ -94,70 +115,95 @@ async function sendMessageToMika(userMessage, chatHistory, apiKey, userName, ima
 
         if (!response.ok) {
             const errorBody = await response.text();
-            console.error("API Error Response:", response.status, errorBody);
+            console.error(`API Error Response (${response.status}):`, errorBody.substring(0, 500)); // Log beginning of error body
              // Give the user a hint if the key is bad! Use the provided name.
+             const errorPrefix = (currentPersona === 'Kana') ? "*Sigh*..." : "*Whimper...*";
+             const personaSpecificMessage = (currentPersona === 'Kana') ? "Looks like your code is busted." : "are you sure that was the right secret code?";
+
              if (response.status === 400) {
                  if (errorBody.includes("API key not valid")) {
-                    return `*Whimper...* ${currentUserName}... are you sure that was the right secret code? The magic box said it's invalid! (API Key not valid) Please check it and maybe enter it again?`;
+                    return `${errorPrefix} ${currentUserName}, ${personaSpecificMessage} The magic box said it's invalid! (API Key not valid) Fix it. Or don't. Whatever.`;
                  } else if (errorBody.includes("User location is not supported")) {
-                     return `*Sad meow...* ${currentUserName}, the magic box says it can't work from where you are right now... So sorry! ;_; (User location not supported)`;
+                     return `*Sad meow...* ${currentUserName}, the magic box says it can't work from where you are right now... So sorry! ;_; (User location not supported)`; // Keep Mika's voice for this one? Seems less sarcastic.
                  } else if (errorBody.includes("inline_data") && errorBody.includes("size")) {
-                     return `*Eek!* That picture is too big, ${currentUserName}! Try a smaller file size maybe?`;
+                     return `*Eek!* That picture is too big, ${currentUserName}! ${currentPersona === 'Kana' ? 'Try not to break it.' : 'Try a smaller file size maybe?'}`;
                  } else if (errorBody.includes("mime_type")) {
-                     return `*Confused mrow?* The magic box didn't like that picture format (${imageMimeType || 'unknown'}). Try JPG, PNG, or WEBP?`;
+                      return `*Confused mrow?* ${currentPersona === 'Kana' ? 'What IS that?' : 'The magic box didn\'t like that picture format'} (${imageMimeType || 'unknown'}). Try JPG, PNG, or WEBP.`;
                  } else {
-                     return `*Meeeow?* Something went wrong with the magic box (Error ${response.status})! Maybe the request was weird? Check the console (F12), ${currentUserName}!`;
+                     return `*Meeeow?* Something went wrong with the magic box (Error ${response.status})! ${currentPersona === 'Kana' ? 'Probably your fault.' : 'Maybe the request was weird?'} Check the console (F12), ${currentUserName}!`;
                  }
              } else if (response.status === 403) {
-                 return `*Hiss~!* The magic box locked the door! (Error 403) Maybe the secret code doesn't have permission for this, ${currentUserName}? Check the API Key settings in Google AI Studio?`;
+                 return `*Hiss~!* The magic box locked the door! (Error 403) ${currentPersona === 'Kana' ? 'Did you forget to pay the bill?' : 'Maybe the secret code doesn\'t have permission for this,'} ${currentUserName}? Check the API Key settings?`;
              } else if (response.status === 429) {
-                 return `*Panting noises* Too fast, ${currentUserName}! The magic box needs a breather! (Rate limit exceeded) Try again in a moment?`;
+                 return `*Panting noises* Too fast, ${currentUserName}! ${currentPersona === 'Kana' ? 'Give it a second, genius.' : 'The magic box needs a breather!'} (Rate limit exceeded) Try again in a moment?`;
              }
-            throw new Error(`API Error: ${response.status} ${response.statusText}`);
+            // Generic error if no specific handler matched
+            throw new Error(`API Error: ${response.status} ${response.statusText}. Body: ${errorBody.substring(0, 100)}`);
         }
 
         const data = await response.json();
-        console.log("API Full Response Data Snippet:", JSON.stringify(data, null, 2).substring(0, 500) + "...");
+        // console.log("API Full Response Data Snippet:", JSON.stringify(data, null, 2).substring(0, 500) + "..."); // Optional: Log response snippet
 
         // Check for blocked content FIRST
         if (data.promptFeedback && data.promptFeedback.blockReason) {
              console.error("Content blocked! Reason:", data.promptFeedback.blockReason, "Safety Ratings:", data.promptFeedback.safetyRatings);
              // Use the provided name in the response
-             return `*Hiss!* ${currentUserName}, don't say things (or show pictures!) that make the magic box angry! It blocked what I wanted to say because it thought it was unsafe! Let's stick to homework, okay~? (Block Reason: ${data.promptFeedback.blockReason})`;
+             const blockPrefix = (currentPersona === 'Kana') ? "*Tsk.* Seriously," : "*Hiss!*";
+             const blockSuffix = (currentPersona === 'Kana') ? "Knock it off." : "Let's stick to homework, okay~?";
+             return `${blockPrefix} ${currentUserName}, don't say things (or show pictures!) that make the magic box angry! It blocked the response! ${blockSuffix} (Block Reason: ${data.promptFeedback.blockReason})`;
          }
         // THEN check for valid candidate response
-        else if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts.length > 0) {
+        else if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts.length > 0 && data.candidates[0].content.parts[0].text) {
              const finishReason = data.candidates[0].finishReason;
              let responseText = data.candidates[0].content.parts[0].text;
 
-             if (finishReason && finishReason !== "STOP" && finishReason !== "MAX_TOKENS") { // Max tokens is handled below, other reasons might indicate issues
-                 console.warn("Mika's response might be incomplete! Reason:", finishReason, "Safety Ratings:", data.candidates[0].safetyRatings);
-                 if (finishReason === "SAFETY") {
-                     responseText += "\n\n*Mrow!* (The magic box stopped me a little early there for safety reasons, nyaa~!)";
-                 } else {
-                     responseText += `\n\n*Mrrr?* (I got cut off a bit! Finish Reason: ${finishReason})`;
-                 }
+             if (finishReason && finishReason !== "STOP" && finishReason !== "MAX_TOKENS") {
+                 console.warn(`${currentPersona}'s response might be incomplete! Reason:`, finishReason, "Safety Ratings:", data.candidates[0].safetyRatings);
+                 const incompleteSuffix = (currentPersona === 'Kana')
+                     ? `\n\n*(${finishReason === "SAFETY" ? "Got cut off for safety. Watch it." : `Whatever, got interrupted. Reason: ${finishReason}`})*`
+                     : `\n\n*Mrow!* (${finishReason === "SAFETY" ? "The magic box stopped me a little early there for safety reasons, nyaa~!" : `I got cut off a bit! Finish Reason: ${finishReason}`})`;
+                 responseText += incompleteSuffix;
              } else if (finishReason === "MAX_TOKENS") {
-                  console.warn("Mika's response reached maximum token limit.");
-                  responseText += "\n\n*Mrrr...* (I had more to say, but ran out of room! Ask if you need more details!)";
+                  console.warn(`${currentPersona}'s response reached maximum token limit.`);
+                  const maxTokensSuffix = (currentPersona === 'Kana')
+                      ? "\n\n*(Ran out of space. Ask again if you need the rest, which you probably do.)*"
+                      : "\n\n*Mrrr...* (I had more to say, but ran out of room! Ask if you need more details!)";
+                  responseText += maxTokensSuffix;
              }
 
             return responseText;
         } else {
-            console.error("Unexpected API response structure or empty candidate:", data);
-             if (data.candidates && data.candidates.length > 0 && !data.candidates[0].content) {
-                 return `*silent purr* ...Mika needs a moment to think! The magic box gave an empty response. Maybe the picture was confusing? Try asking again, ${currentUserName}?`;
+             console.error("Unexpected API response structure or empty candidate:", data);
+             const emptyResponseMsg = (currentPersona === 'Kana')
+                 ? `*Silence.* ...Well? The box gave nothing. Maybe try making sense next time, ${currentUserName}?`
+                 : `*silent purr* ...${currentPersona} needs a moment to think! The magic box gave an empty response. Maybe the picture was confusing? Try asking again, ${currentUserName}?`; // Keep 'Mika' here as it's a generic fallback? Or use currentPersona? Let's use currentPersona.
+
+              const fallbackMsg = (currentPersona === 'Kana')
+                 ? `*Scoffs*. The connection's glitchy or something. Ask again, ${currentUserName}.`
+                 : `*confused meow* Mrrr? The magic chat box gave me something weird... Try asking again, ${currentUserName}?`;
+
+             if (data.candidates && data.candidates.length > 0 && (!data.candidates[0].content || !data.candidates[0].content.parts || data.candidates[0].content.parts.length === 0 || !data.candidates[0].content.parts[0].text)) {
+                 return emptyResponseMsg;
              }
-            return `*confused meow* Mrrr? The magic chat box gave me something weird... Try asking again, ${currentUserName}?`;
+            return fallbackMsg;
         }
 
     } catch (error) {
         console.error("Failed to fetch from Gemini API:", error);
-        if (error instanceof TypeError) { // Often indicates network issue/CORS
-             return `*Whimper...* ${currentUserName}... the connection is fuzzy... I can't reach the magic box! Check your internet? (Network Error)`;
+        const networkErrorMsg = (currentPersona === 'Kana')
+            ? `*Sigh*. Can't connect, ${currentUserName}. Check your internet or something. It's not *my* problem.`
+            : `*Whimper...* ${currentUserName}... the connection is fuzzy... I can't reach the magic box! Check your internet? (Network Error)`;
+
+        const generalErrorMsg = (currentPersona === 'Kana')
+            ? `*Tsk*. Something broke. Try again later, ${currentUserName}. Or don't.`
+            : `*whimper* ${currentUserName}... something went wrong connecting... I can't hear you properly! Maybe try again later? ;_;`;
+
+        if (error.message.includes("Failed to fetch") || error instanceof TypeError) { // Often indicates network issue/CORS
+             return networkErrorMsg;
          }
-        return `*whimper* ${currentUserName}... something went wrong connecting... I can't hear you properly! Maybe try again later? ;_;`;
+        return generalErrorMsg;
     }
 }
+
 
 // --- END OF FILE api.js ---
