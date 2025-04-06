@@ -1,6 +1,6 @@
 // --- START OF FILE rps.js ---
 
-// Nyaa~! Rock Paper Scissors! Get Ready to Lose! ♡ (Now with Kana!)
+// Nyaa~! Rock Paper Scissors! Get Ready to Lose! ♡ (Now with Kana & Role Instructions!)
 
 const RockPaperScissors = (() => {
     let gameUiContainer = null; // Div where the game elements go
@@ -14,7 +14,7 @@ const RockPaperScissors = (() => {
 
     const choices = ['Rock', 'Paper', 'Scissors'];
 
-    // ♡ Pre-defined Taunts! ♡ (Persona-specific)
+    // ♡ Pre-defined Taunts! ♡ (Persona-specific) - Unchanged
     const responses = {
         Mika: {
             win: [
@@ -67,8 +67,7 @@ const RockPaperScissors = (() => {
     // Send message using the callback, attributed to the correct persona
     function _sendMessage(text) {
         if (messageCallback) {
-            // Use currentPersonaInGame as the sender
-            messageCallback(currentPersonaInGame, text);
+            messageCallback(currentPersonaInGame, text); // Use currentPersonaInGame
         } else {
             console.log(`RPS (${currentPersonaInGame}) Message (no callback):`, text);
         }
@@ -80,57 +79,36 @@ const RockPaperScissors = (() => {
         if (resultDisplay) {
              let assistantName = currentPersonaInGame; // Use the current persona's name
              let resultText = "";
-             if (result === 'win') resultText = `☆ ${assistantName} Wins! ☆`;
-             else if (result === 'lose') resultText = `*Hmph!* You Win...`;
+             if (result === 'win') resultText = `☆ ${assistantName} Wins! ☆`; // Assistant won
+             else if (result === 'lose') resultText = `*Hmph!* ${currentUserName} Wins...`; // User won
              else resultText = `It's a Tie!`;
 
-             let message = `You: ${userChoice} | ${assistantName}: ${assistantChoice} | ${resultText}`;
+             let message = `${currentUserName}: ${userChoice} | ${assistantName}: ${assistantChoice} | ${resultText}`;
              resultDisplay.textContent = message;
-             resultDisplay.style.opacity = '1'; // Make sure it's visible
+             resultDisplay.style.opacity = '1';
         }
      }
 
-    // Assistant makes her choice (randomly for now!)
-    function _assistantChoice() {
-        const randomIndex = Math.floor(Math.random() * choices.length);
-        return choices[randomIndex];
-    }
+    // Assistant makes her choice (randomly)
+    function _assistantChoice() { /* ... unchanged ... */ const randomIndex = Math.floor(Math.random() * choices.length); return choices[randomIndex]; }
 
-    // Determine the winner (user perspective)
-    function _determineWinner(userChoice, assistantChoice) {
-        if (userChoice === assistantChoice) {
-            return 'tie';
-        }
-        if (
-            (userChoice === 'Rock' && assistantChoice === 'Scissors') ||
-            (userChoice === 'Scissors' && assistantChoice === 'Paper') ||
-            (userChoice === 'Paper' && assistantChoice === 'Rock')
-        ) {
-            return 'lose'; // User wins, Assistant loses
-        }
-        return 'win'; // Assistant wins, User loses
-    }
+    // Determine the winner (result is from USER's perspective: 'win' = assistant won, 'lose' = user won)
+    function _determineWinner(userChoice, assistantChoice) { /* ... unchanged ... */ if (userChoice === assistantChoice) { return 'tie'; } if ( (userChoice === 'Rock' && assistantChoice === 'Scissors') || (userChoice === 'Scissors' && assistantChoice === 'Paper') || (userChoice === 'Paper' && assistantChoice === 'Rock') ) { return 'lose'; /* User wins */ } return 'win'; /* Assistant wins */ }
 
     // Get a random pre-defined response based on persona
     function _getPredefinedResponse(resultType, userChoice, assistantChoice) {
-        const personaResponses = responses[currentPersonaInGame] || responses['Mika']; // Default to Mika if somehow invalid
+        const personaResponses = responses[currentPersonaInGame] || responses['Mika'];
         const possibleResponses = personaResponses[resultType];
-        if (!possibleResponses || possibleResponses.length === 0) {
-            return "Uh oh, speechless!"; // Fallback
-        }
+        if (!possibleResponses || possibleResponses.length === 0) return "Uh oh, speechless!";
         const randomIndex = Math.floor(Math.random() * possibleResponses.length);
         let chosenResponse = possibleResponses[randomIndex];
-
-        // Replace placeholders
         chosenResponse = chosenResponse.replace(/{user}/g, currentUserName);
         chosenResponse = chosenResponse.replace(/{userChoice}/g, userChoice);
-        // Use a consistent placeholder for the assistant's choice for replacement
         chosenResponse = chosenResponse.replace(/{mikaChoice}|{assistantChoice}/g, assistantChoice);
-
         return chosenResponse;
     }
 
-    // ** UPDATED ** Handle the API call for a fresh response, persona-aware
+    // ** UPDATED ** Handle the API call - prepends ROLE instruction
     async function _fetchApiResponse(resultType, userChoice, assistantChoice) {
         if (!apiCaller) {
             console.warn("API Caller function not provided to RPS game.");
@@ -143,26 +121,31 @@ const RockPaperScissors = (() => {
         else if (resultType === 'lose') resultText = `${currentUserName} won`; // User won
         else resultText = "it was a tie";
 
-        // Construct the persona-specific prompt for the AI
-        const personaPromptPart = (currentPersonaInGame === 'Kana')
-            ? `You are Kana, a sly, sarcastic catgirl playing Rock Paper Scissors against ${currentUserName}.`
-            : `You are Mika, a playful, teasing, possessive catgirl playing Rock Paper Scissors against ${currentUserName}.`;
+        // --- ROLE INSTRUCTION for RPS Reaction ---
+        let roleInstruction = "";
+        if (currentPersonaInGame === 'Kana') {
+            roleInstruction = `[ROLE: You are Kana, reacting to a Rock Paper Scissors game result against ${currentUserName}. Your personality is sly, sarcastic, and superior. React to the situation below with dry wit or sarcasm. Keep it short (1-2 sentences).]\n\n`;
+        } else { // Mika
+            roleInstruction = `[ROLE: You are Mika, reacting to a Rock Paper Scissors game result against your best friend ${currentUserName}. Your personality is bubbly, playful, and energetic. React to the situation below with enthusiasm, cute noises (nyaa, mrow, purr, giggle), or playful teasing. Keep it short (1-2 sentences).]\n\n`;
+        }
+        // --- ---
 
-        const prompt = `${personaPromptPart} You chose ${assistantChoice} and ${currentUserName} chose ${userChoice}. The result was: ${resultText}. Give a short (1-2 sentences), in-character response to ${currentUserName}. ${currentPersonaInGame === 'Kana' ? 'Include dry wit or sarcasm.' : 'Include cat noises like nyaa, mrow, purr, or giggle.'}`;
+        // Construct the situation description
+        const situation = `Game situation: You (${assistantName}) chose ${assistantChoice} and ${currentUserName} chose ${userChoice}. The result was: ${resultText}.`;
+
+        // Prepend role instruction to the situation
+        const prompt = `${roleInstruction}${situation}`;
 
         try {
             _sendMessage("*(Thinking of a special reaction...)*"); // Indicate API call
-            const response = await apiCaller(prompt); // API caller now gets persona context implicitly via its own call to sendMessageToMika
-            if (response && typeof response === 'string') {
-                 // Simple check to prevent overly long/weird responses
-                 if (response.length < 150) {
-                    return response; // Return the fresh response
-                 } else {
-                    console.warn("API response was too long, using fallback.");
-                    return null;
-                 }
+            // apiCaller uses the core personality + the game-specific prompt
+            const response = await apiCaller(prompt);
+            if (response && typeof response === 'string' && response.length < 150) {
+                 return response; // Return the fresh response
+            } else {
+                console.warn("API response invalid or too long, using fallback.");
+                return null;
             }
-            return null; // API call failed or returned unexpected format
         } catch (error) {
             console.error("Error fetching API response for RPS:", error);
             return null; // Error occurred
@@ -194,68 +177,38 @@ const RockPaperScissors = (() => {
         _sendMessage(responseMessage); // Send the chosen message to the log
     }
 
-    // ** UPDATED ** Initialize the game UI, accepting persona
+    // ** UPDATED ** Initialize the game UI, accepting persona (uses currentUserName)
     function init(_gameUiContainer, _messageCallback, _apiCaller, userName, persona) {
-        gameUiContainer = _gameUiContainer;
-        messageCallback = _messageCallback;
-        apiCaller = _apiCaller;
+        gameUiContainer = _gameUiContainer; messageCallback = _messageCallback; apiCaller = _apiCaller;
         currentUserName = userName || "User"; // Use provided name
         currentPersonaInGame = persona || 'Mika'; // Store the active persona
-        roundCount = 0; // Reset round count for API calls
+        roundCount = 0; // Reset round count
 
-        if (!gameUiContainer) {
-            console.error("RPS Game UI container not provided!");
-            return;
-        }
+        if (!gameUiContainer) { console.error("RPS Game UI container not provided!"); return; }
+        gameUiContainer.innerHTML = ''; // Clear previous content
 
-        // Clear previous content
-        gameUiContainer.innerHTML = '';
-
-        // 1. Add instructions/title (persona-specific)
+        // 1. Add instructions/title (persona-specific, uses currentUserName)
         const instructionText = document.createElement('p');
         instructionText.textContent = (currentPersonaInGame === 'Kana')
             ? `Rock, Paper, Scissors. Choose, ${currentUserName}. Let's get this over with.`
             : `Choose your weapon, ${currentUserName}! Rock, Paper, or Scissors?`;
-        instructionText.style.marginBottom = '15px';
-        instructionText.style.textAlign = 'center';
+        instructionText.style.marginBottom = '15px'; instructionText.style.textAlign = 'center';
         gameUiContainer.appendChild(instructionText);
 
         // 2. Create choice buttons
-        const buttonContainer = document.createElement('div');
-        buttonContainer.style.display = 'flex';
-        buttonContainer.style.justifyContent = 'center';
-        buttonContainer.style.gap = '15px';
-        buttonContainer.style.marginBottom = '20px';
-
-        choices.forEach(choice => {
-            const button = document.createElement('button');
-            button.textContent = choice;
-            button.className = 'rps-choice-button'; // Use class from index.html CSS
-
-            button.addEventListener('click', () => handleUserChoice(choice));
-            buttonContainer.appendChild(button);
-        });
+        const buttonContainer = document.createElement('div'); /* ... styles ... */ buttonContainer.style.display = 'flex'; buttonContainer.style.justifyContent = 'center'; buttonContainer.style.gap = '15px'; buttonContainer.style.marginBottom = '20px';
+        choices.forEach(choice => { /* ... button creation ... */ const button = document.createElement('button'); button.textContent = choice; button.className = 'rps-choice-button'; button.addEventListener('click', () => handleUserChoice(choice)); buttonContainer.appendChild(button); });
         gameUiContainer.appendChild(buttonContainer);
 
          // 3. Create display area for results
-         const resultDisplay = document.createElement('div');
-         resultDisplay.id = 'rps-result-display';
-         resultDisplay.textContent = 'Make your move!';
-         resultDisplay.style.marginTop = '10px';
-         resultDisplay.style.padding = '10px';
-         resultDisplay.style.minHeight = '30px'; // Ensure space even when empty
-         resultDisplay.style.textAlign = 'center';
-         resultDisplay.style.fontWeight = 'bold';
-         resultDisplay.style.border = '1px dashed var(--game-cell-border, #f06292)';
-         resultDisplay.style.borderRadius = '5px';
-         resultDisplay.style.backgroundColor = 'rgba(0,0,0,0.1)';
-         resultDisplay.style.opacity = '0.6'; // Start slightly faded
-         resultDisplay.style.transition = 'opacity 0.3s ease';
-         resultDisplay.style.color = 'var(--game-cell-text)'; // Use theme color
-         gameUiContainer.appendChild(resultDisplay);
+         const resultDisplay = document.createElement('div'); resultDisplay.id = 'rps-result-display'; resultDisplay.textContent = 'Make your move!'; /* ... styles ... */ resultDisplay.style.marginTop = '10px'; resultDisplay.style.padding = '10px'; resultDisplay.style.minHeight = '30px'; resultDisplay.style.textAlign = 'center'; resultDisplay.style.fontWeight = 'bold'; resultDisplay.style.border = '1px dashed var(--game-cell-border, #f06292)'; resultDisplay.style.borderRadius = '5px'; resultDisplay.style.backgroundColor = 'rgba(0,0,0,0.1)'; resultDisplay.style.opacity = '0.6'; resultDisplay.style.transition = 'opacity 0.3s ease'; resultDisplay.style.color = 'var(--game-cell-text)'; gameUiContainer.appendChild(resultDisplay);
 
+        // Initial message sent from index.html upon loading game (No, it's sent here now)
+         const initialMessage = (currentPersonaInGame === 'Kana')
+            ? `Rock paper scissors. Go.`
+            : `Let's play Rock Paper Scissors, ${currentUserName}! Make your choice! ♡`;
+         _sendMessage(initialMessage);
 
-        // Initial message sent from index.html upon loading game
     }
 
     // Public interface
