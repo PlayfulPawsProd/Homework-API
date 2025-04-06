@@ -107,14 +107,14 @@
         #send-button:active { transform: scale(0.98); }
         #send-button:disabled { background: #666; cursor: not-allowed; transform: none; opacity: 0.6; }
         /* Game Area Styles */
-        #game-area { display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px; width: 100%; height: 100%; box-sizing: border-box; overflow: hidden; background-color: var(--chat-bg); color: var(--chat-text); }
+        #game-area { display: none; flex-direction: column; align-items: center; justify-content: space-between; /* Try space-between */ padding: 10px; width: 100%; height: 100%; box-sizing: border-box; overflow: hidden; background-color: var(--chat-bg); color: var(--chat-text); }
         #game-title { color: var(--chat-header-text); font-size: 1.3em; margin-bottom: 10px; text-shadow: 0 0 3px var(--chat-header-shadow); flex-shrink: 0; text-align: center;}
-        #game-specific-ui { width: 100%; height: auto; display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; flex-shrink: 0; overflow-y: auto; padding-bottom: 5px; max-height: calc(100% - 100px); }
+        #game-specific-ui { width: 100%; flex-grow: 1; /* Allow UI to take available space */ display: flex; flex-direction: column; align-items: center; justify-content: center; /* Center content vertically if possible */ margin-bottom: 10px; overflow-y: auto; /* Scroll if needed */ padding-bottom: 5px; min-height: 100px; /* Minimum space */ }
         #game-specific-ui > #diary-chat-view, #game-specific-ui > #diary-entries-view { width: 100%; height: 100%; }
         #diary-chat-view, #diary-entries-view { width: 100%; height: 100%; overflow: hidden; display: flex; flex-direction: column; }
         #diary-entries-view { overflow-y: auto; }
         /* Game Styles (TTT, RPS, GTN, 20Q, Diary, StoryTime) */
-        #ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 240px; height: 240px; margin-bottom: 10px; border: 3px solid var(--game-board-border); border-radius: 8px; background-color: var(--game-board-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 240px; height: 240px; margin: 10px auto; border: 3px solid var(--game-board-border); border-radius: 8px; background-color: var(--game-board-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); flex-shrink: 0; }
         .ttt-cell { border: 1px solid var(--game-cell-border); display: flex; justify-content: center; align-items: center; font-size: 2.5em; font-weight: bold; cursor: pointer; color: var(--game-cell-text); transition: background-color 0.2s, color 0.2s; user-select: none; }
         .ttt-cell:hover { background-color: var(--game-cell-hover-bg); } .ttt-cell.taken { cursor: not-allowed; color: var(--game-cell-taken-text); } .ttt-cell.taken:hover { background-color: transparent; }
         .rps-choice-button { font-family: inherit; padding: 10px 20px; font-size: 1.1em; border-radius: 10px; border: none; cursor: pointer; background: var(--header-button-bg, #f06292); color: var(--header-button-text, #1a0d13); transition: transform 0.1s ease, background-color 0.2s, color 0.2s; flex-shrink: 0; }
@@ -197,12 +197,15 @@
         .library-back-button { margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; }
         /* End Library Styles */
 
-        /* Shared Game Message Log */
-        #game-message-log { width: 100%; max-width: 450px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin-bottom: 10px; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0; margin-top: auto; display: none; }
+        /* Shared Game Message Log (UPDATED CSS) */
+        #game-message-log { width: calc(100% - 20px); max-width: 500px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin: 10px auto 10px auto; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0; /* display: none; Set by JS */ }
         #game-message-log p { margin: 2px 0; line-height: 1.3; word-wrap: break-word; }
-        #game-message-log .mika-gamemsg { color: var(--game-message-mika); } #game-message-log .user-gamemsg { color: var(--game-message-user); } #game-message-log .system-gamemsg { color: var(--game-message-system); font-style: italic; }
+        #game-message-log .mika-gamemsg { color: var(--game-message-mika); }
+        #game-message-log .user-gamemsg { color: var(--game-message-user); }
+        #game-message-log .system-gamemsg { color: var(--game-message-system); font-style: italic; }
+
         /* Shared Game Buttons */
-        #ttt-reset-button, #back-to-chat-button { padding: 8px 20px; font-size: 0.9em; font-weight: bold; border-radius: 15px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease; border: none; color: var(--button-text); background: linear-gradient(45deg, var(--button-gradient-1), var(--button-gradient-2)); margin-top: 5px; flex-shrink: 0; }
+        #ttt-reset-button, #back-to-chat-button { padding: 8px 20px; font-size: 0.9em; font-weight: bold; border-radius: 15px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease; border: none; color: var(--button-text); background: linear-gradient(45deg, var(--button-gradient-1), var(--button-gradient-2)); margin-top: 5px; flex-shrink: 0; display: block; margin-left: auto; margin-right: auto; }
         #ttt-reset-button:hover, #back-to-chat-button:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.3); background: linear-gradient(45deg, var(--send-button-hover-1), var(--send-button-hover-2)); }
         #ttt-reset-button:active, #back-to-chat-button:active { transform: scale(0.98); }
         /* Scrollbar Styles */
@@ -218,6 +221,7 @@
              #image-preview-area img { max-height: 30px; } #remove-image-button { width: 14px; height: 14px; font-size: 9px; line-height: 14px; top: -4px; right: -4px; }
              .dropdown-menu { max-height: 150px; }
              #game-area { padding: 8px; } #game-title { font-size: 1.1em; margin-bottom: 8px; }
+             #game-specific-ui { min-height: 80px; max-height: calc(100% - 110px); } /* Adjust for smaller screens */
              #ttt-board { width: 180px; height: 180px; } .ttt-cell { font-size: 1.8em; }
              .rps-choice-button { font-size: 1em; padding: 8px 15px; }
              #gtn-input { width: 100px; font-size: 0.9em; } #gtn-submit { font-size: 0.9em; padding: 8px 10px; } #gtn-indicator { min-width: 140px; font-size: 0.9em; }
@@ -236,7 +240,7 @@
              #story-initial-prompt h3 { font-size: 1.1em; } #story-initial-prompt p { font-size: 0.9em; }
              #story-custom-prompt-input { font-size: 0.9em; }
              .library-item { padding: 8px 12px; } .library-item-title { font-size: 0.95em; } .library-item-date { font-size: 0.75em; }
-             #game-message-log { max-width: 100%; height: 80px; padding: 5px;}
+             #game-message-log { height: 80px; padding: 5px;} /* Adjust log height */
              #ttt-reset-button, #back-to-chat-button { font-size: 0.85em; padding: 6px 15px; }
         }
     </style>
@@ -255,8 +259,7 @@
             <h2 id="chat-title">Study Time with Mika! ♡</h2>
             <div class="header-buttons">
                 <button id="history-button" class="header-button" title="View Past Chats">History</button>
-                <!-- Adaptive Button: Text/Action set by JS -->
-                <button id="home-button" class="header-button">Loading...</button>
+                <button id="home-button" class="header-button">Loading...</button> <!-- Adaptive Button -->
                 <button id="games-button" class="header-button" title="Play Games!">🎮 Games</button>
                 <button id="settings-button" class="header-button" title="Settings">⚙️ Settings</button>
             </div>
@@ -293,7 +296,7 @@
                     <button id="send-button" disabled>Send</button>
                 </div>
             </div>
-            <div id="game-area" style="display: none;"> <!-- Game content --> </div>
+            <div id="game-area" style="display: none;"> <!-- Game content loaded here --> </div>
         </div>
     </div>
 
@@ -320,7 +323,7 @@
         const mainContentArea = document.getElementById('main-content-area'); const chatArea = document.getElementById('chat-area'); const gameArea = document.getElementById('game-area');
         const chatLog = document.getElementById('chat-log'); const chatInput = document.getElementById('chat-input'); const sendButton = document.getElementById('send-button');
         const settingsButton = document.getElementById('settings-button');
-        const homeButton = document.getElementById('home-button'); // <<< Reference to the adaptive button
+        const homeButton = document.getElementById('home-button'); // Adaptive button
         const historyButton = document.getElementById('history-button'); const gamesButton = document.getElementById('games-button');
         const historyDropdown = document.getElementById('history-dropdown'); const settingsDropdown = document.getElementById('settings-dropdown'); const gamesDropdown = document.getElementById('games-dropdown');
         const gameTttButton = document.getElementById('game-ttt-button'); const gameRpsButton = document.getElementById('game-rps-button'); const gameGtnButton = document.getElementById('game-gtn-button'); const game20qButton = document.getElementById('game-20q-button'); const gameDiaryButton = document.getElementById('game-diary-button'); const gameStoryButton = document.getElementById('game-story-button');
@@ -364,7 +367,11 @@
 
         // --- Chat UI ---
         function appendMessage(sender, message, isHtml = false, imageUrl = null) {
-            if (!chatLog || !chatArea || chatArea.style.display === 'none') { console.log("Skipped msg:", sender); return; }
+            // Ensure chatArea is visible before appending
+            if (!chatLog || !chatArea || chatArea.style.display === 'none') {
+                 console.log(`Skipped message append for ${sender} because chatArea is hidden.`);
+                 return;
+             }
             const msgId = `msg-${Date.now()}-${Math.random().toString(16).slice(2)}`; const el = document.createElement('p'); el.id = msgId;
             const contentSpan = document.createElement('span'); contentSpan.className = 'message-content'; const msgText = isHtml ? message : sanitizeHTML(message);
             if (sender === 'user') { el.className = 'user-message'; contentSpan.innerHTML = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${msgText}`; if (imageUrl && imageUrl !== "[Image Placeholder]") { const img = document.createElement('img'); img.src = imageUrl; img.alt = "Uploaded image"; img.className = "thumbnail"; contentSpan.appendChild(document.createElement('br')); contentSpan.appendChild(img); } else if (imageUrl === "[Image Placeholder]") { const placeholder = document.createElement('em'); placeholder.textContent = ' [Image Attached]'; placeholder.style.fontSize = '0.9em'; contentSpan.appendChild(placeholder); } }
@@ -383,14 +390,13 @@
 
         // --- Chat Management ---
         function startNewChat(greet = true) {
-            // Assumes we are already in chat view. Button state managed by switchToChatView.
             if (currentChatId && currentChatHistory.length > 0) { allChats[currentChatId] = currentChatHistory; saveAllChats(); }
             currentChatId = getTimestamp(); currentChatHistory = []; clearChatDisplay();
             if (greet) { appendMessage('system', `Started new chat with ${currentUserName}!`); } else { appendMessage('system', `Started a new chat.`); }
             removeSelectedImage(); enableChatInput(); updateHistoryDropdown(); console.log(`New chat started: ${currentChatId}`); closeAllDropdowns();
         }
         function loadChat(chatId) {
-            switchToChatView(); // Ensures correct view and button state
+            switchToChatView();
             if (currentChatId && currentChatHistory.length > 0 && currentChatId !== chatId) { allChats[currentChatId] = currentChatHistory; }
             if (allChats[chatId]) {
                 currentChatId = chatId; currentChatHistory = allChats[chatId]; clearChatDisplay();
@@ -421,41 +427,125 @@
                 catch (err) { console.error("Game onExit error or timeout:", err); }
             } else if (isGameActive) { console.warn("Game was active but no onExit function found on module."); }
             currentActiveGameModule = null; isGameActive = false;
-            gameArea.style.display = 'none'; chatArea.style.display = 'flex';
+            gameArea.style.display = 'none'; chatArea.style.display = 'flex'; // Ensure Chat is flex
             clearGameAreaContent(); console.log("View switched to: Chat");
-            // <<< ADAPTIVE BUTTON: Set to 'New Chat' >>>
-            if (homeButton) {
-                homeButton.textContent = '➕ New Chat';
-                homeButton.title = 'Start a New Chat';
-                homeButton.onclick = () => startNewChat(true);
-            }
+            if (homeButton) { homeButton.textContent = '➕ New Chat'; homeButton.title = 'Start a New Chat'; homeButton.onclick = () => startNewChat(true); }
             if (chatInput && !chatInput.disabled) { setTimeout(() => chatInput.focus(), 50); }
             if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred install prompt after returning to chat."); installPopup.style.display = 'flex'; }
         }
         function switchToGameView(module = null) {
             if (!gameArea || !chatArea) return;
-            chatArea.style.display = 'none'; gameArea.style.display = 'flex';
+            chatArea.style.display = 'none'; gameArea.style.display = 'flex'; // Ensure Game is flex
             isGameActive = true; currentActiveGameModule = module;
             closeAllDropdowns();
             if (installPopup.style.display === 'flex') { installPopup.style.display = 'none'; console.log("Hiding install prompt for game."); }
             console.log(`View switched to: Game (${module?.constructor?.name || 'Unknown'})`);
-            // <<< ADAPTIVE BUTTON: Set to 'Home' >>>
-            if (homeButton) {
-                homeButton.textContent = '🏠 Home';
-                homeButton.title = 'Back to Main Chat';
-                homeButton.onclick = switchToChatView;
-            }
+            if (homeButton) { homeButton.textContent = '🏠 Home'; homeButton.title = 'Back to Main Chat'; homeButton.onclick = switchToChatView; }
         }
 
-        // --- Game Loading ---
-        function setupGameAreaBase(titleText) { if (!gameArea) return null; clearGameAreaContent(); const title = document.createElement('h2'); title.id = 'game-title'; title.textContent = titleText; gameArea.appendChild(title); return gameArea; }
-        function displayGameMessage(sender, text) { let log = null; let useDiaryLayout = false; let useStoryLayout = false; if (currentActiveGameModule === MikaDiary && document.getElementById('diary-chat-log')) { log = document.getElementById('diary-chat-log'); useDiaryLayout = true; } else if (currentActiveGameModule === StoryTime && document.getElementById('story-display-area')) { log = document.getElementById('story-display-area'); useStoryLayout = true; } else if (document.getElementById('game-message-log')) { log = document.getElementById('game-message-log'); log.style.display = 'block'; } if (!log) { console.warn("Game message target log not found for:", sender); return; } const el = document.createElement('p'); let msg = sanitizeHTML(text); if (useDiaryLayout) { /* Diary handles formatting */ } else if (useStoryLayout) { if (sender === 'User') { el.className = 'user-action'; msg = `> ${sanitizeHTML(currentUserName)}: ${msg}`; } else { msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); } el.innerHTML = msg; } else { let css = 'system-gamemsg'; if (sender === 'Mika') { css = 'mika-gamemsg'; msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); } else if (sender === 'User') { css = 'user-gamemsg'; } el.className = css; el.innerHTML = msg; } log.appendChild(el); setTimeout(() => { log.scrollTop = log.scrollHeight; }, 0); }
+        // --- Game Loading (Using CORRECTED setupGameAreaBase) ---
+        function setupGameAreaBase(titleText) {
+            // Clears gameArea, adds Title, returns gameArea for population
+            if (!gameArea) return null;
+            clearGameAreaContent();
+            const title = document.createElement('h2');
+            title.id = 'game-title';
+            title.textContent = titleText;
+            gameArea.appendChild(title);
+            return gameArea; // Return main container
+        }
+
+        function displayGameMessage(sender, text) { // Unified game logger
+            let log = null; let useDiaryLayout = false; let useStoryLayout = false;
+            if (currentActiveGameModule === MikaDiary && document.getElementById('diary-chat-log')) { log = document.getElementById('diary-chat-log'); useDiaryLayout = true; }
+            else if (currentActiveGameModule === StoryTime && document.getElementById('story-display-area')) { log = document.getElementById('story-display-area'); useStoryLayout = true; }
+            else { log = document.getElementById('game-message-log'); } // Find the log (should exist if created by load func)
+
+            if (!log) { // If log doesn't exist (e.g., structure issue), log warning
+                 console.warn("Game message target log not found for:", sender, "- Message:", text);
+                 return;
+             }
+
+            if (log.id === 'game-message-log' && log.style.display === 'none') { log.style.display = 'block'; } // Make shared log visible
+
+            const el = document.createElement('p'); let msg = sanitizeHTML(text);
+            if (useDiaryLayout) { /* Diary handles own formatting */ }
+            else if (useStoryLayout) { if (sender === 'User') { el.className = 'user-action'; msg = `> ${sanitizeHTML(currentUserName)}: ${msg}`; } else { msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); } el.innerHTML = msg; }
+            else { let css = 'system-gamemsg'; if (sender === 'Mika') { css = 'mika-gamemsg'; msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); } else if (sender === 'User') { css = 'user-gamemsg'; } el.className = css; el.innerHTML = msg; }
+            log.appendChild(el); setTimeout(() => { log.scrollTop = log.scrollHeight; }, 0);
+        }
+
         async function callMikaApiForGame(prompt, context = []) { if (!currentApiKey) return Promise.reject("API Key missing!"); const user = currentUserName || "Study Buddy"; console.log(`API game call: ${prompt.substring(0,60)}...`); try { const resp = await sendMessageToMika(prompt, context, currentApiKey, user); return (typeof resp === 'string' && resp.trim()) ? resp : null; } catch (err) { console.error("API game error:", err); return Promise.reject(`API error: ${err}`); } }
-        // --- Load Specific Games ---
-         function loadTicTacToe() { const module = TicTacToe; switchToGameView(module); const container = setupGameAreaBase('Tic-Tac-Toe ♡'); if (container && module?.init) { const uiArea = document.createElement('div'); uiArea.id = 'game-specific-ui'; const boardElement = document.createElement('div'); boardElement.id = 'ttt-board'; uiArea.appendChild(boardElement); container.insertBefore(uiArea, container.querySelector('#game-message-log')); module.init(boardElement, displayGameMessage); if (!container.querySelector('#back-to-chat-button')) { const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView; container.appendChild(backBtn); }} else { console.error("TTT load fail"); displayGameMessage('System', 'Mrow! TTT failed...'); currentActiveGameModule = null; }}
-         function loadRPS() { const module = RockPaperScissors; switchToGameView(module); const container = setupGameAreaBase('Rock Paper Scissors!'); if (container && module?.init) { const uiArea = document.createElement('div'); uiArea.id = 'game-specific-ui'; container.insertBefore(uiArea, container.querySelector('#game-message-log')); module.init(uiArea, displayGameMessage, callMikaApiForGame, currentUserName); if (!container.querySelector('#back-to-chat-button')) { const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView; container.appendChild(backBtn); }} else { console.error("RPS load fail"); displayGameMessage('System', 'Mrow! RPS failed...'); currentActiveGameModule = null; }}
-         function loadGuessTheNumber() { const module = GuessTheNumber; switchToGameView(module); const container = setupGameAreaBase('Guess My Number~'); if (container && module?.init) { const uiArea = document.createElement('div'); uiArea.id = 'game-specific-ui'; container.insertBefore(uiArea, container.querySelector('#game-message-log')); module.init(uiArea, displayGameMessage, callMikaApiForGame, currentUserName); if (!container.querySelector('#back-to-chat-button')) { const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView; container.appendChild(backBtn); }} else { console.error("GTN load fail"); displayGameMessage('System', 'Mrow! GTN failed...'); currentActiveGameModule = null; }}
-         function loadTwentyQuestions() { const module = TwentyQuestions; switchToGameView(module); const container = setupGameAreaBase('20 Questions!'); if (container && module?.init) { const uiArea = document.createElement('div'); uiArea.id = 'game-specific-ui'; container.insertBefore(uiArea, container.querySelector('#game-message-log')); module.init(uiArea, displayGameMessage, callMikaApiForGame, currentUserName); if (!container.querySelector('#back-to-chat-button')) { const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView; container.appendChild(backBtn); }} else { console.error("20Q load fail"); displayGameMessage('System', 'Mrow! 20Q failed...'); currentActiveGameModule = null; }}
+
+        // --- Load Specific Games (Ensure log and UI containers are created) ---
+         function loadTicTacToe() {
+             const module = TicTacToe;
+             switchToGameView(module);
+             const container = setupGameAreaBase('Tic-Tac-Toe ♡'); // Get main game area after clearing
+             if (container && module?.init) {
+                 // Create containers specific to this game load
+                 const uiArea = document.createElement('div'); uiArea.id = 'game-specific-ui';
+                 const boardElement = document.createElement('div'); boardElement.id = 'ttt-board'; uiArea.appendChild(boardElement);
+                 const gameLog = document.createElement('div'); gameLog.id = 'game-message-log'; gameLog.style.display = 'none'; // Start hidden
+                 const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView;
+
+                 // Append elements in desired order (UI, Log, Button)
+                 container.appendChild(uiArea);
+                 container.appendChild(gameLog);
+                 container.appendChild(backBtn);
+
+                 module.init(boardElement, displayGameMessage); // Init with specific board element
+             } else { console.error("TTT load fail"); displayGameMessage('System', 'Mrow! TTT failed...'); currentActiveGameModule = null; }
+         }
+         function loadRPS() {
+             const module = RockPaperScissors;
+             switchToGameView(module);
+             const container = setupGameAreaBase('Rock Paper Scissors!');
+             if (container && module?.init) {
+                 const uiArea = document.createElement('div'); uiArea.id = 'game-specific-ui';
+                 const gameLog = document.createElement('div'); gameLog.id = 'game-message-log'; gameLog.style.display = 'none';
+                 const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView;
+
+                 container.appendChild(uiArea);
+                 container.appendChild(gameLog);
+                 container.appendChild(backBtn);
+
+                 module.init(uiArea, displayGameMessage, callMikaApiForGame, currentUserName);
+             } else { console.error("RPS load fail"); displayGameMessage('System', 'Mrow! RPS failed...'); currentActiveGameModule = null; }
+         }
+         function loadGuessTheNumber() {
+             const module = GuessTheNumber;
+             switchToGameView(module);
+             const container = setupGameAreaBase('Guess My Number~');
+             if (container && module?.init) {
+                 const uiArea = document.createElement('div'); uiArea.id = 'game-specific-ui';
+                 const gameLog = document.createElement('div'); gameLog.id = 'game-message-log'; gameLog.style.display = 'none';
+                 const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView;
+
+                 container.appendChild(uiArea);
+                 container.appendChild(gameLog);
+                 container.appendChild(backBtn);
+
+                 module.init(uiArea, displayGameMessage, callMikaApiForGame, currentUserName);
+             } else { console.error("GTN load fail"); displayGameMessage('System', 'Mrow! GTN failed...'); currentActiveGameModule = null; }
+         }
+         function loadTwentyQuestions() {
+             const module = TwentyQuestions;
+             switchToGameView(module);
+             const container = setupGameAreaBase('20 Questions!');
+             if (container && module?.init) {
+                 const uiArea = document.createElement('div'); uiArea.id = 'game-specific-ui';
+                 const gameLog = document.createElement('div'); gameLog.id = 'game-message-log'; gameLog.style.display = 'none';
+                 const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat ♡'; backBtn.onclick = switchToChatView;
+
+                 container.appendChild(uiArea);
+                 container.appendChild(gameLog);
+                 container.appendChild(backBtn);
+
+                 module.init(uiArea, displayGameMessage, callMikaApiForGame, currentUserName);
+             } else { console.error("20Q load fail"); displayGameMessage('System', 'Mrow! 20Q failed...'); currentActiveGameModule = null; }
+         }
+         // Diary and StoryTime manage their own full container content
          function loadDiary() { const module = MikaDiary; switchToGameView(module); clearGameAreaContent(); if (gameArea && module?.init) { module.init(gameArea, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("Diary load fail"); gameArea.innerHTML = '<p class="system-message">Mrow! Diary failed...</p>'; const b = document.createElement('button'); b.id='back-to-chat-button'; b.textContent='Back ♡'; b.onclick=switchToChatView; gameArea.appendChild(b); currentActiveGameModule = null; }}
          function loadStoryTime() { const module = StoryTime; switchToGameView(module); clearGameAreaContent(); if (gameArea && module?.init) { module.init(gameArea, displayGameMessage, callMikaApiForGame, currentUserName); } else { console.error("StoryTime load fail"); gameArea.innerHTML = '<p class="system-message">Mrow! Story Time failed...</p>'; const b = document.createElement('button'); b.id='back-to-chat-button'; b.textContent='Back ♡'; b.onclick=switchToChatView; gameArea.appendChild(b); currentActiveGameModule = null; }}
          function clearGameAreaContent() { if (gameArea) gameArea.innerHTML = ''; }
@@ -483,27 +573,15 @@
              finally { isMikaTyping = false; if (currentApiKey) enableChatInput(); else disableChatInput("API Key needed!"); }
         }
 
-        // --- Initialization Flow (UPDATED for Adaptive Button) ---
+        // --- Initialization Flow ---
         function proceedToChat() {
             if (!chatContainer) return;
             chatContainer.style.display = 'flex';
-            // Set initial view state without calling full switchToChatView yet
-            chatArea.style.display = 'flex'; gameArea.style.display = 'none';
-            isGameActive = false; currentActiveGameModule = null;
-            // <<< SET INITIAL ADAPTIVE BUTTON STATE >>>
-            if (homeButton) {
-                homeButton.textContent = '➕ New Chat';
-                homeButton.title = 'Start a New Chat';
-                homeButton.onclick = () => startNewChat(true); // Default action is new chat
-            }
+            chatArea.style.display = 'flex'; gameArea.style.display = 'none'; isGameActive = false; currentActiveGameModule = null;
+            if (homeButton) { homeButton.textContent = '➕ New Chat'; homeButton.title = 'Start a New Chat'; homeButton.onclick = () => startNewChat(true); }
             const chatId = loadAllChats(); updateInputPlaceholder();
-            if (chatId) { loadChat(chatId); } // Loads chat, implicitly calls switchToChatView which sets button correctly
-            else {
-                // If no chat loaded, explicitly clear display and show welcome
-                clearChatDisplay();
-                appendMessage('system', `Ready for your homework, ${currentUserName}!`);
-                enableChatInput(); // Ensure input is enabled
-            }
+            if (chatId) { loadChat(chatId); }
+            else { clearChatDisplay(); appendMessage('system', `Ready for your homework, ${currentUserName}!`); enableChatInput(); }
             updateChatTitle(); updateHistoryDropdown();
             if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred install prompt."); installPopup.style.display = 'flex'; }
         }
@@ -522,7 +600,7 @@
         if (imageUploadButton) imageUploadButton.addEventListener('click', () => imageUploadInput?.click());
         if (imageUploadInput) imageUploadInput.addEventListener('change', handleImageSelection);
         if (removeImageButton) removeImageButton.addEventListener('click', removeSelectedImage);
-        // <<< Adaptive button's listener is set dynamically in view switching functions >>>
+        // Adaptive button listener is set dynamically
         if (historyButton) historyButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(historyDropdown); });
         if (gamesButton) gamesButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(gamesDropdown); });
         if (settingsButton) settingsButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(settingsDropdown); });
