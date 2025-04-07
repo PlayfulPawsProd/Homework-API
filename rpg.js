@@ -274,9 +274,11 @@ const RpgApp = (() => {
         } finally {
             isGenerating = false;
             _setLoadingState(false);
-             if (gameActive && questTextInput) {
-                questTextInput.focus();
-             }
+// *** REMOVED THE FOCUS LINES ***
+        // if (gameActive && questTextInput) {
+        //    questTextInput.focus();
+        // }
+        // *** END OF REMOVAL ***
         }
     }
 
