@@ -60,7 +60,7 @@ const RpgApp = (() => {
     let genreSelector = null;
     let archetypeSelector = null;
     let lengthSelector = null;
-    let customQuestInput = null; // *** NEW: For custom prompt ***
+    let customQuestInput = null;
 
     // --- Helper Functions ---
     function _getCurrentDateString() { return new Date().toISOString().slice(0, 10); }
@@ -84,9 +84,8 @@ const RpgApp = (() => {
             const stored = localStorage.getItem(QUEST_LIBRARY_KEY);
             if (stored) {
                 questLibrary = JSON.parse(stored);
-                // Basic validation and adding default persona if missing
                 questLibrary = questLibrary.map(q => ({ ...q, persona: q.persona || 'Mika' }));
-                questLibrary.sort((a, b) => b.timestamp - a.timestamp); // Sort newest first
+                questLibrary.sort((a, b) => b.timestamp - a.timestamp);
                 console.log(`Loaded ${questLibrary.length} quests from library.`);
             } else {
                 questLibrary = [];
@@ -100,9 +99,8 @@ const RpgApp = (() => {
 
     function _saveLibrary() {
         try {
-            // Prune if library exceeds max size
             if (questLibrary.length > MAX_LIBRARY_ENTRIES) {
-                questLibrary.sort((a, b) => b.timestamp - a.timestamp); // Ensure newest are kept
+                questLibrary.sort((a, b) => b.timestamp - a.timestamp);
                 questLibrary = questLibrary.slice(0, MAX_LIBRARY_ENTRIES);
                 console.log(`Pruned RPG library to ${MAX_LIBRARY_ENTRIES} entries.`);
             }
@@ -115,27 +113,27 @@ const RpgApp = (() => {
 
     // --- Core Logic ---
 
-    // *** UPDATED: _startGame now accepts optional custom prompt ***
     async function _startGame(customPromptText = null) {
-        const selectedGenre = customPromptText ? "Custom" : currentGenre; // Mark genre if custom
+        const selectedGenre = customPromptText ? "Custom" : currentGenre;
         const selectedArchetype = currentCharacterArchetype;
         const selectedLength = currentQuestLengthPreference;
 
         console.log(`Starting RPG Quest: Genre=${selectedGenre}, Archetype=${selectedArchetype}, Length=${selectedLength}`);
-        _createGameLayout(); // Set up the display area
+        _createGameLayout();
         gameActive = true;
         isGenerating = true;
         _setLoadingState(true);
         questHistory = [];
 
-        // Build the initial prompt
         const archetypeTerm = ARCHETYPES[selectedArchetype]?.promptTerm || 'an Adventurer';
         let startingScenario;
         if (customPromptText) {
             startingScenario = `based on this idea from ${currentUserName}: "${customPromptText}". Make sure the quest has a clear goal.`;
+            currentGenre = "Custom"; // Set genre state for saving later
         } else {
             const genreTerm = GENRES[selectedGenre]?.promptTerm || 'a fantasy setting';
             startingScenario = `in ${genreTerm}. Create a clear quest goal for them.`;
+            currentGenre = selectedGenre; // Set genre state
         }
 
         const initialPrompt = `[ROLE: You are ${currentPersonaInGame}, the Game Master!] Start an interactive RPG quest for ${currentUserName}, who is playing as ${archetypeTerm}, ${startingScenario}. Describe the opening scene vividly (2 paragraphs) and present the main quest goal clearly. End by giving ${currentUserName} exactly ${MAX_CHOICES_DISPLAYED} distinct action choices as a numbered list (e.g., '1. Choice one').`;
@@ -143,20 +141,19 @@ const RpgApp = (() => {
         _appendNarrative(`**(GM ${currentPersonaInGame} is preparing the adventure...)**`, 'system-gamemsg');
 
         try {
-             // *** ACTUAL API CALL ***
-            const responseText = await callMikaApiForApp(initialPrompt); // No context needed for start
+            // *** REPLACE WITH ACTUAL API CALL ***
+            const responseText = await callMikaApiForApp(initialPrompt);
+            // const responseText = `The dusty tavern door creaks open, revealing ${currentUserName}, ${archetypeTerm}, blinking in the dim light. A worried-looking barkeep polishes a mug nervously. "Adventurer!" he cries, "Thank goodness! The Goblins stole Barnaby, our prize-winning pumpkin! We need someone to venture into the Whispering Woods and get him back!"\n\nThe woods are dark and spooky just outside town. You can hear strange rustling sounds already. What do you do?\n\n1. March straight into the woods.\n2. Ask the barkeep for more details.\n3. Try to sneak around the edge of the woods.`; // Placeholder
 
             if (responseText) {
-                const { narrative, choices, questEnded } = _parseGmResponse(responseText); // Process the REAL response
-
-                _clearDisplayArea(); // Clear the "preparing" message
+                const { narrative, choices, questEnded } = _parseGmResponse(responseText);
+                _clearDisplayArea();
                 if (narrative) {
-                    questHistory.push({ narrative: narrative, action: "[Start]" }); // Add initial state
+                    questHistory.push({ narrative: narrative, action: "[Start]" });
                     _appendNarrative(narrative);
                     if (!questEnded && choices.length > 0) {
                         _displayChoices(choices);
                     } else {
-                        // Handle API response that ended immediately or gave no choices
                         _appendNarrative(`GM: Hmm, the adventure ended before it began! Maybe try a different setup?`);
                         _showRestartButton();
                         gameActive = false;
@@ -184,7 +181,6 @@ const RpgApp = (() => {
         }
     }
 
-    // *** NEW: Function to handle starting with custom text ***
     function _startCustomQuest() {
         if (!customQuestInput || isGenerating) return;
         const customText = customQuestInput.value.trim();
@@ -194,65 +190,61 @@ const RpgApp = (() => {
             customQuestInput.focus();
             return;
         }
-        _startGame(customText); // Pass the custom text to _startGame
+        _startGame(customText);
     }
 
 
-    // *** UPDATED: _handleUserAction uses real API call ***
     async function _handleUserAction(actionText) {
         if (!gameActive || isGenerating) return;
 
-        // Handle "end" command separately
         const lowerCaseAction = actionText.toLowerCase().trim();
         if (lowerCaseAction === 'end') {
             _appendUserActionToQuest(actionText);
             _appendNarrative(`GM: You decided to end the quest here. Adventure awaits another day!`);
             gameActive = false;
-            await _saveCompletedQuest('Ended'); // Mark as ended manually
+            await _saveCompletedQuest('Ended');
             _showRestartButton();
             if (questInputArea) questInputArea.style.display = 'none';
-            return; // Stop processing
+            return;
         }
-
 
         console.log(`User action (Turn ${questHistory.length}): ${actionText}`);
         _appendUserActionToQuest(actionText);
         if (questTextInput) questTextInput.value = '';
-        _displayChoices([]); // Clear old choices
+        _displayChoices([]);
 
         isGenerating = true;
         _setLoadingState(true);
 
-        // Build context and prompt for API
         const contextTurns = questHistory.slice(-QUEST_CONTEXT_LENGTH);
-        // Format context for the API call
         const apiContext = contextTurns
-            .filter(turn => turn.action !== "[Start]") // Filter out the starting entry which has no user action
+            .filter(turn => turn.action !== "[Start]")
             .flatMap(turn => [
-                { role: 'model', parts: [{ text: turn.narrative }] }, // GM narrative = model
-                { role: 'user', parts: [{ text: turn.action }] }     // User action = user
+                { role: 'model', parts: [{ text: turn.narrative }] },
+                { role: 'user', parts: [{ text: turn.action }] }
             ]);
 
-
-        const turnCount = questHistory.length; // Current turn number (starts at 1 after first narrative)
+        const turnCount = questHistory.length;
         const targetTurns = LENGTHS[currentQuestLengthPreference]?.turns || Infinity;
         let lengthNudge = "";
-        // Add nudge slightly before the target to give API a chance to wrap up
         if (targetTurns !== Infinity && turnCount >= targetTurns - 1 ) {
             lengthNudge = ` IMPORTANT: The player prefers a '${currentQuestLengthPreference}' length quest (around ${targetTurns} turns). This is turn ${turnCount}. Guide the narrative towards a conclusion based on their action. If the action naturally leads to the end (success or failure), describe it and write '(Quest Complete)' or '(Quest Failed)' on a new line after the description, instead of offering choices.`;
         }
 
-        const prompt = `[ROLE: You are ${currentPersonaInGame}, the Game Master!] Continue the interactive RPG based on the recent history. The player is ${currentUserName} (${ARCHETYPES[currentCharacterArchetype]?.promptTerm}). Their latest action was: "${actionText}".\n\nDescribe what happens next (1-2 paragraphs) in the ${GENRES[currentGenre]?.promptTerm} setting, maintaining your ${currentPersonaInGame} GM personality. Determine success/failure/consequences narratively based on the action and situation.${lengthNudge} Unless the quest is ending (due to the action or length guidance), give ${currentUserName} exactly ${MAX_CHOICES_DISPLAYED} new, distinct action choices as a numbered list (e.g., '1. Choice one'). Ensure choices make sense.`;
+        const prompt = `[ROLE: You are ${currentPersonaInGame}, the Game Master!] Continue the interactive RPG based on the recent history. The player is ${currentUserName} (${ARCHETYPES[currentCharacterArchetype]?.promptTerm}). Their latest action was: "${actionText}".\n\nDescribe what happens next (1-2 paragraphs) in the ${GENRES[currentGenre]?.promptTerm || 'chosen'} setting, maintaining your ${currentPersonaInGame} GM personality. Determine success/failure/consequences narratively based on the action and situation.${lengthNudge} Unless the quest is ending (due to the action or length guidance), give ${currentUserName} exactly ${MAX_CHOICES_DISPLAYED} new, distinct action choices as a numbered list (e.g., '1. Choice one'). Ensure choices make sense.`;
 
         try {
-             // *** ACTUAL API CALL ***
-             const responseText = await callMikaApiForApp(prompt, apiContext);
+            // *** REPLACE WITH ACTUAL API CALL ***
+            const responseText = await callMikaApiForApp(prompt, apiContext);
+            // const fakeApiResponse = `You march boldly into the woods! Twigs snap underfoot. Suddenly, three Goblins jump out, brandishing pointy sticks! "Who goes there?!" one squeaks.\n\n(Quest Complete)`; // Placeholder End
+            // const fakeApiResponse = `You ask the barkeep, "Tell me more." He explains the Goblins live in a cave past the Murky Mire and are led by Snaggletooth.\n\nWhat do you do?\n1. Head towards the Murky Mire.\n2. Ask if Barnaby has any special features.\n3. Offer the barkeep gold for a map.`; // Placeholder Continue
+
 
             if (responseText) {
                  const { narrative, choices, questEnded, outcome } = _parseGmResponse(responseText);
 
                  if (narrative) {
-                     questHistory.push({ narrative: narrative, action: actionText }); // Store turn *after* getting response
+                     questHistory.push({ narrative: narrative, action: actionText });
                      _appendNarrative(narrative);
 
                      if (questEnded) {
@@ -263,38 +255,31 @@ const RpgApp = (() => {
                          if (questInputArea) questInputArea.style.display = 'none';
                      } else if (choices.length > 0) {
                          _displayChoices(choices);
-                         // Prune history internally if needed (optional)
-                         // if (questHistory.length > 20) questHistory = questHistory.slice(-20);
                      } else {
                           _appendNarrative("GM: ...Hmm, I seem to have run out of ideas for choices! Where do we go from here? Maybe type 'end' or try something specific?");
-                          // Don't end game, let user type something
                      }
                  } else {
-                     // API gave response, but parsing failed to get narrative
                      _appendNarrative(`GM: ${currentPersonaInGame === 'Kana' ? 'My response was garbled.' : 'Meeeow! My crystal ball is fuzzy...'} Try again?`);
-                     _displayChoices([]); // Show no choices
+                     _displayChoices([]);
                  }
 
             } else {
-                 // API call failed or returned empty
                  _appendNarrative(`GM: ${currentPersonaInGame === 'Kana' ? 'Connection error or empty response.' : 'Mrow! Couldn\'t reach the adventure realm...'} Try again?`);
-                 _displayChoices([]); // Show no choices
+                 _displayChoices([]);
             }
         } catch (error) {
             console.error("Error processing RPG turn:", error);
             _appendNarrative(`GM: *Hiss!* My GM powers fizzled! Error: ${error}. Try again?`);
-            _displayChoices([]); // Show no choices
+            _displayChoices([]);
         } finally {
             isGenerating = false;
             _setLoadingState(false);
-             // Refocus input if game is still active
              if (gameActive && questTextInput) {
                 questTextInput.focus();
              }
         }
     }
 
-    // _parseGmResponse (remains the same as previous version - might need tweaking based on real API output)
     function _parseGmResponse(responseText) {
         let narrative = responseText || "";
         let choices = [];
@@ -340,49 +325,51 @@ const RpgApp = (() => {
         return { narrative, choices, questEnded, outcome };
     }
 
-    // *** PLACEHOLDER: Needs real implementation ***
      async function _generateQuestTitle(history) {
          if (!apiCaller || !history || history.length === 0) return null;
          console.warn("Quest title generation using API not yet implemented, using default.");
-         // Basic Placeholder Logic:
-         const firstNarrative = history[0]?.narrative.substring(0, 100) || "Adventure";
-         const lastAction = history[history.length-1]?.action || "the End";
-         // This would ideally be a prompt to the API
-         // const prompt = `Generate a short title (4-8 words) for an RPG quest that started like: "${firstNarrative}..." and involved the action "${lastAction}". Output only the title.`;
-         // const titleResponse = await callMikaApiForApp(prompt);
-         // if(titleResponse) return titleResponse.replace(/["'*]/g, '');
-         await new Promise(resolve => setTimeout(resolve, 100)); // Simulate potential API delay
-         return `Quest about ${lastAction.substring(0, 20)}...`; // Very basic default
+
+         const firstNarrative = history[0]?.narrative.substring(0, 150) || "An adventure";
+         const lastAction = history.length > 1 ? history[history.length - 1]?.action.substring(0,50) : "the beginning";
+         const prompt = `[ROLE: You are a creative writer.] Generate a short, catchy title (4-8 words max) for an RPG quest that started like: "${firstNarrative}..." and involved the player action "${lastAction}". Output only the title text, no extra characters or quotes.`;
+
+         try {
+             const titleResponse = await callMikaApiForApp(prompt, []); // No history context needed for title
+             if(titleResponse) {
+                 let cleanTitle = titleResponse.replace(/["'*]/g, '').trim();
+                 // Optional: Basic title case
+                 cleanTitle = cleanTitle.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                 if (cleanTitle.length > 0 && cleanTitle.length < 80) {
+                     console.log("Generated quest title:", cleanTitle);
+                     return cleanTitle;
+                 }
+             }
+             console.warn("Generated title was invalid or empty:", titleResponse);
+         } catch(error) {
+             console.error("API call for quest title failed:", error);
+         }
+         // Fallback if API fails or returns invalid title
+         return `Quest: ${lastAction}...`;
      }
 
 
     async function _saveCompletedQuest(outcome) {
         if (!questHistory || questHistory.length === 0) return;
         console.log("Saving completed quest. Outcome:", outcome);
-        let title = `A ${currentGenre} Quest (${_getCurrentDateString()})`; // Default
+        let title = `A ${currentGenre} Quest (${_getCurrentDateString()})`;
 
         try {
-            const generatedTitle = await _generateQuestTitle([...questHistory]); // Pass copy
-            if (generatedTitle) {
-                title = generatedTitle;
-            }
-        } catch(error) {
-             console.error("Error generating quest title:", error);
-        }
+            const generatedTitle = await _generateQuestTitle([...questHistory]);
+            if (generatedTitle) { title = generatedTitle; }
+        } catch(error) { console.error("Error generating quest title:", error); }
 
         const questLog = {
-            title: title,
-            timestamp: Date.now(),
-            history: [...questHistory], // Save copy
-            persona: currentPersonaInGame,
-            outcome: outcome || 'Ended',
-            genre: currentGenre,
-            archetype: currentCharacterArchetype,
-            length: currentQuestLengthPreference
+            title: title, timestamp: Date.now(), history: [...questHistory],
+            persona: currentPersonaInGame, outcome: outcome || 'Ended',
+            genre: currentGenre, archetype: currentCharacterArchetype, length: currentQuestLengthPreference
         };
         questLibrary.push(questLog);
         _saveLibrary();
-        // Use messageCallback for system messages outside the app UI
         if(messageCallback) messageCallback('System', `Quest "${title}" saved to log!`);
     }
 
@@ -390,7 +377,6 @@ const RpgApp = (() => {
     function _clearGameContainer() { if (gameUiContainer) gameUiContainer.innerHTML = ''; initialPromptArea = questDisplayArea = questChoicesArea = questInputArea = questTextInput = questSendButton = questStatusArea = libraryViewArea = questDetailViewArea = genreSelector = archetypeSelector = lengthSelector = customQuestInput = null; }
     function _clearDisplayArea() { if(questDisplayArea) questDisplayArea.innerHTML = ''; }
 
-    // *** UPDATED: _createInitialUI includes custom prompt input ***
     function _createInitialUI() {
         _clearGameContainer();
         currentView = 'prompt';
@@ -441,14 +427,14 @@ const RpgApp = (() => {
         startButton.textContent = 'Start Selected Quest!';
         startButton.className = 'rps-choice-button';
         startButton.style.marginTop = '10px';
-        startButton.onclick = () => _startGame(); // No argument = use selected options
+        startButton.onclick = () => _startGame();
         initialPromptArea.appendChild(startButton);
 
-        // *** NEW: Custom Prompt Area ***
+        // Custom Prompt Area
         const customArea = document.createElement('div');
         customArea.style.marginTop = '20px';
         customArea.style.width = '100%';
-        customArea.style.maxWidth = '450px'; // Limit width
+        customArea.style.maxWidth = '450px';
         const customLabel = document.createElement('p');
         customLabel.textContent = 'Or Describe Your Own Quest Idea:';
         customLabel.style.marginBottom = '5px';
@@ -458,20 +444,18 @@ const RpgApp = (() => {
         customQuestInput.style.cssText = `width: 100%; padding: 8px; box-sizing: border-box; margin-bottom: 5px; background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 4px;`;
         const customStartButton = document.createElement('button');
         customStartButton.textContent = 'Start Custom Quest!';
-        customStartButton.className = 'rps-choice-button secondary'; // Different style maybe
+        customStartButton.className = 'rps-choice-button secondary';
         customStartButton.onclick = _startCustomQuest;
         customArea.appendChild(customLabel);
         customArea.appendChild(customQuestInput);
         customArea.appendChild(customStartButton);
         initialPromptArea.appendChild(customArea);
-        // *** END: Custom Prompt Area ***
-
 
         // Library Button
         const libraryButton = document.createElement('button');
         libraryButton.textContent = 'View Quest Log 📚';
         libraryButton.className = 'rps-choice-button secondary';
-        libraryButton.style.marginTop = '25px'; // Increased margin
+        libraryButton.style.marginTop = '25px';
         libraryButton.onclick = _createLibraryUI;
         initialPromptArea.appendChild(libraryButton);
 
@@ -479,13 +463,12 @@ const RpgApp = (() => {
         const backBtn = document.createElement('button');
         backBtn.id = 'back-to-chat-button';
         backBtn.textContent = 'Back to Chat';
-        backBtn.className = 'rps-choice-button secondary'; // Consistent secondary style
+        backBtn.className = 'rps-choice-button secondary';
         backBtn.style.marginTop = '10px';
         backBtn.onclick = () => { if (typeof switchToChatView === 'function') switchToChatView(); };
         initialPromptArea.appendChild(backBtn);
 
         gameUiContainer.appendChild(initialPromptArea);
-        // Apply common styles to selects
         [genreSelector, archetypeSelector, lengthSelector].forEach(sel => {
             if(sel) { sel.style.padding = '5px'; sel.style.borderRadius = '4px'; sel.style.backgroundColor = 'var(--input-bg)'; sel.style.color = 'var(--text-color)'; sel.style.border = '1px solid var(--input-border)'; }
         });
@@ -567,6 +550,7 @@ const RpgApp = (() => {
         _appendNarrative(formattedText, 'user-action');
     }
 
+    // *** UPDATED _displayChoices with scrolling logic ***
     function _displayChoices(choices) {
         if (!questChoicesArea) return;
         questChoicesArea.innerHTML = '';
@@ -575,15 +559,45 @@ const RpgApp = (() => {
         choices.forEach((choiceText, index) => {
             const button = document.createElement('button');
             const cleanChoiceText = choiceText.replace(/^[\*\-\d]+\.?\s*/, '').trim();
-            button.className = 'rps-choice-button story-choice';
+            button.className = 'rps-choice-button story-choice'; // Reuse storytime class
             button.onclick = () => _handleUserAction(cleanChoiceText);
 
             const textSpan = document.createElement('span');
             textSpan.textContent = `${index + 1}. ${cleanChoiceText}`;
-            textSpan.className = 'scrollable-text';
+            textSpan.className = 'scrollable-text'; // Reuse storytime class
             button.appendChild(textSpan);
             questChoicesArea.appendChild(button);
-            // Add text scrolling logic if desired
+
+            // --- Scrolling Logic ---
+            requestAnimationFrame(() => {
+                 if (!button.isConnected) return;
+                 const computedStyle = window.getComputedStyle(button);
+                 const paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
+                 const paddingRight = parseFloat(computedStyle.paddingRight) || 0;
+                 const availableWidth = button.clientWidth - paddingLeft - paddingRight;
+                 const textWidth = textSpan.scrollWidth;
+
+                 if (textWidth > availableWidth + 1) {
+                     button.classList.add('text-overflow-scroll');
+                     const scrollDistance = availableWidth - textWidth;
+                     button.style.setProperty('--scroll-distance', `${scrollDistance - 5}px`);
+
+                     const overflowAmount = textWidth - availableWidth;
+                     const baseDuration = 6;
+                     const extraPerPixel = 0.06;
+                     let duration = Math.max(6, baseDuration + overflowAmount * extraPerPixel);
+                     duration = Math.min(duration, 25);
+                     textSpan.style.animationDuration = `${duration.toFixed(1)}s`;
+
+                     button.title = cleanChoiceText;
+                 } else {
+                     button.classList.remove('text-overflow-scroll');
+                     button.title = '';
+                     button.style.removeProperty('--scroll-distance');
+                     textSpan.style.animationDuration = '';
+                 }
+            });
+             // --- End Scrolling Logic ---
         });
     }
 
@@ -661,7 +675,7 @@ const RpgApp = (() => {
             container.innerHTML = `<p style="text-align: center; font-style: italic; color: var(--system-message-text);">No quests recorded yet. Go have an adventure!</p>`;
             return;
         }
-        questLibrary.forEach((quest, index) => { // Use index directly as it's sorted on load
+        questLibrary.forEach((quest, index) => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'library-item';
             itemDiv.onclick = () => _createQuestDetailView(index);
@@ -688,7 +702,7 @@ const RpgApp = (() => {
      function _createQuestDetailView(questIndex) {
          _clearGameContainer();
          currentView = 'detail';
-         const quest = questLibrary[questIndex]; // Access using index from sorted list
+         const quest = questLibrary[questIndex];
          if (!quest) {
              console.error(`Quest with index ${questIndex} not found in sorted library.`);
              _createLibraryUI(); return;
@@ -717,7 +731,6 @@ const RpgApp = (() => {
          backButton.onclick = _createLibraryUI;
          questDetailViewArea.appendChild(backButton);
 
-         // Render quest history
          quest.history.forEach(turn => {
              if (turn.action === "[Start]") {
                  const narrativeP = document.createElement('p');
@@ -747,7 +760,7 @@ const RpgApp = (() => {
         console.log("Initializing RPG Adventure App...");
         gameUiContainer = _gameUiContainer;
         messageCallback = _messageCallback;
-        apiCaller = _apiCaller; // Needed for generating quest content
+        apiCaller = _apiCaller;
         currentUserName = userName || "Adventurer";
         currentPersonaInGame = persona || 'Mika';
         isGenerating = false;
@@ -759,7 +772,7 @@ const RpgApp = (() => {
         }
 
         _loadLibrary();
-        _createInitialUI(); // Start at the setup screen
+        _createInitialUI();
 
         console.log(`RPG App initialized for ${currentUserName} with GM ${currentPersonaInGame}.`);
     }
