@@ -23,7 +23,7 @@
             --send-button-hover-1: #f06292; --send-button-hover-2: #d81b60; --scrollbar-thumb: #f06292; --scrollbar-track: rgba(26, 13, 19, 0.5); --scrollbar-thumb-hover: #d81b60;
             --dropdown-bg: #1a0d13; --dropdown-border: #f06292; --dropdown-shadow: rgba(0, 0, 0, 0.4); --dropdown-button-text: #ffacd1; --dropdown-button-hover-bg: rgba(240, 98, 146, 0.2);
             --dropdown-delete-text: #ff8a80; --dropdown-delete-hover-bg: rgba(255, 138, 128, 0.3); --header-button-bg: #f06292; --header-button-text: #1a0d13; --header-button-hover-bg: #d81b60;
-            /* Game/App Vars */
+            /* App Vars (Previously Game Vars) */
             --game-board-bg: var(--chat-input-bg); --game-board-border: var(--chat-border); --game-cell-border: var(--chat-input-border); --game-cell-hover-bg: var(--chat-header-bg);
             --game-cell-text: var(--chat-text); --game-cell-taken-text: var(--mika-message-name); --game-message-log-bg: var(--chat-log-bg); --game-message-log-border: var(--chat-input-border);
             --game-message-log-text: var(--chat-log-text); --game-message-mika: var(--mika-message-text); --game-message-user: var(--user-message-text); --game-message-system: var(--system-message-text);
@@ -42,7 +42,7 @@
             --chat-input-border: #f48fb1; --chat-input-focus-shadow: rgba(244, 143, 177, 0.6); --scrollbar-thumb: #f48fb1; --scrollbar-track: rgba(44, 31, 48, 0.5); --scrollbar-thumb-hover: #d81b60;
             --dropdown-bg: #2c1f30; --dropdown-border: #f48fb1; --dropdown-shadow: rgba(0, 0, 0, 0.6); --dropdown-button-text: #ffc1e3; --dropdown-button-hover-bg: rgba(244, 143, 177, 0.2);
             --dropdown-delete-text: #ff8a80; --dropdown-delete-hover-bg: rgba(255, 138, 128, 0.3); --header-button-bg: #f48fb1; --header-button-text: #2c1f30; --header-button-hover-bg: #d81b60;
-            /* Dark Game/App Vars */
+            /* Dark App Vars (Previously Game Vars) */
             --game-board-bg: var(--chat-input-bg); --game-board-border: var(--chat-border); --game-cell-border: var(--chat-input-border); --game-cell-hover-bg: var(--chat-header-bg);
             --game-cell-text: var(--chat-text); --game-cell-taken-text: var(--mika-message-name); --game-message-log-bg: var(--chat-log-bg); --game-message-log-border: var(--chat-input-border);
             --game-message-log-text: var(--chat-log-text); --game-message-mika: var(--mika-message-text); --game-message-user: var(--user-message-text); --game-message-system: var(--system-message-text);
@@ -83,8 +83,7 @@
         .header-button:hover { background-color: var(--header-button-hover-bg); transform: scale(1.05); } .header-button:active { transform: scale(0.98); }
         /* Dropdown Styles */
         .dropdown-menu { display: none; position: absolute; top: calc(100% + 5px); background-color: var(--dropdown-bg); border: 1px solid var(--dropdown-border); border-radius: 5px; box-shadow: 0 4px 10px var(--dropdown-shadow); z-index: 10; max-height: 200px; overflow-y: auto; min-width: 160px; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--chat-input-bg); transition: background-color 0.3s ease, border-color 0.3s ease; }
-        /* Position specific dropdowns */
-        #history-dropdown, #apps-dropdown, #settings-dropdown { right: 15px; } /* Updated games-dropdown to apps-dropdown here */
+        #history-dropdown, #apps-dropdown, #settings-dropdown { right: 15px; }
         .dropdown-menu button { display: block; width: 100%; padding: 8px 12px; background: none; border: none; border-bottom: 1px solid rgba(240, 98, 146, 0.3); color: var(--dropdown-button-text); text-align: left; cursor: pointer; font-size: 0.9em; transition: background-color 0.2s ease, color 0.3s ease; }
         .dropdown-menu button:last-child { border-bottom: none; } .dropdown-menu button:hover { background-color: var(--dropdown-button-hover-bg); } .dropdown-menu button:disabled { opacity: 0.5; cursor: not-allowed; background-color: transparent !important; }
         .dropdown-menu button.delete-history, .dropdown-menu button.reset-settings { color: var(--dropdown-delete-text); font-weight: bold; border-top: 1px solid var(--dropdown-border); margin-top: 5px; }
@@ -120,15 +119,15 @@
         #send-button:hover { background: linear-gradient(45deg, var(--send-button-hover-1), var(--send-button-hover-2)); transform: scale(1.02); }
         #send-button:active { transform: scale(0.98); }
         #send-button:disabled { background: #666; cursor: not-allowed; transform: none; opacity: 0.6; }
-        /* App Area Styles (Previously Game Area) */
+        /* App Area Styles */
         #app-area { display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px; width: 100%; height: 100%; box-sizing: border-box; overflow: hidden; background-color: var(--chat-bg); color: var(--chat-text); }
-        /* App Styles (TTT, RPS, GTN, 20Q, Diary, StoryTime, Chores) */
+        /* App Styles (TTT, RPS, GTN, 20Q, Diary, StoryTime, Chores, Tracker) */
         /* ... TTT Styles ... */
         #ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 240px; height: 240px; margin: 10px auto; border: 3px solid var(--game-board-border); border-radius: 8px; background-color: var(--game-board-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); flex-shrink: 0; }
         .ttt-cell { border: 1px solid var(--game-cell-border); display: flex; justify-content: center; align-items: center; font-size: 2.5em; font-weight: bold; cursor: pointer; color: var(--game-cell-text); transition: background-color 0.2s, color 0.2s; user-select: none; }
         .ttt-cell:hover { background-color: var(--game-cell-hover-bg); } .ttt-cell.taken { cursor: not-allowed; color: var(--game-cell-taken-text); } .ttt-cell.taken:hover { background-color: transparent; }
         /* ... RPS Styles (Shared Button Style) ... */
-        .rps-choice-button { font-family: inherit; padding: 10px 20px; font-size: 1.1em; border-radius: 10px; border: none; cursor: pointer; background: var(--header-button-bg, #f06292); color: var(--header-button-text, #1a0d13); transition: transform 0.1s ease, background-color 0.2s, color 0.2s; flex-shrink: 0; margin: 5px; /* Added margin */ }
+        .rps-choice-button { font-family: inherit; padding: 10px 20px; font-size: 1.1em; border-radius: 10px; border: none; cursor: pointer; background: var(--header-button-bg, #f06292); color: var(--header-button-text, #1a0d13); transition: transform 0.1s ease, background-color 0.2s, color 0.2s; flex-shrink: 0; margin: 5px; }
         .rps-choice-button:hover { transform: scale(1.05); background: var(--header-button-hover-bg, #d81b60); } .rps-choice-button:active { transform: scale(0.98); }
         .rps-choice-button.secondary { background: var(--secondary-button-bg); color: var(--secondary-button-text); border: 1px solid var(--secondary-button-border); } .rps-choice-button.secondary:hover { background: var(--secondary-button-hover-bg); }
         #rps-result-display { margin-top: 10px; padding: 10px; min-height: 30px; text-align: center; font-weight: bold; border: 1px dashed var(--game-cell-border, #f06292); border-radius: 5px; background-color: rgba(0,0,0,0.1); opacity: 0.6; transition: opacity 0.3s ease; color: var(--game-cell-text); width: 90%; max-width: 350px; }
@@ -145,8 +144,8 @@
         #tq-questions-left { margin-bottom: 10px; text-align: center; font-size: 1.1em; color: var(--system-message-text); transition: color 0.3s ease, font-weight 0.3s ease; }
         #tq-new-game { margin-top: 5px; }
         /* ... Diary Styles ... */
-        #diary-chat-view, #diary-entries-view { width: 100%; height: 100%; overflow: hidden; display: flex; flex-direction: column; } /* Ensure full height for Diary views within appArea */
-        #diary-entries-view { overflow-y: auto; } /* Allow scrolling only for entries */
+        #diary-chat-view, #diary-entries-view { width: 100%; height: 100%; overflow: hidden; display: flex; flex-direction: column; }
+        #diary-entries-view { overflow-y: auto; }
         .diary-top-notes-area { flex-shrink: 0; height: 90px; overflow-y: auto; border-bottom: 1px solid var(--chat-input-border); padding: 5px; background-color: rgba(0,0,0, 0.1); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; }
         .diary-notes-empty { color: var(--system-message-text); font-style: italic; text-align: center; margin-top: 15px; font-size: 0.9em;}
         .diary-note-item { background-color: rgba(255, 255, 255, 0.1); padding: 4px 8px; margin-bottom: 3px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; }
@@ -158,8 +157,8 @@
         .diary-chat-log-area { flex-grow: 1; overflow-y: auto; padding: 8px; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; }
         .diary-chat-log-area p { margin: 4px 0 7px 0; line-height: 1.4; word-wrap: break-word; max-width: 100%; position: relative; padding-right: 25px; }
         .diary-user-message { color: var(--user-message-text); text-align: right; margin-left: auto; max-width: 90%; } .diary-user-message strong { color: var(--user-message-name); }
-        .diary-mika-message { color: var(--mika-message-text); margin-right: auto; max-width: 90%; } /* Applies to both personas */
-        .diary-mika-message strong { color: var(--mika-message-name); } /* Name color applies to both */
+        .diary-mika-message { color: var(--mika-message-text); margin-right: auto; max-width: 90%; }
+        .diary-mika-message strong { color: var(--mika-message-name); }
         .diary-heart-button { position: absolute; top: 1px; right: 1px; background: none; border: none; color: var(--system-message-text); cursor: pointer; font-size: 1em; padding: 0; line-height: 1; opacity: 0.3; transition: opacity 0.2s, color 0.2s; }
         .diary-chat-log-area p:hover .diary-heart-button { opacity: 1; } .diary-heart-button.active { color: var(--mika-message-name); opacity: 1; }
         .diary-input-area { display: flex; padding: 8px; border-top: 1px solid var(--chat-input-border); background-color: var(--chat-input-area-bg); flex-shrink: 0; }
@@ -176,7 +175,7 @@
         #story-wrapper { display: flex; flex-direction: column; height: 100%; width: 100%; box-sizing: border-box; }
         .story-display-area { flex-grow: 1; overflow-y: auto; padding: 10px 15px; margin-bottom: 5px; background-color: rgba(0,0,0, 0.1); border-radius: 8px; border: 1px solid var(--chat-input-border); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; color: var(--chat-log-text); }
         .story-display-area p { margin: 0 0 10px 0; line-height: 1.5; white-space: pre-wrap; } .story-display-area p:last-child { margin-bottom: 0; }
-        .story-display-area p > strong:first-child { color: var(--mika-message-name); } /* Applies to both personas */ .story-display-area p > strong { font-weight: bold; } .story-display-area p > em { font-style: italic; }
+        .story-display-area p > strong:first-child { color: var(--mika-message-name); } .story-display-area p > strong { font-weight: bold; } .story-display-area p > em { font-style: italic; }
         .story-display-area p.user-action { text-align: right; color: var(--user-message-text); font-style: italic; opacity: 0.9; margin: 5px 0; border-top: 1px dashed rgba(var(--user-message-text-rgb), 0.3); padding-top: 5px; margin-top: 5px; }
         .story-status-area { flex-shrink: 0; text-align: center; padding: 3px; font-style: italic; font-size: 0.9em; color: var(--typing-indicator-text); min-height: 1.2em; display: none; }
         .story-interaction-area { flex-shrink: 0; padding: 5px 0; border-top: 1px solid var(--chat-input-border); background-color: var(--chat-input-area-bg); }
@@ -190,13 +189,13 @@
         .story-input-area { display: flex; justify-content: center; align-items: center; padding: 0 10px; }
         .story-text-input { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--chat-input-border); background-color: var(--chat-input-bg); color: var(--chat-input-text); border-radius: 15px 0 0 15px; font-size: 0.95em; outline: none; }
         .story-send-button { padding: 8px 15px; border-radius: 0 15px 15px 0; font-size: 0.95em; margin-left: -1px; }
-        #story-initial-prompt { text-align: center; padding: 20px; display: flex; flex-direction: column; align-items: center;} /* Adjust prompt layout */
+        #story-initial-prompt { text-align: center; padding: 20px; display: flex; flex-direction: column; align-items: center;}
         #story-initial-prompt h3 { color: var(--chat-header-text); margin-bottom: 10px; }
         #story-initial-prompt p { color: var(--chat-text); font-size: 1em; margin-bottom: 15px;}
-        #story-initial-prompt > div { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;} /* Container for buttons/input */
+        #story-initial-prompt > div { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;}
         #story-custom-prompt-input { margin-top: 15px; padding: 8px 12px; border: 1px solid var(--input-border, #ccc); border-radius: 5px; width: 80%; max-width: 400px; background-color: var(--input-bg); color: var(--text-color); font-size: 0.95em; display: block; margin-left: auto; margin-right: auto; margin-bottom: 10px; }
-        .length-button { font-size: 0.8em !important; padding: 4px 8px !important; margin: 0 3px !important; } /* Specific style for length buttons */
-        .length-button.selected-length { background: var(--header-button-bg); color: var(--header-button-text); border-color: var(--header-button-bg); } /* Highlight selected length */
+        .length-button { font-size: 0.8em !important; padding: 4px 8px !important; margin: 0 3px !important; }
+        .length-button.selected-length { background: var(--header-button-bg); color: var(--header-button-text); border-color: var(--header-button-bg); }
         /* Library Styles */
         .library-view, .story-detail-view { width: 100%; height: 100%; overflow-y: auto; padding: 10px; box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); }
         .library-title { text-align: center; color: var(--chat-header-text); margin-bottom: 15px; font-size: 1.2em; }
@@ -210,22 +209,20 @@
         .library-back-button { margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; }
         /* ... Chores Styles ... */
         #chore-list div { transition: opacity 0.3s ease, text-decoration 0.3s ease; }
-        #chore-commentary { /* Styling for the temp commentary */
-             transition: opacity 0.5s ease-out; /* Ensure transition is set */
-             min-height: 1.5em; /* Ensure space */
-             height: 1.5em; /* Fixed height */
-             text-align: center; font-style: italic; font-size: 0.9em;
-             color: var(--mika-message-name); flex-shrink: 0;
-             margin-top: 5px; overflow: hidden; white-space: nowrap;
-             text-overflow: ellipsis; opacity: 1; /* Start visible */
-         }
-        #parent-management-area input[type=text], #parent-management-area input[type=number], #parent-management-area input[type=password] {
-             background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 4px; margin-bottom: 5px; padding: 5px 8px; /* Added padding */ }
+        #chore-commentary { transition: opacity 0.5s ease-out; min-height: 1.5em; height: 1.5em; text-align: center; font-style: italic; font-size: 0.9em; color: var(--mika-message-name); flex-shrink: 0; margin-top: 5px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; opacity: 1; }
+        #parent-management-area input[type=text], #parent-management-area input[type=number], #parent-management-area input[type=password] { background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 4px; margin-bottom: 5px; padding: 5px 8px; }
         #parent-management-area h4 { margin-top: 15px; margin-bottom: 8px; color: var(--chat-header-text); }
         #manage-chore-list span { flex-grow: 1; margin-right: 10px; }
-        #chore-history-view #history-list-container { background-color: rgba(0,0,0,0.1); } /* Slightly different bg for history list */
+        #chore-history-view #history-list-container { background-color: rgba(0,0,0,0.1); }
+        /* ... Tracker Styles (Minimal for now, uses shared styles) ... */
+        /* Specific styles for tracker can be added here if needed */
+        #tracker-prediction { font-size: 1.1em; margin-bottom: 5px; color: var(--mika-message-name); font-weight: bold; text-align: center; }
+        #tracker-stats { font-size: 0.9em; margin-bottom: 15px; color: var(--system-message-text); text-align: center; }
+        #tracker-past-cycles div { padding: 4px 0; font-size: 0.9em; border-bottom: 1px dotted var(--input-border); }
+        #tracker-disclaimer { font-size: 0.85em; font-style: italic; color: var(--error-color); text-align: center; padding: 5px; border: 1px dashed var(--error-color); border-radius: 4px; margin-top: 10px; }
 
-        /* Shared App Message Log (Positioning Fixed) */
+
+        /* Shared App Message Log */
         #app-message-log { width: calc(100% - 20px); max-width: 600px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin: 10px auto 10px auto; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0; display: none; }
         #app-message-log p { margin: 2px 0; line-height: 1.3; word-wrap: break-word; }
         #app-message-log .mika-gamemsg { color: var(--game-message-mika); } #app-message-log .mika-gamemsg strong { color: var(--mika-message-name); font-weight: bold; }
@@ -243,13 +240,13 @@
              #chat-container { height: 95vh; border-radius: 10px; font-size: 14px; }
              #chat-header h2 { font-size: 1.1em; } .header-button { font-size: 0.75em; padding: 4px 8px; }
              #chat-log { padding: 10px; } #chat-input-area { padding: 6px 8px; }
-             #image-upload-button, #camera-button { font-size: 1.4em; padding: 4px 6px; } /* Responsive camera button */
+             #image-upload-button, #camera-button { font-size: 1.4em; padding: 4px 6px; }
              #chat-input { padding: 8px 12px; font-size: 0.9em; } #send-button { padding: 8px 12px; font-size: 0.9em; }
              #image-preview-area img { max-height: 30px; } #remove-image-button { width: 14px; height: 14px; font-size: 9px; line-height: 14px; top: -4px; right: -4px; }
              .dropdown-menu { max-height: 150px; }
-             #app-area { padding: 8px; } /* Updated game-area to app-area */
+             #app-area { padding: 8px; }
              #ttt-board { width: 180px; height: 180px; } .ttt-cell { font-size: 1.8em; }
-             .rps-choice-button { font-size: 0.9em; padding: 8px 12px; margin: 3px; } /* Adjusted RPS button */
+             .rps-choice-button { font-size: 0.9em; padding: 8px 12px; margin: 3px; }
              #gtn-input { width: 100px; font-size: 0.9em; } #gtn-submit { font-size: 0.9em; padding: 8px 10px; } #gtn-indicator { min-width: 140px; font-size: 0.9em; }
              #tq-question-input, #tq-guess-input { width: calc(100% - 70px); max-width: 220px; font-size: 0.9em; }
              #tq-ask-button, #tq-guess-button { font-size: 0.85em; padding: 7px; }
@@ -265,9 +262,9 @@
              .story-send-button { font-size: 0.9em; padding: 6px 10px; }
              #story-initial-prompt h3 { font-size: 1.1em; } #story-initial-prompt p { font-size: 0.9em; }
              #story-custom-prompt-input { font-size: 0.9em; }
-             .length-button { font-size: 0.7em !important; padding: 3px 5px !important; } /* Even smaller length buttons */
+             .length-button { font-size: 0.7em !important; padding: 3px 5px !important; }
              .library-item { padding: 8px 12px; } .library-item-title { font-size: 0.95em; } .library-item-date { font-size: 0.75em; }
-             #app-message-log { height: 70px; padding: 5px;} /* Adjust log height - Updated ID */
+             #app-message-log { height: 70px; padding: 5px;}
              #ttt-reset-button, #back-to-chat-button { font-size: 0.85em; padding: 6px 15px; }
              /* Responsive Chores */
              #chore-list div { padding: 6px 3px; }
@@ -275,13 +272,18 @@
              #parent-management-area { padding: 10px; }
              #parent-management-area input[type=text], #parent-management-area input[type=number], #parent-management-area input[type=password] { padding: 4px 6px; }
              #parent-management-area button { font-size: 0.9em; padding: 6px 10px; }
-             #chore-commentary { font-size: 0.85em; min-height: 1.4em; height: 1.4em;} /* Adjust commentary size */
+             #chore-commentary { font-size: 0.85em; min-height: 1.4em; height: 1.4em;}
+             /* Responsive Tracker */
+             #tracker-prediction { font-size: 1em; }
+             #tracker-stats { font-size: 0.85em; }
+             #tracker-past-cycles div { font-size: 0.85em; }
+             #tracker-disclaimer { font-size: 0.8em; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Popups -->
+    <!-- Popups (Unchanged) -->
     <div id="disclaimer-popup" class="popup-overlay"> <div class="popup-modal"> <h2>☆ Hold on a Sec! (=^･ω･^=) ☆</h2> <p>Hiii! Before we start, just a few quick things, nyaa~!</p> <p>☆ Your secret API code stays super safe! It only lives in *your* browser's storage. I don't send it anywhere else, promise! *pinky swear* ♡</p> <p>☆ I'm powered by AI magic! ✨ I try my bestest to be helpful and safe, *purrrr*, but sometimes AI can say silly things! The person who shared me isn't responsible for everything I might say, okay?</p> <p>☆ **Important!** Could you please show this to a parent or guardian? They just need to tap the button below! Teehee~ Thanks!</p> <div class="popup-buttons"> <button id="disclaimer-agree-button" class="popup-button">Okay! We Understand! ♡</button> </div> </div> </div>
     <div id="api-key-popup" class="popup-overlay"> <div class="popup-modal"> <h2>(=^･ω･^=) Need the Secret Code!</h2> <p>Please enter your Google Gemini API Key! It's saved safely in *your* browser, nya~!</p> <input type="password" id="api-key-input" placeholder="Paste your Gemini API Key here~ ♡" autocomplete="new-password"> <p id="api-key-error" class="popup-error">Meeeow! You need to paste a key!</p> <div class="popup-buttons"> <button id="save-api-key-button" class="popup-button">Save & Continue! ♡</button> </div> </div> </div>
     <div id="name-popup" class="popup-overlay"> <div class="popup-modal"> <h2>☆ Who am I talking to? ☆</h2> <p>Tell me your name! So I know who my awesome Study Buddy (or Chore Helper!) is! ♡</p> <input type="text" id="name-input" placeholder="Enter name here~"> <p id="name-error" class="popup-error">Please enter a name!</p> <div class="popup-buttons"> <button id="save-name-button" class="popup-button">That's Me!</button> </div> </div> </div>
@@ -296,16 +298,16 @@
             <div class="header-buttons">
                 <button id="history-button" class="header-button" title="View Past Chats">History</button>
                 <button id="home-button" class="header-button">Loading...</button>
-                <!-- *** UPDATED BUTTON *** -->
                 <button id="apps-button" class="header-button" title="Open Apps!">🎮 Apps</button>
                 <button id="settings-button" class="header-button" title="Settings">⚙️ Settings</button>
             </div>
             <div id="history-dropdown" class="dropdown-menu"></div>
-            <!-- *** UPDATED DROPDOWN ID *** -->
             <div id="apps-dropdown" class="dropdown-menu">
                 <button id="app-diary-button" title="Open Our Secret Diary ♡">Diary ♡</button>
                 <button id="app-story-button" title="Let's tell a story!">Story Time 📖</button>
                 <button id="app-chores-button" title="Manage Chores!">Chores 🎀</button>
+                <!-- *** NEW APP BUTTON *** -->
+                <button id="app-tracker-button" title="Open Cycle Tracker">Cycle Tracker 🌸</button>
                 <button id="app-ttt-button" title="Play Tic-Tac-Toe!">Tic-Tac-Toe ♡</button>
                 <button id="app-rps-button" title="Play Rock Paper Scissors!">Rock Paper Scissors!</button>
                 <button id="app-gtn-button" title="Play Guess The Number!">Guess The Number~</button>
@@ -325,9 +327,9 @@
             <div id="chat-area" style="display: none;">
                <div id="chat-log"> <p class="system-message">Initializing...</p> </div>
                 <div id="chat-input-area">
-                    <input type="file" id="image-upload-input" accept="image/*"> <!-- Keep accept generic initially -->
+                    <input type="file" id="image-upload-input" accept="image/*">
                     <button id="image-upload-button" title="Upload Homework Picture">📎</button>
-                    <button id="camera-button" title="Take Picture">📸</button> <!-- Camera Button -->
+                    <button id="camera-button" title="Take Picture">📸</button>
                     <input type="text" id="chat-input" placeholder="Loading..." disabled>
                     <div id="image-preview-area">
                         <img id="image-preview" src="#" alt="Image preview">
@@ -336,25 +338,26 @@
                     <button id="send-button" disabled>Send</button>
                 </div>
             </div>
-            <!-- *** UPDATED ID *** -->
             <div id="app-area" style="display: none;"> </div>
         </div>
     </div>
 
-    <!-- Include APP scripts (previously GAME scripts) -->
-    <script src="games.js"></script>
+    <!-- Include APP scripts -->
+    <script src="games.js"></script> <!-- Contains TicTacToe -->
     <script src="rps.js"></script>
     <script src="guess_number.js"></script>
     <script src="twenty_questions.js"></script>
     <script src="diary.js"></script>
     <script src="storytime.js"></script>
     <script src="chores.js"></script>
+    <!-- *** INCLUDE NEW TRACKER SCRIPT *** -->
+    <script src="tracker.js"></script>
     <!-- Include API script -->
     <script src="api.js"></script>
 
     <!-- Main Application Logic -->
     <script>
-        // Nyaa~! Mika & Kana's Helper & Fun Time App! ♡ (With Camera & Chores!)
+        // Nyaa~! Mika & Kana's Helper & Fun Time App! ♡ (With Camera, Chores & Tracker!)
 
         // --- DOM Elements ---
         const bodyElement = document.body; const themeColorMeta = document.getElementById('theme-color-meta');
@@ -366,16 +369,12 @@
         const mikaWarningPopup = document.getElementById('mika-warning-popup'); const mikaSwitchConfirmButton = document.getElementById('mika-switch-confirm-button'); const mikaSwitchCancelButton = document.getElementById('mika-switch-cancel-button');
         const chatContainer = document.getElementById('chat-container'); const chatTitle = document.getElementById('chat-title');
         const mainContentArea = document.getElementById('main-content-area'); const chatArea = document.getElementById('chat-area');
-        // *** UPDATED ID ***
         const appArea = document.getElementById('app-area');
         const chatLog = document.getElementById('chat-log'); const chatInput = document.getElementById('chat-input'); const sendButton = document.getElementById('send-button');
         const settingsButton = document.getElementById('settings-button'); const homeButton = document.getElementById('home-button'); const historyButton = document.getElementById('history-button');
-        // *** UPDATED VARIABLE NAME & ID ***
         const appsButton = document.getElementById('apps-button');
         const historyDropdown = document.getElementById('history-dropdown'); const settingsDropdown = document.getElementById('settings-dropdown');
-        // *** UPDATED VARIABLE NAME & ID ***
         const appsDropdown = document.getElementById('apps-dropdown');
-        // *** UPDATED BUTTON IDs for consistency (app- prefix) ***
         const appTttButton = document.getElementById('app-ttt-button');
         const appRpsButton = document.getElementById('app-rps-button');
         const appGtnButton = document.getElementById('app-gtn-button');
@@ -383,23 +382,23 @@
         const appDiaryButton = document.getElementById('app-diary-button');
         const appStoryButton = document.getElementById('app-story-button');
         const appChoresButton = document.getElementById('app-chores-button');
+        // *** ADD TRACKER BUTTON ELEMENT ***
+        const appTrackerButton = document.getElementById('app-tracker-button');
         const settingsInstallButton = document.getElementById('settings-install-button'); const settingsThemeButton = document.getElementById('settings-theme-button'); const settingsPersonaButton = document.getElementById('settings-persona-button'); const settingsResetButton = document.getElementById('settings-reset-button');
-        const imageUploadInput = document.getElementById('image-upload-input'); const imageUploadButton = document.getElementById('image-upload-button'); const cameraButton = document.getElementById('camera-button'); /* CAMERA BUTTON */ const imagePreviewArea = document.getElementById('image-preview-area'); const imagePreview = document.getElementById('image-preview'); const removeImageButton = document.getElementById('remove-image-button');
+        const imageUploadInput = document.getElementById('image-upload-input'); const imageUploadButton = document.getElementById('image-upload-button'); const cameraButton = document.getElementById('camera-button'); const imagePreviewArea = document.getElementById('image-preview-area'); const imagePreview = document.getElementById('image-preview'); const removeImageButton = document.getElementById('remove-image-button');
         const deleteAllHistoryButtonTemplate = document.createElement('button'); deleteAllHistoryButtonTemplate.className = 'delete-history'; deleteAllHistoryButtonTemplate.textContent = 'Delete ALL History'; deleteAllHistoryButtonTemplate.title = 'Permanently delete all saved chats!';
 
         // --- State & Config ---
         let currentChatHistory = []; let isAssistantTyping = false; let currentApiKey = null; let currentUserName = "Study Buddy"; let allChats = {}; let currentChatId = null; const MAX_HISTORY_LENGTH = 16; let deferredInstallPrompt = null; const DISCLAIMER_AGREED_KEY = 'mikaDisclaimerAgreed_v1'; const THEME_PREFERENCE_KEY = 'mikaThemePreference_v1'; const INSTALL_PROMPT_SHOWN_KEY = 'mikaInstallPromptShown'; let selectedImageData = null; let selectedImageMimeType = null; const MAX_IMAGE_SIZE_MB = 4;
-        // *** Renamed isGameActive to isAppActive ***
         let isAppActive = false;
-        // *** Renamed currentActiveGameModule to currentActiveAppModule ***
         let currentActiveAppModule = null;
         let currentPersona = 'Mika'; const PERSONA_PREFERENCE_KEY = 'mikaPersonaPreference_v1';
 
         // --- Utility Functions ---
         const getTimestamp = () => Date.now();
-        const sanitizeHTML = (str) => { if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) { return DOMPurify.sanitize(str, { USE_PROFILES: { html: true }, ALLOWED_TAGS: ['strong', 'em', 'code', 'br', 'del', 'pre', 'span', 'div', 'p', 'h3', 'h4', 'label', 'button', 'input'], KEEP_CONTENT: true }); } else { console.warn("DOMPurify missing, basic fallback."); return str.replace(/</g, '&lt;').replace(/>/g, '&gt;'); } };
+        const sanitizeHTML = (str) => { if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) { return DOMPurify.sanitize(str, { USE_PROFILES: { html: true }, ALLOWED_TAGS: ['strong', 'em', 'code', 'br', 'del', 'pre', 'span', 'div', 'p', 'h3', 'h4', 'label', 'button', 'input', 'strong', 'i'], KEEP_CONTENT: true }); } else { console.warn("DOMPurify missing, basic fallback."); return str.replace(/</g, '&lt;').replace(/>/g, '&gt;'); } }; // Added strong, i for tracker formatting just in case
 
-        // --- Local Storage ---
+        // --- Local Storage (Unchanged) ---
         function saveToLocalStorage(key, value) { try { localStorage.setItem(key, value); return true; } catch (e) { console.error(`Save LS Error [${key}]:`, e); return false; } }
         function loadFromLocalStorage(key) { try { const v = localStorage.getItem(key); return v; } catch (e) { console.error(`Load LS Error [${key}]:`, e); } return null; }
         function clearFromLocalStorage(key) { try { localStorage.removeItem(key); console.log(`Cleared ${key}`); } catch (e) { console.error(`Clear LS Error [${key}]:`, e); } }
@@ -410,23 +409,23 @@
         const saveThemePreference = (t) => saveToLocalStorage(THEME_PREFERENCE_KEY, t); const loadThemePreference = () => loadFromLocalStorage(THEME_PREFERENCE_KEY); const clearThemePreference = () => clearFromLocalStorage(THEME_PREFERENCE_KEY);
         const savePersonaPreference = (p) => saveToLocalStorage(PERSONA_PREFERENCE_KEY, p); const loadPersonaPreference = () => loadFromLocalStorage(PERSONA_PREFERENCE_KEY); const clearPersonaPreference = () => clearFromLocalStorage(PERSONA_PREFERENCE_KEY);
 
-        // --- Chat History Management ---
+        // --- Chat History Management (Unchanged) ---
         function saveAllChats() { try { if (currentChatId && currentChatHistory.length > 0) { allChats[currentChatId] = currentChatHistory; } if (Object.keys(allChats).length > 0) { saveToLocalStorage('mikaHelper_allChats', JSON.stringify(allChats)); } else { clearFromLocalStorage('mikaHelper_allChats'); } } catch (e) { console.error("Save Chats Error:", e); } }
         function loadAllChats() { try { const stored = loadFromLocalStorage('mikaHelper_allChats'); if (stored) { allChats = JSON.parse(stored); const ids = Object.keys(allChats).sort((a, b) => b - a); if (ids.length > 0) return ids[0]; } } catch (e) { console.error("Load Chats Error:", e); allChats = {}; clearFromLocalStorage('mikaHelper_allChats'); } return null; }
         function deleteAllChats() { const confirmMsg = `Delete ALL chat history for ${currentUserName}? This cannot be undone!`; if (confirm(confirmMsg)) { clearFromLocalStorage('mikaHelper_allChats'); allChats = {}; startNewChat(false); updateHistoryDropdown(); const deletedMsg = `All chat history deleted for ${currentUserName}.`; appendMessage('system', deletedMsg); console.log("History deleted."); closeAllDropdowns(); } }
 
-        // --- Theme & Persona ---
+        // --- Theme & Persona (Unchanged) ---
         function applyTheme(theme) { if (theme === 'dark') { bodyElement.classList.add('dark-mode'); settingsThemeButton.textContent = "☀️ Light Mode"; themeColorMeta.content = '#2c1f30'; } else { bodyElement.classList.remove('dark-mode'); settingsThemeButton.textContent = "🌙 Dark Mode"; themeColorMeta.content = '#d81b60'; } }
         function toggleTheme() { const newTheme = bodyElement.classList.contains('dark-mode') ? 'light' : 'dark'; applyTheme(newTheme); saveThemePreference(newTheme); closeAllDropdowns(); }
         function applyPersona(persona, isInitialLoad = false) { currentPersona = persona; if (!chatTitle || !chatInput || !settingsPersonaButton || !mikaWarningPopup || !kanaWarningPopup) { console.warn("Persona UI elements not found."); return; } settingsPersonaButton.textContent = (persona === 'Mika') ? "Switch to Kana" : "Switch to Mika"; const namePlaceholders = document.querySelectorAll('.popup-user-name-placeholder'); namePlaceholders.forEach(span => { span.textContent = sanitizeHTML(currentUserName); }); if (!isAppActive) { updateChatTitle(); updateInputPlaceholder(); } let systemMessageText = ""; if (!isInitialLoad && !isAppActive) { if (persona === 'Kana') { systemMessageText = `Switched to Kana for ${currentUserName}.`; } else { systemMessageText = `Mika is back! Yay! Ready to help, ${currentUserName}! ♡`; } appendMessage('system', systemMessageText); } updateTypingIndicatorText(); savePersonaPreference(persona); console.log(`Applied persona: ${persona}`); }
         function updateTypingIndicatorText() { const indicator = chatLog?.querySelector('.typing-indicator'); if (indicator) { indicator.innerHTML = (currentPersona === 'Kana') ? `Kana is contemplating ${currentUserName}'s request... *sigh*` : `Mika is thinking... *purrrr*`; } const storyStatusArea = document.getElementById('story-status-area'); if (isAppActive && isAssistantTyping && storyStatusArea) { storyStatusArea.textContent = (currentPersona === 'Kana') ? 'Generating narrative...' : 'Mika is weaving the tale... *purrrr*'; } }
 
-        // --- PWA Install ---
+        // --- PWA Install (Unchanged) ---
         function setupInstallPromptHandler() { window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstallPrompt = e; console.log('beforeinstallprompt fired'); if (settingsInstallButton) settingsInstallButton.disabled = false; if (!hasInstallPromptBeenShown() && chatContainer.style.display === 'flex' && !isAppActive) { installPopup.style.display = 'flex'; } else { console.log("Install prompt deferred."); } }); installButton.addEventListener('click', handleManualInstall); installLaterButton.addEventListener('click', () => { installPopup.style.display = 'none'; saveInstallPromptShown(); console.log('Install later.'); }); window.addEventListener('appinstalled', () => { console.log('PWA installed'); installPopup.style.display = 'none'; if (settingsInstallButton) settingsInstallButton.disabled = true; deferredInstallPrompt = null; }); }
         async function handleManualInstall() { if (installPopup.style.display === 'flex') installPopup.style.display = 'none'; closeAllDropdowns(); if (deferredInstallPrompt) { try { deferredInstallPrompt.prompt(); const { outcome } = await deferredInstallPrompt.userChoice; console.log(`Install outcome: ${outcome}`); if (outcome === 'accepted') { if (settingsInstallButton) settingsInstallButton.disabled = true; } saveInstallPromptShown(); } catch (err) { console.error("Install prompt error:", err); appendMessage('system', `Mrow! Install prompt failed... (${currentPersona === 'Kana' ? 'Whatever.' : 'Nyaa!'})`); } } else { console.log("Install prompt not available."); appendMessage('system', `Already installed or not available, ${currentPersona === 'Kana' ? 'obviously' : 'nyaa~'}!`); if (settingsInstallButton) settingsInstallButton.disabled = true; } }
         function registerServiceWorker() { if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').then((reg) => console.log('SW registered:', reg.scope)).catch((err) => console.error('SW registration failed:', err)); } else { console.log("SW not supported."); } }
 
-        // --- Chat UI ---
+        // --- Chat UI (Unchanged) ---
         function appendMessage(sender, message, isHtml = false, imageUrl = null) { if (!chatLog || !chatArea || chatArea.style.display === 'none') { console.log(`Skipped message append for ${sender} because chatArea is hidden.`); return; } const msgId = `msg-${Date.now()}-${Math.random().toString(16).slice(2)}`; const el = document.createElement('p'); el.id = msgId; const contentSpan = document.createElement('span'); contentSpan.className = 'message-content'; const msgText = isHtml ? message : sanitizeHTML(message); if (sender === 'user') { el.className = 'user-message'; contentSpan.innerHTML = `<strong>${sanitizeHTML(currentUserName)}:</strong> ${msgText}`; if (imageUrl && imageUrl !== "[Image Placeholder]") { const img = document.createElement('img'); img.src = imageUrl; img.alt = "Uploaded image"; img.className = "thumbnail"; contentSpan.appendChild(document.createElement('br')); contentSpan.appendChild(img); } else if (imageUrl === "[Image Placeholder]") { const placeholder = document.createElement('em'); placeholder.textContent = ' [Image Attached]'; placeholder.style.fontSize = '0.9em'; contentSpan.appendChild(placeholder); } } else if (sender === 'Mika' || sender === 'Kana') { el.className = 'mika-message'; let proc = msgText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>').replace(/```([\s\S]*?)```/g, (m, p1) => `<pre><code>${sanitizeHTML(p1.trim())}</code></pre>`).replace(/(?<!<br>)\n/g, '<br>'); contentSpan.innerHTML = `<strong>${sender}:</strong> ${proc}`; } else { el.className = 'system-message'; contentSpan.innerHTML = msgText; } el.appendChild(contentSpan); chatLog.appendChild(el); scrollToBottom(); }
         function showTypingIndicator() { if (!chatLog || !chatArea || chatArea.style.display === 'none') return; removeTypingIndicator(); const el = document.createElement('p'); el.className = 'typing-indicator'; el.innerHTML = (currentPersona === 'Kana') ? `Kana is contemplating ${currentUserName}'s request... *sigh*` : `Mika is thinking... *purrrr*`; chatLog.appendChild(el); scrollToBottom(); }
         function removeTypingIndicator() { if (!chatLog || !chatArea || chatArea.style.display === 'none') return; const ind = chatLog.querySelector('.typing-indicator'); if (ind) ind.remove(); }
@@ -437,120 +436,87 @@
         function updateChatTitle() { if (!chatTitle) return; if (isAppActive) { /* Title set by switchToAppView */ } else { chatTitle.textContent = (currentPersona === 'Kana') ? `Kana & ${sanitizeHTML(currentUserName)}` : `Mika & ${sanitizeHTML(currentUserName)}! ♡`; document.title = chatTitle.textContent; } }
         function updateInputPlaceholder() { if (chatInput && !chatInput.disabled) { if (isAppActive) { chatInput.placeholder = `Input for app...`; } else { chatInput.placeholder = (currentPersona === 'Kana') ? `What do you want, ${currentUserName}? Spill it.` : `Ask me anything, ${currentUserName}! ♡`; } } }
 
-        // --- Chat Management ---
+        // --- Chat Management (Unchanged) ---
         function startNewChat(greet = true) { if (isAppActive) { console.warn("Attempted start new chat while app active."); appendMessage('system', `Finish the app or go Home first, ${currentUserName}!`); return; } if (currentChatId && currentChatHistory.length > 0) { allChats[currentChatId] = currentChatHistory; saveAllChats(); } currentChatId = getTimestamp(); currentChatHistory = []; clearChatDisplay(); let welcomeMsg = ""; if (greet) { welcomeMsg = (currentPersona === 'Kana') ? `New chat. Ask your questions, ${currentUserName}.` : `Ready for your homework, ${currentUserName}! Or anything else you wanna talk about~ ♡`; } else { welcomeMsg = `Started a new chat for ${currentUserName}.`; } appendMessage('system', welcomeMsg); removeSelectedImage(); enableChatInput(); updateHistoryDropdown(); console.log(`New chat started: ${currentChatId}`); closeAllDropdowns(); }
         function loadChat(chatId) { switchToChatView(); if (currentChatId && currentChatHistory.length > 0 && currentChatId !== chatId) { allChats[currentChatId] = currentChatHistory; } if (allChats[chatId]) { currentChatId = chatId; currentChatHistory = allChats[chatId]; clearChatDisplay(); const loadMsg = (currentPersona === 'Kana') ? `Loaded chat from ${new Date(parseInt(chatId)).toLocaleString()}. Try to keep up, ${currentUserName}.` : `Loaded chat from ${new Date(parseInt(chatId)).toLocaleString()}. Welcome back, ${currentUserName}! ♡`; appendMessage('system', loadMsg); currentChatHistory.forEach(msg => { let displayMsg = msg.parts.find(p => p.text)?.text || ""; let displayImgPlaceholder = msg.parts.some(p => p.placeholder === "[Image Sent]"); let senderName = (msg.role === 'user') ? 'user' : currentPersona; appendMessage(senderName, displayMsg, false, displayImgPlaceholder ? "[Image Placeholder]" : null); }); removeSelectedImage(); enableChatInput(); console.log(`Loaded chat: ${chatId}`); } else { console.error(`Chat ID ${chatId} not found.`); appendMessage('system', `${currentPersona === 'Kana' ? 'Can\'t find that chat. Idiot.' : 'Mrow! Couldn\'t find that chat, ' + currentUserName + '!'}`); } closeAllDropdowns(); saveAllChats(); }
 
-        // --- Dropdowns ---
+        // --- Dropdowns (Unchanged update logic, uses appsDropdown) ---
         function closeAllDropdowns() { if (historyDropdown) historyDropdown.style.display = 'none'; if (settingsDropdown) settingsDropdown.style.display = 'none'; if (appsDropdown) appsDropdown.style.display = 'none'; }
-        // *** Updated toggleDropdown to use appsDropdown ***
         function toggleDropdown(dd) { const isOpen = dd.style.display === 'block'; closeAllDropdowns(); if (!isOpen) { dd.style.display = 'block'; if (dd === historyDropdown) updateHistoryDropdown(); if (dd === settingsDropdown) updateSettingsDropdown(); if (dd === appsDropdown) updateAppsDropdown(); } }
         function updateHistoryDropdown() { if (!historyDropdown) return; historyDropdown.innerHTML = ''; const ids = Object.keys(allChats).sort((a, b) => b - a); if (ids.length === 0) { const p = document.createElement('p'); p.className = 'no-items'; p.textContent = 'No past chats!'; historyDropdown.appendChild(p); } else { ids.forEach(id => { const chat = allChats[id]; if (chat && chat.length > 0) { const btn = document.createElement('button'); const firstMsg = chat.find(m => m.role === 'user'); const txt = firstMsg?.parts.find(p => p.text)?.text || 'Chat'; const img = firstMsg?.parts.some(p => p.placeholder === "[Image Sent]"); const prev = sanitizeHTML(txt.substring(0, 20)) + (img ? ' [📷]' : '') + '...'; const date = new Date(parseInt(id)).toLocaleString(); btn.textContent = `${date} - ${prev}`; btn.title = `Load: ${date}`; btn.onclick = () => loadChat(id); historyDropdown.appendChild(btn); } }); } if (ids.length > 0) { const delBtn = deleteAllHistoryButtonTemplate.cloneNode(true); delBtn.onclick = deleteAllChats; historyDropdown.appendChild(delBtn); } }
         function updateSettingsDropdown() { if (!settingsInstallButton || !settingsPersonaButton) return; settingsInstallButton.disabled = !deferredInstallPrompt; applyTheme(loadThemePreference() || 'light'); settingsPersonaButton.textContent = (currentPersona === 'Mika') ? "Switch to Kana" : "Switch to Mika"; }
-        // *** Renamed function ***
         function updateAppsDropdown() { /* Placeholder - currently just holds static buttons */ }
 
-        // --- View Switching ---
-        // *** Updated function name and logic for App view ***
+        // --- View Switching (Uses appArea, isAppActive, currentActiveAppModule) ---
         async function switchToChatView() { if (!appArea || !chatArea) return; console.log(`Switching to Chat. isAppActive: ${isAppActive}, currentModule: ${currentActiveAppModule?.constructor?.name}`); if (isAppActive && currentActiveAppModule?.onExit) { console.log("Calling app onExit..."); try { await Promise.race([ currentActiveAppModule.onExit(), new Promise((_, reject) => setTimeout(() => reject(new Error("App onExit timed out")), 2000)) ]); console.log("App onExit completed."); } catch (err) { console.error("App onExit error or timeout:", err); } } else if (isAppActive) { console.warn("App was active but no onExit function found."); } currentActiveAppModule = null; isAppActive = false; appArea.style.display = 'none'; chatArea.style.display = 'flex'; clearAppAreaContent(); console.log("View switched to: Chat"); if (homeButton) { homeButton.textContent = '➕ New Chat'; homeButton.title = 'Start a New Chat'; homeButton.onclick = () => startNewChat(true); } updateChatTitle(); updateInputPlaceholder(); enableChatInput(); if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred install prompt."); installPopup.style.display = 'flex'; } }
-        // *** Updated function name and logic for App view ***
         function switchToAppView(module = null, appTitle = "Running App...") { if (!appArea || !chatArea) return; chatArea.style.display = 'none'; appArea.style.display = 'flex'; isAppActive = true; currentActiveAppModule = module; closeAllDropdowns(); disableChatInput("App Active..."); if (chatTitle) chatTitle.textContent = appTitle; document.title = appTitle; if (installPopup.style.display === 'flex') { installPopup.style.display = 'none'; console.log("Hiding install prompt for app."); } console.log(`View switched to: App (${module?.constructor?.name || 'Unknown'})`); if (homeButton) { homeButton.textContent = '🏠 Home'; homeButton.title = 'Back to Main Chat'; homeButton.onclick = switchToChatView; } }
 
         // --- App Loading ---
-        // *** Updated function name and parameter ***
         function setupAppAreaBase(titleText) { if (!appArea) return null; clearAppAreaContent(); return appArea; }
-        // *** Updated displayAppMessage, app-message-log ID, and log creation ***
+        // displayAppMessage uses app-message-log ID
         function displayAppMessage(sender, text) {
             let log = null;
-            // Diary uses its own internal log display method
             if (currentActiveAppModule === MikaDiary && document.getElementById('diary-chat-log')) { MikaDiary.appendDiaryMessage(sender, text); return; }
             else { log = document.getElementById('app-message-log'); }
 
-            // Create the shared log if it doesn't exist for non-Diary/Story/Chore apps
-            if (!log && currentActiveAppModule !== MikaDiary && currentActiveAppModule !== StoryTime && currentActiveAppModule !== ChoreHelper) {
-                console.warn("Shared app message log not found, creating.");
-                log = document.createElement('div');
-                log.id = 'app-message-log'; // *** UPDATED ID ***
-                log.style.cssText = `width: calc(100% - 20px); max-width: 600px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin: 10px auto 10px auto; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0;`;
-                const backButton = appArea.querySelector('#back-to-chat-button'); // Find existing back button
-                if(backButton) { appArea.insertBefore(log, backButton); } // Insert log before back button
-                else { appArea.appendChild(log); } // Append if no back button found yet
-            }
-            // Skip log append for Story/Chore system messages handled elsewhere
-            else if (!log && (currentActiveAppModule === StoryTime || currentActiveAppModule === ChoreHelper)) {
-                console.log("Skipping displayAppMessage for Story/Chore module system message."); return;
-            }
+            if (!log && currentActiveAppModule !== MikaDiary && currentActiveAppModule !== StoryTime && currentActiveAppModule !== ChoreHelper && currentActiveAppModule !== PeriodTracker) { console.warn("Shared app message log not found, creating."); log = document.createElement('div'); log.id = 'app-message-log'; log.style.cssText = `width: calc(100% - 20px); max-width: 600px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin: 10px auto 10px auto; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0;`; const backButton = appArea.querySelector('#back-to-chat-button'); if(backButton) { appArea.insertBefore(log, backButton); } else { appArea.appendChild(log); } }
+            else if (!log && (currentActiveAppModule === StoryTime || currentActiveAppModule === ChoreHelper || currentActiveAppModule === PeriodTracker)) { console.log("Skipping displayAppMessage for Story/Chore/Tracker module system message."); return; }
 
             if (!log) { console.warn("App message target log still not found for:", sender); return; }
-            if (log.id === 'app-message-log') { log.style.display = 'block'; } // Ensure it's visible
+            if (log.id === 'app-message-log') { log.style.display = 'block'; }
 
-            // Append message logic (remains mostly the same, uses gamemsg classes)
             const el = document.createElement('p'); let msg = sanitizeHTML(text); let css = 'system-gamemsg'; const userNameForDisplay = sanitizeHTML(currentUserName);
             if (sender === 'Mika' || sender === 'Kana') { css = 'mika-gamemsg'; msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); el.innerHTML = `<strong>${sender}:</strong> ${msg}`; }
             else if (sender === 'User') { css = 'user-gamemsg'; el.innerHTML = `<strong>${userNameForDisplay}:</strong> ${msg}`; }
             else { css = 'system-gamemsg'; el.innerHTML = msg; }
             el.className = css; log.appendChild(el); setTimeout(() => { if(log) log.scrollTop = log.scrollHeight; }, 50);
         }
-        // *** Updated callMikaApiForApp function name ***
+        // callMikaApiForApp (not used by Tracker, but passed for consistency)
         async function callMikaApiForApp(prompt, context = []) { if (!currentApiKey) { displayAppMessage('System', 'Error: API Key missing!'); return Promise.reject("API Key missing!"); } const user = currentUserName || "User"; console.log(`API app call (${currentPersona} for ${user}): ${prompt.substring(0,60)}...`); try { const resp = await sendMessageToMika(prompt, context, currentApiKey, user, currentPersona); return (typeof resp === 'string' && resp.trim()) ? resp : null; } catch (err) { console.error("API app error:", err); displayAppMessage('System', `API Error: ${err}`); return Promise.reject(`API error: ${err}`); } }
 
-        // --- **UPDATED** Load Specific Apps (Layout Fix, function names, use displayAppMessage/callMikaApiForApp) ---
+        // --- Load Specific Apps ---
+        // (Load functions for TTT, RPS, GTN, 20Q, Diary, StoryTime, Chores remain the same, using App terminology)
          function loadTicTacToe() { const module = TicTacToe; const appTitle = "Tic-Tac-Toe"; switchToAppView(module, appTitle); const container = setupAppAreaBase(); if (container && module?.init) { const uiWrapper = document.createElement('div'); uiWrapper.style.cssText=`display: flex; flex-direction: column; align-items: center; width:100%; flex-grow:1; justify-content:center;`; const boardElement = document.createElement('div'); boardElement.id = 'ttt-board'; uiWrapper.appendChild(boardElement); const resetButton = document.createElement('button'); resetButton.textContent = "New Game!"; resetButton.id = 'ttt-reset-button'; uiWrapper.appendChild(resetButton); container.appendChild(uiWrapper); const appLog = document.createElement('div'); appLog.id = 'app-message-log'; appLog.style.display = 'none'; container.appendChild(appLog); const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat'; backBtn.onclick = switchToChatView; container.appendChild(backBtn); module.init(boardElement, displayAppMessage, currentUserName, currentPersona); const createdResetButton = container.querySelector('#ttt-reset-button'); if (createdResetButton && module.resetGame) { createdResetButton.onclick = module.resetGame; } else if (!createdResetButton && module.resetGame){ const internalReset = document.getElementById('ttt-reset-button'); if(internalReset) internalReset.onclick = module.resetGame; } } else { console.error("TTT load fail"); switchToChatView(); appendMessage('system', 'Mrow! TTT failed...'); } }
          function loadRPS() { const module = RockPaperScissors; const appTitle = "Rock Paper Scissors!"; switchToAppView(module, appTitle); const container = setupAppAreaBase(); if (container && module?.init) { const uiWrapper = document.createElement('div'); uiWrapper.style.cssText=`display: flex; flex-direction: column; align-items: center; width:100%; flex-grow:1; justify-content:center;`; const uiArea = document.createElement('div'); uiArea.id = 'rps-ui-area'; uiWrapper.appendChild(uiArea); container.appendChild(uiWrapper); const appLog = document.createElement('div'); appLog.id = 'app-message-log'; appLog.style.display = 'none'; container.appendChild(appLog); const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat'; backBtn.onclick = switchToChatView; container.appendChild(backBtn); module.init(uiArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("RPS load fail"); switchToChatView(); appendMessage('system', 'Mrow! RPS failed...'); } }
          function loadGuessTheNumber() { const module = GuessTheNumber; const appTitle = "Guess The Number"; switchToAppView(module, appTitle); const container = setupAppAreaBase(); if (container && module?.init) { const uiWrapper = document.createElement('div'); uiWrapper.style.cssText=`display: flex; flex-direction: column; align-items: center; width:100%; flex-grow:1; justify-content:center;`; const uiArea = document.createElement('div'); uiArea.id = 'gtn-ui-area'; uiWrapper.appendChild(uiArea); container.appendChild(uiWrapper); const appLog = document.createElement('div'); appLog.id = 'app-message-log'; appLog.style.display = 'none'; container.appendChild(appLog); const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat'; backBtn.onclick = switchToChatView; container.appendChild(backBtn); module.init(uiArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("GTN load fail"); switchToChatView(); appendMessage('system', 'Mrow! GTN failed...'); } }
          function loadTwentyQuestions() { const module = TwentyQuestions; const appTitle = "20 Questions"; switchToAppView(module, appTitle); const container = setupAppAreaBase(); if (container && module?.init) { const uiWrapper = document.createElement('div'); uiWrapper.style.cssText=`display: flex; flex-direction: column; align-items: center; width:100%; flex-grow:1; justify-content:center;`; const uiArea = document.createElement('div'); uiArea.id = 'tq-ui-area'; uiWrapper.appendChild(uiArea); container.appendChild(uiWrapper); const appLog = document.createElement('div'); appLog.id = 'app-message-log'; appLog.style.display = 'none'; container.appendChild(appLog); const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat'; backBtn.onclick = switchToChatView; container.appendChild(backBtn); module.init(uiArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("20Q load fail"); switchToChatView(); appendMessage('system', 'Mrow! 20Q failed...'); } }
-         function loadDiary() { const module = MikaDiary; const appTitle = "Secret Diary ♡"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); /* Note: Diary uses its own message display inside */ } else { console.error("Diary load fail"); switchToChatView(); appendMessage('system', 'Mrow! Diary failed...'); } }
-         function loadStoryTime() { const module = StoryTime; const appTitle = "Story Time 📖"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); /* Note: StoryTime primarily uses its internal display */ } else { console.error("StoryTime load fail"); switchToChatView(); appendMessage('system', 'Mrow! Story Time failed...'); } }
-         function loadChores() { const module = ChoreHelper; const appTitle = "Chore Helper 🎀"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); /* Note: Chores mostly uses its internal display */ } else { console.error("Chore Helper load fail"); switchToChatView(); appendMessage('system', `${currentPersona === 'Kana' ? 'Chore module failed.' : 'Mrow! Chore Helper failed...'}`); } }
-         // *** Updated function name ***
+         function loadDiary() { const module = MikaDiary; const appTitle = "Secret Diary ♡"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("Diary load fail"); switchToChatView(); appendMessage('system', 'Mrow! Diary failed...'); } }
+         function loadStoryTime() { const module = StoryTime; const appTitle = "Story Time 📖"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("StoryTime load fail"); switchToChatView(); appendMessage('system', 'Mrow! Story Time failed...'); } }
+         function loadChores() { const module = ChoreHelper; const appTitle = "Chore Helper 🎀"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("Chore Helper load fail"); switchToChatView(); appendMessage('system', `${currentPersona === 'Kana' ? 'Chore module failed.' : 'Mrow! Chore Helper failed...'}`); } }
+         // *** NEW FUNCTION TO LOAD TRACKER ***
+         function loadPeriodTracker() {
+            const module = PeriodTracker;
+            const appTitle = "Cycle Tracker 🌸";
+            switchToAppView(module, appTitle);
+            if (appArea && module?.init) {
+                // Pass null for apiCaller as Tracker doesn't use it
+                module.init(appArea, displayAppMessage, null, currentUserName, currentPersona);
+            } else {
+                console.error("Period Tracker load fail");
+                switchToChatView();
+                appendMessage('system', 'Mrow! Period Tracker failed...');
+            }
+         }
          function clearAppAreaContent() { if (appArea) appArea.innerHTML = ''; }
 
-        // --- Image Handling ---
-        // **UPDATED** handleImageSelection calls resizer
-        function handleImageSelection(event) {
-            const file = event.target.files[0];
-            if (imageUploadInput) { imageUploadInput.removeAttribute('capture'); imageUploadInput.value = null; /* CRITICAL: Reset input value */ }
-            if (!file) { removeSelectedImage(); return; }
-            if (!file.type.startsWith('image/')) { appendMessage('system', `${currentPersona === 'Kana' ? 'That\'s not an image.' : 'Mrow! Not an image file, ' + currentUserName + '!'}`); removeSelectedImage(); return; }
-            _resizeAndPreviewImage(file); // Call resizer
-        }
-        // **NEW** Resizer function
-        function _resizeAndPreviewImage(file) {
-            const MAX_WIDTH = 1024; const MAX_HEIGHT = 1024; const MIME_TYPE = "image/jpeg"; const QUALITY = 0.8;
-            const blobURL = URL.createObjectURL(file); const img = new Image();
-            img.onload = () => {
-                URL.revokeObjectURL(blobURL); let width = img.width; let height = img.height;
-                if (width > height) { if (width > MAX_WIDTH) { height = Math.round(height * MAX_WIDTH / width); width = MAX_WIDTH; } }
-                else { if (height > MAX_HEIGHT) { width = Math.round(width * MAX_HEIGHT / height); height = MAX_HEIGHT; } }
-                const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
-                const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
-                const resizedDataUrl = canvas.toDataURL(MIME_TYPE, QUALITY);
-                console.log(`Image resized to ${width}x${height}, New size approx: ${Math.round(resizedDataUrl.length * 3/4 / 1024)} KB`);
-                if (imagePreview) imagePreview.src = resizedDataUrl;
-                if (imagePreviewArea) imagePreviewArea.style.display = 'inline-block';
-                selectedImageData = resizedDataUrl.split(',')[1]; selectedImageMimeType = MIME_TYPE;
-                enableChatInput();
-            };
-            img.onerror = (e) => { URL.revokeObjectURL(blobURL); console.error("Image loading error for resizing:", e); appendMessage('system', `${currentPersona === 'Kana' ? 'Couldn\'t process that image.' : 'Meeeow! Error reading the picture for resizing, ' + currentUserName + '...'}`); removeSelectedImage(); };
-            img.src = blobURL;
-        }
+        // --- Image Handling (Unchanged) ---
+        function handleImageSelection(event) { const file = event.target.files[0]; if (imageUploadInput) { imageUploadInput.removeAttribute('capture'); imageUploadInput.value = null; } if (!file) { removeSelectedImage(); return; } if (!file.type.startsWith('image/')) { appendMessage('system', `${currentPersona === 'Kana' ? 'That\'s not an image.' : 'Mrow! Not an image file, ' + currentUserName + '!'}`); removeSelectedImage(); return; } _resizeAndPreviewImage(file); }
+        function _resizeAndPreviewImage(file) { const MAX_WIDTH = 1024; const MAX_HEIGHT = 1024; const MIME_TYPE = "image/jpeg"; const QUALITY = 0.8; const blobURL = URL.createObjectURL(file); const img = new Image(); img.onload = () => { URL.revokeObjectURL(blobURL); let width = img.width; let height = img.height; if (width > height) { if (width > MAX_WIDTH) { height = Math.round(height * MAX_WIDTH / width); width = MAX_WIDTH; } } else { if (height > MAX_HEIGHT) { width = Math.round(width * MAX_HEIGHT / height); height = MAX_HEIGHT; } } const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height); const resizedDataUrl = canvas.toDataURL(MIME_TYPE, QUALITY); console.log(`Image resized to ${width}x${height}, New size approx: ${Math.round(resizedDataUrl.length * 3/4 / 1024)} KB`); if (imagePreview) imagePreview.src = resizedDataUrl; if (imagePreviewArea) imagePreviewArea.style.display = 'inline-block'; selectedImageData = resizedDataUrl.split(',')[1]; selectedImageMimeType = MIME_TYPE; enableChatInput(); }; img.onerror = (e) => { URL.revokeObjectURL(blobURL); console.error("Image loading error for resizing:", e); appendMessage('system', `${currentPersona === 'Kana' ? 'Couldn\'t process that image.' : 'Meeeow! Error reading the picture for resizing, ' + currentUserName + '...'}`); removeSelectedImage(); }; img.src = blobURL; }
         function removeSelectedImage() { selectedImageData = null; selectedImageMimeType = null; if (imageUploadInput) imageUploadInput.value = null; if (imagePreviewArea) imagePreviewArea.style.display = 'none'; if (imagePreview) imagePreview.src = '#'; enableChatInput(); console.log("Image removed."); }
 
-        // --- API Call & Message Handling ---
-        // *** Updated handleSendMessage to check isAppActive ***
+        // --- API Call & Message Handling (Unchanged) ---
         async function handleSendMessage() { if (isAppActive || isAssistantTyping || !currentApiKey) return; const userInputText = chatInput.value.trim(); const hasTxt = userInputText.length > 0; const hasImg = !!selectedImageData; if (!hasTxt && !hasImg) return; let roleInstruction = ""; if (!isAppActive) { if (currentPersona === 'Mika') { roleInstruction = `[ROLE: You are Mika, acting as a helpful assistant for ${currentUserName}. Focus on assisting with their request (likely homework help), but maintain your bubbly, playful, teasing, and possessive catgirl personality described in the system prompt. Use cute cat noises and actions. Address the user as '${currentUserName}'. Keep responses helpful but fun.]\n\n`; } else { roleInstruction = `[ROLE: You are Kana, acting as a sarcastic assistant for ${currentUserName}. Assist them with their request (likely homework help) in your characteristic sly, witty, and begrudging manner described in the system prompt. Address the user as '${currentUserName}' or a sarcastic nickname. Keep responses sharp and concise.]\n\n`; } } const messageToSend = roleInstruction + userInputText; const imgData = selectedImageData; const imgMime = selectedImageMimeType; const imgPreviewUrl = hasImg ? imagePreview.src : null; removeSelectedImage(); appendMessage('user', userInputText || "[Image Attached]", false, imgPreviewUrl); const userParts = []; if (hasTxt) userParts.push({ text: userInputText }); if (hasImg) userParts.push({ placeholder: "[Image Sent]", mimeType: imgMime }); currentChatHistory.push({ role: 'user', parts: userParts }); chatInput.value = ''; isAssistantTyping = true; disableChatInput(); showTypingIndicator(); const historyContext = currentChatHistory.slice(0, -1).map(msg => ({ role: msg.role, parts: msg.parts.filter(p => p.text).map(p => ({ text: p.text })) })).filter(msg => msg.parts.length > 0); const trimmedHistoryContext = historyContext.length > MAX_HISTORY_LENGTH ? historyContext.slice(-MAX_HISTORY_LENGTH) : historyContext; if (historyContext.length > MAX_HISTORY_LENGTH) { console.log("Chat history pruned for API context."); } try { const userForApi = currentUserName || "User"; const resp = await sendMessageToMika(messageToSend, trimmedHistoryContext, currentApiKey, userForApi, currentPersona, imgData, imgMime); removeTypingIndicator(); appendMessage(currentPersona, resp); currentChatHistory.push({ role: 'model', parts: [{ text: resp }] }); saveAllChats(); } catch (err) { console.error("Send error:", err); removeTypingIndicator(); const errorMsg = err.message || `${currentPersona === 'Kana' ? 'Connection error. Whatever.' : 'Mrow! Error talking, ' + currentUserName + '...'}`; appendMessage('system', errorMsg); } finally { isAssistantTyping = false; if (currentApiKey) enableChatInput(); else disableChatInput("API Key needed!"); } }
 
-        // --- Initialization Flow ---
-        // *** Updated proceedToChat to check appArea and isAppActive ***
+        // --- Initialization Flow (Unchanged) ---
         function proceedToChat() { if (!chatContainer) return; chatContainer.style.display = 'flex'; chatArea.style.display = 'flex'; appArea.style.display = 'none'; isAppActive = false; currentActiveAppModule = null; if (homeButton) { homeButton.textContent = '➕ New Chat'; homeButton.title = 'Start a New Chat'; homeButton.onclick = () => startNewChat(true); } const chatId = loadAllChats(); if (chatId) { loadChat(chatId); } else { clearChatDisplay(); const welcomeMsg = (currentPersona === 'Kana') ? `Ready when you are, ${currentUserName}. What homework have you got?` : `Ready for your homework, ${currentUserName}! Ask me anything! ♡`; appendMessage('system', welcomeMsg); enableChatInput(); } updateChatTitle(); updateInputPlaceholder(); updateHistoryDropdown(); if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred install prompt."); installPopup.style.display = 'flex'; } }
         function checkNameAndProceed() { const name = loadUserName(); if (name) { currentUserName = name; if (namePopup) namePopup.style.display = 'none'; applyPersona(currentPersona, true); checkApiKeyAndProceed(); } else { if (namePopup && nameInput) { if(apiKeyPopup) apiKeyPopup.style.display = 'none'; if(disclaimerPopup) disclaimerPopup.style.display = 'none'; nameInput.value = "Study Buddy"; namePopup.style.display = 'flex'; nameInput.focus(); nameInput.select(); } } }
         function checkApiKeyAndProceed() { const key = loadApiKey(); if (key) { currentApiKey = key; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; proceedToChat(); } else { if (apiKeyPopup && chatContainer && apiKeyInput) { if (namePopup) namePopup.style.display = 'none'; if(disclaimerPopup) disclaimerPopup.style.display = 'none'; chatContainer.style.display = 'none'; apiKeyPopup.style.display = 'flex'; disableChatInput("API Key needed!"); apiKeyInput.focus(); } } }
-        // *** Updated initializeApp to check appArea ***
         function initializeApp() { console.log("Initializing App..."); registerServiceWorker(); setupInstallPromptHandler(); const theme = loadThemePreference(); applyTheme(theme || 'light'); currentPersona = loadPersonaPreference() || 'Mika'; if (hasAgreedToDisclaimer()) { console.log("Disclaimer agreed."); checkNameAndProceed(); } else { console.log("Showing disclaimer."); if (disclaimerPopup) disclaimerPopup.style.display = 'flex'; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; if (namePopup) namePopup.style.display = 'none'; if (chatContainer) chatContainer.style.display = 'none'; if (appArea) appArea.style.display = 'none'; if (chatArea) chatArea.style.display = 'none'; } updateChatTitle(); updateInputPlaceholder(); }
 
 
         // --- Event Listeners ---
-        if (settingsResetButton) settingsResetButton.addEventListener('click', () => { closeAllDropdowns(); const confirmMsg = `⚠️ Reset ALL Settings for ${currentUserName}? Clears API Key, Name, Persona, Disclaimer, Theme, Install status, All Chats, AND All Chores/Diary/Stories & reloads. Sure, ${currentUserName}?!`; if (confirm(confirmMsg)) { console.log("Resetting all application data..."); clearApiKey(); clearUserName(); clearPersonaPreference(); clearDisclaimerAgreement(); clearInstallPromptShown(); clearThemePreference(); clearFromLocalStorage('mikaHelper_allChats'); clearFromLocalStorage('mikaChores_list_v1'); clearFromLocalStorage('mikaChores_balance_v1'); clearFromLocalStorage('mikaChores_history_v1'); clearFromLocalStorage('mikaChores_pinHash_v1'); clearFromLocalStorage('mikaChores_lastDay_v1'); clearFromLocalStorage('mikaStoryLibrary_v1'); clearFromLocalStorage('mikaDiaryEntries_v1'); window.location.reload(); } });
+        // Reset listener updated to clear tracker data
+        if (settingsResetButton) settingsResetButton.addEventListener('click', () => { closeAllDropdowns(); const confirmMsg = `⚠️ Reset ALL Settings for ${currentUserName}? Clears API Key, Name, Persona, Disclaimer, Theme, Install status, All Chats, AND All Chores/Diary/Stories/Tracker Data & reloads. Sure, ${currentUserName}?!`; if (confirm(confirmMsg)) { console.log("Resetting all application data..."); clearApiKey(); clearUserName(); clearPersonaPreference(); clearDisclaimerAgreement(); clearInstallPromptShown(); clearThemePreference(); clearFromLocalStorage('mikaHelper_allChats'); clearFromLocalStorage('mikaChores_list_v1'); clearFromLocalStorage('mikaChores_balance_v1'); clearFromLocalStorage('mikaChores_history_v1'); clearFromLocalStorage('mikaChores_pinHash_v1'); clearFromLocalStorage('mikaChores_lastDay_v1'); clearFromLocalStorage('mikaStoryLibrary_v1'); clearFromLocalStorage('mikaDiaryEntries_v1'); clearFromLocalStorage('mikaPeriodTrackerData_v1'); /* <-- CLEAR TRACKER DATA */ window.location.reload(); } });
         if (disclaimerAgreeButton) disclaimerAgreeButton.addEventListener('click', () => { saveDisclaimerAgreement(); disclaimerPopup.style.display = 'none'; checkNameAndProceed(); });
         if (saveApiKeyButton) saveApiKeyButton.addEventListener('click', () => { if (!apiKeyInput) return; const key = apiKeyInput.value.trim(); if (key) { if (saveApiKey(key)) { currentApiKey = key; apiKeyPopup.style.display = 'none'; apiKeyError.style.display = 'none'; proceedToChat(); } else { apiKeyError.textContent = "Save failed?"; apiKeyError.style.display = 'block'; } } else { apiKeyError.textContent = "Key needed!"; apiKeyError.style.display = 'block'; } });
         if (apiKeyInput) apiKeyInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveApiKeyButton?.click(); if (apiKeyError) apiKeyError.style.display = 'none'; });
@@ -558,17 +524,16 @@
         if (nameInput) nameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveNameButton?.click(); if (nameError) nameError.style.display = 'none'; });
         if (sendButton) sendButton.addEventListener('click', handleSendMessage);
         if (chatInput) { chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }); chatInput.addEventListener('input', enableChatInput); }
-        // Image/Camera Button Listeners
+        // Image/Camera Button Listeners (Unchanged)
         if (imageUploadButton) { imageUploadButton.addEventListener('click', () => { if (imageUploadInput) { imageUploadInput.removeAttribute('capture'); imageUploadInput.accept = 'image/*'; imageUploadInput.click(); } }); }
         if (cameraButton) { cameraButton.addEventListener('click', () => { if (imageUploadInput) { imageUploadInput.setAttribute('capture', 'environment'); imageUploadInput.accept = 'image/*'; imageUploadInput.click(); } }); }
         if (imageUploadInput) imageUploadInput.addEventListener('change', handleImageSelection);
         if (removeImageButton) removeImageButton.addEventListener('click', removeSelectedImage);
         // Header Buttons
         if (historyButton) historyButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(historyDropdown); });
-        // *** Updated listener for appsButton ***
         if (appsButton) appsButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(appsDropdown); });
         if (settingsButton) settingsButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(settingsDropdown); });
-        // App Listeners (using updated IDs)
+        // App Listeners
         if (appTttButton) appTttButton.addEventListener('click', () => { closeAllDropdowns(); loadTicTacToe(); });
         if (appRpsButton) appRpsButton.addEventListener('click', () => { closeAllDropdowns(); loadRPS(); });
         if (appGtnButton) appGtnButton.addEventListener('click', () => { closeAllDropdowns(); loadGuessTheNumber(); });
@@ -576,17 +541,19 @@
         if (appDiaryButton) appDiaryButton.addEventListener('click', () => { closeAllDropdowns(); loadDiary(); });
         if (appStoryButton) appStoryButton.addEventListener('click', () => { closeAllDropdowns(); loadStoryTime(); });
         if (appChoresButton) appChoresButton.addEventListener('click', () => { closeAllDropdowns(); loadChores(); });
-        // Settings Listeners
+        // *** ADD TRACKER BUTTON LISTENER ***
+        if (appTrackerButton) appTrackerButton.addEventListener('click', () => { closeAllDropdowns(); loadPeriodTracker(); });
+        // Settings Listeners (Unchanged)
         if (settingsInstallButton) settingsInstallButton.addEventListener('click', handleManualInstall);
         if (settingsThemeButton) settingsThemeButton.addEventListener('click', toggleTheme);
         if (settingsPersonaButton) settingsPersonaButton.addEventListener('click', (e) => { e.stopPropagation(); closeAllDropdowns(); applyPersona(currentPersona, true); if (currentPersona === 'Mika') { if(kanaWarningPopup) kanaWarningPopup.style.display = 'flex'; } else { if(mikaWarningPopup) mikaWarningPopup.style.display = 'flex'; } });
-        // Persona Popup Button Listeners
+        // Persona Popup Button Listeners (Unchanged)
         if (kanaSwitchConfirmButton) kanaSwitchConfirmButton.addEventListener('click', () => { if (kanaWarningPopup) kanaWarningPopup.style.display = 'none'; applyPersona('Kana'); closeAllDropdowns(); });
         if (kanaSwitchCancelButton) kanaSwitchCancelButton.addEventListener('click', () => { if (kanaWarningPopup) kanaWarningPopup.style.display = 'none'; closeAllDropdowns(); });
         if (mikaSwitchConfirmButton) mikaSwitchConfirmButton.addEventListener('click', () => { if (mikaWarningPopup) mikaWarningPopup.style.display = 'none'; applyPersona('Mika'); closeAllDropdowns(); });
         if (mikaSwitchCancelButton) mikaSwitchCancelButton.addEventListener('click', () => { if (mikaWarningPopup) mikaWarningPopup.style.display = 'none'; closeAllDropdowns(); });
 
-        // Close dropdowns on outside click (*** Updated to check appsDropdown ***)
+        // Close dropdowns on outside click (Unchanged)
         document.addEventListener('click', (e) => { if (historyDropdown?.style.display === 'block' && !historyDropdown.contains(e.target) && e.target !== historyButton) historyDropdown.style.display = 'none'; if (settingsDropdown?.style.display === 'block' && !settingsDropdown.contains(e.target) && e.target !== settingsButton) settingsDropdown.style.display = 'none'; if (appsDropdown?.style.display === 'block' && !appsDropdown.contains(e.target) && e.target !== appsButton) appsDropdown.style.display = 'none'; });
 
         // --- Start the App ---
