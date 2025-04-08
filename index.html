@@ -120,7 +120,7 @@
         #send-button:disabled { background: #666; cursor: not-allowed; transform: none; opacity: 0.6; }
         /* App Area Styles */
         #app-area { display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px; width: 100%; height: 100%; box-sizing: border-box; overflow: hidden; background-color: var(--chat-bg); color: var(--chat-text); }
-        /* App Styles (TTT, RPS, GTN, 20Q, Diary, StoryTime, Chores, Tracker, Horoscope, RPG, Jetpack) */
+        /* App Styles (TTT, RPS, GTN, 20Q, Diary, StoryTime, Chores, Tracker, Horoscope, RPG, Jetpack, ComicStrip) */
         /* ... TTT Styles ... */
         #ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 240px; height: 240px; margin: 10px auto; border: 3px solid var(--game-board-border); border-radius: 8px; background-color: var(--game-board-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); flex-shrink: 0; }
         .ttt-cell { border: 1px solid var(--game-cell-border); display: flex; justify-content: center; align-items: center; font-size: 2.5em; font-weight: bold; cursor: pointer; color: var(--game-cell-text); transition: background-color 0.2s, color 0.2s; user-select: none; }
@@ -234,7 +234,20 @@
         /* ... Jetpack Styles ... */
         #jetpack-commentary { min-height: 1.4em; height: auto; text-align: center; font-style: italic; font-size: 0.85em; color: var(--mika-message-name); padding: 3px 0; margin-bottom: 5px; overflow: hidden; opacity: 1; transition: opacity 0.5s ease-out; flex-shrink: 0; }
         #jetpack-game-iframe { width: 100%; height: calc(100% - 65px); border: none; flex-grow: 1; }
-
+        /* ... Comic Strip Styles ... */
+        #comic-main-view { display: flex; flex-direction: column; align-items: center; padding: 10px; box-sizing: border-box; height: 100%; width: 100%; }
+        #comic-controls { margin-bottom: 10px; text-align: center; }
+        #comic-loading { font-style: italic; color: var(--typing-indicator-text); margin-bottom: 10px; }
+        #comic-display-area { display: flex; justify-content: space-around; align-items: flex-start; width: 100%; max-width: 700px; flex-grow: 1; overflow-x: auto; overflow-y: hidden; padding-bottom: 10px; /* Space for scrollbar if needed */ }
+        .comic-panel { width: 30%; border: 1px solid var(--chat-input-border); border-radius: 5px; background-color: rgba(255, 255, 255, 0.05); padding: 8px; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; margin: 0 5px; }
+        .comic-panel pre { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; font-size: 0.8em; line-height: 1.1; margin: 0 0 5px 0; white-space: pre; overflow-x: auto; /* In case ASCII is too wide */ color: var(--chat-text); background-color: var(--game-board-bg); padding: 5px; border-radius: 3px; width: 100%; box-sizing: border-box; }
+        .comic-panel p { font-size: 0.85em; margin: 0; color: var(--chat-log-text); flex-grow: 1; width: 100%; }
+        #comic-history-view { padding: 15px; box-sizing: border-box; height: 100%; overflow-y: auto; }
+        #comic-history-list { margin-top: 10px; }
+        .comic-history-item { background-color: rgba(255, 255, 255, 0.05); border: 1px solid var(--chat-input-border); padding: 8px 12px; margin-bottom: 8px; border-radius: 8px; cursor: pointer; transition: background-color 0.2s ease; display: flex; justify-content: space-between; font-size: 0.9em; }
+        .comic-history-item:hover { background-color: rgba(255, 255, 255, 0.1); }
+        .comic-history-item span:first-child { color: var(--chat-text); }
+        .comic-history-item span:last-child { color: var(--system-message-text); font-size: 0.9em; }
 
         /* Shared App Message Log */
         #app-message-log { width: calc(100% - 20px); max-width: 600px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin: 10px auto 10px auto; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0; display: none; }
@@ -303,6 +316,11 @@
               /* Responsive Jetpack */
              #jetpack-commentary { font-size: 0.8em; min-height: 1.3em; }
              #jetpack-game-iframe { height: calc(100% - 55px); /* Adjust height slightly for smaller screens */ }
+             /* Responsive Comic */
+             #comic-display-area { flex-direction: column; align-items: center; overflow-x: hidden; overflow-y: auto; }
+             .comic-panel { width: 90%; margin-bottom: 10px; }
+             .comic-panel pre { font-size: 0.75em; }
+             .comic-panel p { font-size: 0.8em; }
         }
     </style>
 </head>
@@ -334,9 +352,10 @@
                 <button id="app-tracker-button" title="Open Cycle Tracker">Cycle Tracker 🌸</button>
                 <button id="app-horoscope-button" title="Daily Horoscope">Horoscope ✨</button>
                 <button id="app-rpg-button" title="Start RPG Adventure!">RPG Adventure 🎲</button>
-                <!-- *** NEW JETPACK BUTTON *** -->
                 <button id="app-jetpack-button" title="Play Kitty Jet Pack!">Jetpack 🚀</button>
-                <!-- *** END NEW BUTTON *** -->
+                 <!-- *** NEW COMIC BUTTON *** -->
+                <button id="app-comic-button" title="Get a Daily Comic Strip!">Comic Strip 😂</button>
+                 <!-- *** END NEW BUTTON *** -->
                 <button id="app-ttt-button" title="Play Tic-Tac-Toe!">Tic-Tac-Toe ♡</button>
                 <button id="app-rps-button" title="Play Rock Paper Scissors!">Rock Paper Scissors!</button>
                 <button id="app-gtn-button" title="Play Guess The Number!">Guess The Number~</button>
@@ -384,14 +403,15 @@
     <script src="tracker.js"></script>
     <script src="horoscope.js"></script>
     <script src="rpg.js"></script>
-    <!-- *** INCLUDE NEW JETPACK SCRIPT *** -->
     <script src="jetpack.js"></script>
+    <!-- *** INCLUDE NEW COMIC SCRIPT *** -->
+    <script src="comicstrip.js"></script>
     <!-- Include API script -->
     <script src="api.js"></script>
 
     <!-- Main Application Logic -->
     <script>
-        // Nyaa~! Mika & Kana's Helper & Fun Time App! ♡ (With Camera, Chores, Tracker, Horoscope, RPG & Jetpack!)
+        // Nyaa~! Mika & Kana's Helper & Fun Time App! ♡ (With Camera, Chores, Tracker, Horoscope, RPG, Jetpack, & Comic!)
 
         // --- DOM Elements ---
         const bodyElement = document.body; const themeColorMeta = document.getElementById('theme-color-meta');
@@ -419,8 +439,9 @@
         const appTrackerButton = document.getElementById('app-tracker-button');
         const appHoroscopeButton = document.getElementById('app-horoscope-button');
         const appRpgButton = document.getElementById('app-rpg-button');
-        // *** ADD JETPACK BUTTON REF ***
         const appJetpackButton = document.getElementById('app-jetpack-button');
+        // *** ADD COMIC BUTTON REF ***
+        const appComicButton = document.getElementById('app-comic-button');
         const settingsInstallButton = document.getElementById('settings-install-button'); const settingsThemeButton = document.getElementById('settings-theme-button'); const settingsPersonaButton = document.getElementById('settings-persona-button'); const settingsResetButton = document.getElementById('settings-reset-button');
         const imageUploadInput = document.getElementById('image-upload-input'); const imageUploadButton = document.getElementById('image-upload-button'); const cameraButton = document.getElementById('camera-button'); const imagePreviewArea = document.getElementById('image-preview-area'); const imagePreview = document.getElementById('image-preview'); const removeImageButton = document.getElementById('remove-image-button');
         const deleteAllHistoryButtonTemplate = document.createElement('button'); deleteAllHistoryButtonTemplate.className = 'delete-history'; deleteAllHistoryButtonTemplate.textContent = 'Delete ALL History'; deleteAllHistoryButtonTemplate.title = 'Permanently delete all saved chats!';
@@ -492,7 +513,7 @@
         function setupAppAreaBase(titleText) { if (!appArea) return null; clearAppAreaContent(); return appArea; }
         function displayAppMessage(sender, text) {
             // Skip message display for specific apps handled internally or don't need it
-            const noLogModules = [MikaDiary, StoryTime, ChoreHelper, PeriodTracker, HoroscopeApp, RpgApp, JetpackGame];
+            const noLogModules = [MikaDiary, StoryTime, ChoreHelper, PeriodTracker, HoroscopeApp, RpgApp, JetpackGame, ComicStripApp]; // Added ComicStripApp
             if (noLogModules.some(mod => currentActiveAppModule === mod)) {
                 console.log(`Skipping displayAppMessage for ${sender} in ${currentActiveAppModule?.constructor?.name || 'current app'}.`);
                 return;
@@ -530,18 +551,19 @@
          function loadPeriodTracker() { const module = PeriodTracker; const appTitle = "Cycle Tracker 🌸"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, null, currentUserName, currentPersona); } else { console.error("Period Tracker load fail"); switchToChatView(); appendMessage('system', 'Mrow! Period Tracker failed...'); } }
          function loadHoroscopeApp() { const module = HoroscopeApp; const appTitle = "Daily Horoscope ✨"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("Horoscope App load fail"); switchToChatView(); appendMessage('system', 'Mrow! Horoscope App failed...'); } }
          function loadRpgApp() { const module = RpgApp; const appTitle = "RPG Adventure 🎲"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("RPG App load fail"); switchToChatView(); appendMessage('system', 'Meeeow! RPG App failed...'); } }
-         // *** NEW FUNCTION TO LOAD JETPACK GAME ***
-         function loadJetpackGame() {
-             const module = JetpackGame; // Assumes JetpackGame object in jetpack.js
-             const appTitle = "Kitty Jet Pack 🚀";
+         function loadJetpackGame() { const module = JetpackGame; const appTitle = "Kitty Jet Pack 🚀"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, null, currentUserName, currentPersona); } else { console.error("Jetpack Game load fail"); switchToChatView(); appendMessage('system', 'Meeeow! Jetpack game failed to load...'); } }
+         // *** NEW FUNCTION TO LOAD COMIC STRIP APP ***
+         function loadComicStripApp() {
+             const module = ComicStripApp; // Assumes ComicStripApp object in comicstrip.js
+             const appTitle = "Daily Comic Strip 😂";
              switchToAppView(module, appTitle); // Switch view, pass module reference
              if (appArea && module?.init) {
-                 // Pass the appArea container, messageCallback (maybe unused?), apiCaller (unused), username, persona
-                 module.init(appArea, displayAppMessage, null, currentUserName, currentPersona);
+                 // Pass the appArea container, messageCallback (for system messages), apiCaller, username, persona
+                 module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona);
              } else {
-                 console.error("Jetpack Game load fail");
+                 console.error("Comic Strip App load fail");
                  switchToChatView(); // Go back if failed
-                 appendMessage('system', 'Meeeow! Jetpack game failed to load...');
+                 appendMessage('system', 'Meeeow! Comic Strip app failed to load...');
              }
          }
          function clearAppAreaContent() { if (appArea) appArea.innerHTML = ''; }
@@ -560,10 +582,9 @@
         function checkApiKeyAndProceed() { const key = loadApiKey(); if (key) { currentApiKey = key; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; proceedToChat(); } else { if (apiKeyPopup && chatContainer && apiKeyInput) { if (namePopup) namePopup.style.display = 'none'; if(disclaimerPopup) disclaimerPopup.style.display = 'none'; chatContainer.style.display = 'none'; apiKeyPopup.style.display = 'flex'; disableChatInput("API Key needed!"); apiKeyInput.focus(); } } }
         function initializeApp() { console.log("Initializing App..."); registerServiceWorker(); setupInstallPromptHandler(); const theme = loadThemePreference(); applyTheme(theme || 'light'); currentPersona = loadPersonaPreference() || 'Mika'; if (hasAgreedToDisclaimer()) { console.log("Disclaimer agreed."); checkNameAndProceed(); } else { console.log("Showing disclaimer."); if (disclaimerPopup) disclaimerPopup.style.display = 'flex'; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; if (namePopup) namePopup.style.display = 'none'; if (chatContainer) chatContainer.style.display = 'none'; if (appArea) appArea.style.display = 'none'; if (chatArea) chatArea.style.display = 'none'; } updateChatTitle(); updateInputPlaceholder(); }
 
-
         // --- Event Listeners ---
-        // Reset listener updated to clear RPG & Jetpack data (Jetpack has no data, just clear RPG)
-        if (settingsResetButton) settingsResetButton.addEventListener('click', () => { closeAllDropdowns(); const confirmMsg = `⚠️ Reset ALL Settings for ${currentUserName}? Clears API Key, Name, Persona, Disclaimer, Theme, Install status, All Chats, AND All Chores/Diary/Stories/Tracker/Horoscope/RPG Data & reloads. Sure, ${currentUserName}?!`; if (confirm(confirmMsg)) { console.log("Resetting all application data..."); clearApiKey(); clearUserName(); clearPersonaPreference(); clearDisclaimerAgreement(); clearInstallPromptShown(); clearThemePreference(); clearFromLocalStorage('mikaHelper_allChats'); clearFromLocalStorage('mikaChores_list_v2'); /* Updated chore key */ clearFromLocalStorage('mikaChores_balance_v1'); clearFromLocalStorage('mikaChores_history_v1'); clearFromLocalStorage('mikaChores_pinHash_v1'); clearFromLocalStorage('mikaChores_lockedDate_v1'); /* Added lock key */ clearFromLocalStorage('mikaChores_bonusEnabled_v1'); clearFromLocalStorage('mikaChores_bonusTiers_v1'); clearFromLocalStorage('mikaStoryLibrary_v1'); clearFromLocalStorage('mikaDiaryEntries_v1'); clearFromLocalStorage('mikaPeriodTrackerData_v1'); clearFromLocalStorage('mikaHoroscopeCache_v1'); clearFromLocalStorage('mikaHoroscopeUserSign_v1'); clearFromLocalStorage('mikaRpgLibrary_v1'); /* <-- CLEAR RPG DATA */ window.location.reload(); } });
+        // Reset listener updated to clear Comic data
+        if (settingsResetButton) settingsResetButton.addEventListener('click', () => { closeAllDropdowns(); const confirmMsg = `⚠️ Reset ALL Settings for ${currentUserName}? Clears API Key, Name, Persona, Disclaimer, Theme, Install status, All Chats, AND All Chores/Diary/Stories/Tracker/Horoscope/RPG/Comic Data & reloads. Sure, ${currentUserName}?!`; if (confirm(confirmMsg)) { console.log("Resetting all application data..."); clearApiKey(); clearUserName(); clearPersonaPreference(); clearDisclaimerAgreement(); clearInstallPromptShown(); clearThemePreference(); clearFromLocalStorage('mikaHelper_allChats'); clearFromLocalStorage('mikaChores_list_v2'); /* Updated chore key */ clearFromLocalStorage('mikaChores_balance_v1'); clearFromLocalStorage('mikaChores_history_v1'); clearFromLocalStorage('mikaChores_pinHash_v1'); clearFromLocalStorage('mikaChores_lockedDate_v1'); /* Added lock key */ clearFromLocalStorage('mikaChores_bonusEnabled_v1'); clearFromLocalStorage('mikaChores_bonusTiers_v1'); clearFromLocalStorage('mikaStoryLibrary_v1'); clearFromLocalStorage('mikaDiaryEntries_v1'); clearFromLocalStorage('mikaPeriodTrackerData_v1'); clearFromLocalStorage('mikaHoroscopeCache_v1'); clearFromLocalStorage('mikaHoroscopeUserSign_v1'); clearFromLocalStorage('mikaRpgLibrary_v1'); clearFromLocalStorage('mikaComicCacheV2'); /* <-- CLEAR COMIC DATA */ window.location.reload(); } });
         if (disclaimerAgreeButton) disclaimerAgreeButton.addEventListener('click', () => { saveDisclaimerAgreement(); disclaimerPopup.style.display = 'none'; checkNameAndProceed(); });
         if (saveApiKeyButton) saveApiKeyButton.addEventListener('click', () => { if (!apiKeyInput) return; const key = apiKeyInput.value.trim(); if (key) { if (saveApiKey(key)) { currentApiKey = key; apiKeyPopup.style.display = 'none'; apiKeyError.style.display = 'none'; proceedToChat(); } else { apiKeyError.textContent = "Save failed?"; apiKeyError.style.display = 'block'; } } else { apiKeyError.textContent = "Key needed!"; apiKeyError.style.display = 'block'; } });
         if (apiKeyInput) apiKeyInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveApiKeyButton?.click(); if (apiKeyError) apiKeyError.style.display = 'none'; });
@@ -591,8 +612,9 @@
         if (appTrackerButton) appTrackerButton.addEventListener('click', () => { closeAllDropdowns(); loadPeriodTracker(); });
         if (appHoroscopeButton) appHoroscopeButton.addEventListener('click', () => { closeAllDropdowns(); loadHoroscopeApp(); });
         if (appRpgButton) appRpgButton.addEventListener('click', () => { closeAllDropdowns(); loadRpgApp(); });
-        // *** ADD JETPACK LISTENER ***
         if (appJetpackButton) appJetpackButton.addEventListener('click', () => { closeAllDropdowns(); loadJetpackGame(); });
+        // *** ADD COMIC LISTENER ***
+        if (appComicButton) appComicButton.addEventListener('click', () => { closeAllDropdowns(); loadComicStripApp(); });
         // Settings Listeners
         if (settingsInstallButton) settingsInstallButton.addEventListener('click', handleManualInstall);
         if (settingsThemeButton) settingsThemeButton.addEventListener('click', toggleTheme);
