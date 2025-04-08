@@ -1,4 +1,4 @@
-// --- START OF FILE jetpack.js --- (MODIFIED)
+// --- START OF FILE jetpack.js --- (MODIFIED AGAIN for iOS Touch Fix)
 
 // Nyaa~! Kitty Jet Pack! Fly high, User~! ♡ (Or... whatever. - Kana)
 
@@ -86,59 +86,46 @@ const JetpackGame = (() => {
 
     // --- Initialization and Exit ---
     function init(_gameUiContainer, _messageCallback, _apiCaller, userName, persona) {
-        console.log("Initializing Jetpack Game Viewer...");
+        console.log("Initializing Jetpack Game Viewer (iOS Touch Fix Attempt)..."); // Updated log
         gameUiContainer = _gameUiContainer;
-        // messageCallback not really used here, maybe for errors?
-        // apiCaller not used here
-        currentUserName = userName || "Player"; // Make sure username is set
+        currentUserName = userName || "Player";
         currentPersonaInGame = persona || 'Mika';
-        commentaryIntervalId = null; // Reset interval ID on init
+        commentaryIntervalId = null;
 
         if (!gameUiContainer) {
             console.error("Jetpack Game UI container not provided!");
             if(_messageCallback) _messageCallback('System', 'Error: Jetpack UI container missing!');
-            // Potentially call switchToChatView() here if possible?
             return;
         }
-        gameUiContainer.innerHTML = ''; // Clear previous content
-        // Ensure the container itself is using flexbox column layout
+        gameUiContainer.innerHTML = '';
         gameUiContainer.style.display = 'flex';
         gameUiContainer.style.flexDirection = 'column';
-        gameUiContainer.style.height = '100%'; // Make sure container takes height
+        gameUiContainer.style.height = '100%';
 
-        // Create the commentary area
+        // Create the commentary area (Unchanged)
         commentaryElement = document.createElement('div');
         commentaryElement.id = 'jetpack-commentary';
-        // ** Adjusted CSS for fixed height **
         commentaryElement.style.cssText = `
-            min-height: 1.4em; /* Ensure minimum space */
-            height: 2.8em; /* Reserve space for ~2 lines to prevent shifting */
-            overflow: hidden; /* Hide overflow if message is longer */
-            text-align: center;
-            font-style: italic;
-            font-size: 0.85em;
-            color: var(--mika-message-name);
-            padding: 3px 0;
-            margin-bottom: 5px;
-            opacity: 1;
-            transition: opacity 0.5s ease-out;
-            flex-shrink: 0; /* Don't shrink this element */
-            display: flex; /* Use flex to center vertically */
-            align-items: center; /* Center text vertically */
-            justify-content: center; /* Center text horizontally */
-            line-height: 1.4em; /* Match min-height for single line centering */
+            min-height: 1.4em; height: 2.8em; overflow: hidden;
+            text-align: center; font-style: italic; font-size: 0.85em;
+            color: var(--mika-message-name); padding: 3px 0; margin-bottom: 5px;
+            opacity: 1; transition: opacity 0.5s ease-out; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; line-height: 1.4em;
         `;
         gameUiContainer.appendChild(commentaryElement);
 
-        // ** NEW: Create a wrapper for the iframe for faded border effect **
+        // *** MODIFICATION START ***
+        // Create a SIMPLE wrapper (mostly for structure/flex grow)
         const iframeWrapper = document.createElement('div');
-        iframeWrapper.id = 'jetpack-iframe-container'; // ID for CSS styling
+        iframeWrapper.id = 'jetpack-iframe-container';
         iframeWrapper.style.cssText = `
             width: 100%;
             flex-grow: 1; /* Takes up remaining vertical space */
-            overflow: hidden; /* Needed for pseudo-element positioning */
-            position: relative; /* Needed for pseudo-element positioning */
-            border-radius: 8px; /* Optional: Rounded corners for the fade effect */
+            /* REMOVED overflow: hidden; */
+            /* REMOVED position: relative; */
+            /* REMOVED border-radius: 8px; */
+            /* We might need position relative IF we add pseudo-elements later for border */
+            position: relative; /* Keep for potential overlay effects if needed */
         `;
 
         // Create the iframe for the game
@@ -149,60 +136,61 @@ const JetpackGame = (() => {
             width: 100%;
             height: 100%; /* Fill the wrapper */
             border: none;
-            display: block; /* Prevent extra space below iframe */
+            display: block;
+            /* --- APPLY VISUALS AND FIXES DIRECTLY HERE --- */
+            border-radius: 8px; /* Apply rounded corners to the iframe */
+            overflow: hidden; /* Make the iframe clip its content to the rounded corners */
+            -webkit-overflow-scrolling: touch; /* Keep the iOS touch scrolling helper */
+            /* --- --- */
         `;
-        iframeWrapper.appendChild(iframe); // Add iframe to the wrapper
-        gameUiContainer.appendChild(iframeWrapper); // Add wrapper to the main container
+        // *** MODIFICATION END ***
 
-        // Create the back button
+        iframeWrapper.appendChild(iframe);
+        gameUiContainer.appendChild(iframeWrapper);
+
+        // Create the back button (Unchanged)
         const backButton = document.createElement('button');
-        backButton.id = 'back-to-chat-button'; // Consistent ID
+        backButton.id = 'back-to-chat-button';
         backButton.textContent = 'Back to Chat';
-        // Ensure button class is applied for consistent styling
-        backButton.className = 'rps-choice-button secondary'; // Or your preferred button class
+        backButton.className = 'rps-choice-button secondary';
         backButton.onclick = () => {
-            // Assumes switchToChatView is globally available from index.html
             if (typeof switchToChatView === 'function') {
                 switchToChatView();
             } else {
                 console.error("Cannot find switchToChatView function!");
             }
         };
-        backButton.style.marginTop = '10px'; // Space above button
-        backButton.style.flexShrink = '0'; // Prevent button from shrinking
-        // Center the button if desired
+        backButton.style.marginTop = '10px';
+        backButton.style.flexShrink = '0';
         backButton.style.display = 'block';
         backButton.style.marginLeft = 'auto';
         backButton.style.marginRight = 'auto';
         gameUiContainer.appendChild(backButton);
 
-        // Start the commentary timer
+        // Start the commentary timer (Unchanged)
         if (commentaryIntervalId) clearInterval(commentaryIntervalId);
-        // Show first commentary immediately? Optional.
-        // _showJetpackCommentary();
         commentaryIntervalId = setInterval(_showJetpackCommentary, COMMENTARY_INTERVAL_MS);
 
-        console.log(`Jetpack Game viewer initialized for ${currentUserName} with ${currentPersonaInGame}.`);
+        console.log(`Jetpack Game viewer initialized for ${currentUserName} with ${currentPersonaInGame}. Applied direct iframe styles for iOS touch.`);
     }
 
-    function onExit() {
+    function onExit() { // Unchanged
         console.log("JetpackGame onExit called.");
-        // IMPORTANT: Clear the commentary timer when leaving the game!
         if (commentaryIntervalId) {
             clearInterval(commentaryIntervalId);
             commentaryIntervalId = null;
             console.log("Commentary interval cleared.");
         }
-        commentaryElement = null; // Clear reference
-        return Promise.resolve(true); // Indicate synchronous completion
+        commentaryElement = null;
+        return Promise.resolve(true);
     }
 
     // --- Public Interface ---
     return {
         init: init,
-        onExit: onExit // Make sure onExit is exposed
+        onExit: onExit
     };
 
 })();
 
-// --- END OF FILE jetpack.js --- (MODIFIED)
+// --- END OF FILE jetpack.js --- (MODIFIED AGAIN for iOS Touch Fix)
