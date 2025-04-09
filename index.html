@@ -120,7 +120,8 @@
         #send-button:disabled { background: #666; cursor: not-allowed; transform: none; opacity: 0.6; }
         /* App Area Styles */
         #app-area { display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px; width: 100%; height: 100%; box-sizing: border-box; overflow: hidden; background-color: var(--chat-bg); color: var(--chat-text); }
-        /* App Styles (TTT, RPS, GTN, 20Q, Diary, StoryTime, Chores, Tracker, Horoscope, RPG, Jetpack, ComicStrip) */
+
+        /* --- App Specific Styles --- */
         /* ... TTT Styles ... */
         #ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 240px; height: 240px; margin: 10px auto; border: 3px solid var(--game-board-border); border-radius: 8px; background-color: var(--game-board-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); flex-shrink: 0; }
         .ttt-cell { border: 1px solid var(--game-cell-border); display: flex; justify-content: center; align-items: center; font-size: 2.5em; font-weight: bold; cursor: pointer; color: var(--game-cell-text); transition: background-color 0.2s, color 0.2s; user-select: none; }
@@ -232,8 +233,9 @@
         #quest-input-area { /* Reuse story-input-area styles */ }
         #quest-status-area { /* Reuse story-status-area styles */ }
         /* ... Jetpack Styles ... */
-        #jetpack-commentary { min-height: 1.4em; height: auto; text-align: center; font-style: italic; font-size: 0.85em; color: var(--mika-message-name); padding: 3px 0; margin-bottom: 5px; overflow: hidden; opacity: 1; transition: opacity 0.5s ease-out; flex-shrink: 0; }
-        #jetpack-game-iframe { width: 100%; height: calc(100% - 65px); border: none; flex-grow: 1; }
+        #jetpack-commentary { min-height: 1.4em; height: 2.8em; overflow: hidden; text-align: center; font-style: italic; font-size: 0.85em; color: var(--mika-message-name); padding: 3px 0; margin-bottom: 5px; opacity: 1; transition: opacity 0.5s ease-out; flex-shrink: 0; display: flex; align-items: center; justify-content: center; line-height: 1.4em; }
+        #jetpack-iframe-container { width: 100%; flex-grow: 1; position: relative; } /* Added wrapper */
+        #jetpack-game-iframe { width: 100%; height: 100%; border: none; display: block; border-radius: 8px; overflow: hidden; -webkit-overflow-scrolling: touch; }
         /* ... Comic Strip Styles ... */
         #comic-main-view { display: flex; flex-direction: column; align-items: center; padding: 10px; box-sizing: border-box; height: 100%; width: 100%; }
         #comic-controls { margin-bottom: 10px; text-align: center; }
@@ -248,6 +250,10 @@
         .comic-history-item:hover { background-color: rgba(255, 255, 255, 0.1); }
         .comic-history-item span:first-child { color: var(--chat-text); }
         .comic-history-item span:last-child { color: var(--system-message-text); font-size: 0.9em; }
+        /* ... Gotchi Styles ... */
+        /* (Styles for bars, buttons, etc., are mostly covered by reused classes) */
+        /* Add keyframes for tail sway here or ensure they are loaded */
+        @keyframes tail-sway { 0% { transform: rotate(-10deg); } 100% { transform: rotate(10deg); } }
 
         /* Shared App Message Log */
         #app-message-log { width: calc(100% - 20px); max-width: 600px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin: 10px auto 10px auto; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0; display: none; }
@@ -321,12 +327,16 @@
              .comic-panel { width: 90%; margin-bottom: 10px; }
              .comic-panel pre { font-size: 0.75em; }
              .comic-panel p { font-size: 0.8em; }
+             /* Responsive Gotchi */
+             #gotchi-graphic-container { width: 60px; height: 80px; } /* Slightly smaller */
+             #gotchi-message-display { bottom: 95px; /* Adjust message position */ font-size: 0.85em; padding: 6px 10px; }
+             /* Adjust commands slightly */
         }
     </style>
 </head>
 <body>
 
-    <!-- Popups (Unchanged) -->
+    <!-- Popups -->
     <div id="disclaimer-popup" class="popup-overlay"> <div class="popup-modal"> <h2>☆ Hold on a Sec! (=^･ω･^=) ☆</h2> <p>Hiii! Before we start, just a few quick things, nyaa~!</p> <p>☆ Your secret API code stays super safe! It only lives in *your* browser's storage. I don't send it anywhere else, promise! *pinky swear* ♡</p> <p>☆ I'm powered by AI magic! ✨ I try my bestest to be helpful and safe, *purrrr*, but sometimes AI can say silly things! The person who shared me isn't responsible for everything I might say, okay?</p> <p>☆ **Important!** Could you please show this to a parent or guardian? They just need to tap the button below! Teehee~ Thanks!</p> <div class="popup-buttons"> <button id="disclaimer-agree-button" class="popup-button">Okay! We Understand! ♡</button> </div> </div> </div>
     <div id="api-key-popup" class="popup-overlay"> <div class="popup-modal"> <h2>(=^･ω･^=) Need the Secret Code!</h2> <p>Please enter your Google Gemini API Key! It's saved safely in *your* browser, nya~!</p> <input type="password" id="api-key-input" placeholder="Paste your Gemini API Key here~ ♡" autocomplete="new-password"> <p id="api-key-error" class="popup-error">Meeeow! You need to paste a key!</p> <div class="popup-buttons"> <button id="save-api-key-button" class="popup-button">Save & Continue! ♡</button> </div> </div> </div>
     <div id="name-popup" class="popup-overlay"> <div class="popup-modal"> <h2>☆ Who am I talking to? ☆</h2> <p>Tell me your name! So I know who my awesome Study Buddy (or Chore Helper!) is! ♡</p> <input type="text" id="name-input" placeholder="Enter name here~"> <p id="name-error" class="popup-error">Please enter a name!</p> <div class="popup-buttons"> <button id="save-name-button" class="popup-button">That's Me!</button> </div> </div> </div>
@@ -346,20 +356,24 @@
             </div>
             <div id="history-dropdown" class="dropdown-menu"></div>
             <div id="apps-dropdown" class="dropdown-menu">
+                <!-- Core Apps -->
                 <button id="app-diary-button" title="Open Our Secret Diary ♡">Diary ♡</button>
-                <button id="app-story-button" title="Let's tell a story!">Story Time 📖</button>
                 <button id="app-chores-button" title="Manage Chores!">Chores 🎀</button>
                 <button id="app-tracker-button" title="Open Cycle Tracker">Cycle Tracker 🌸</button>
                 <button id="app-horoscope-button" title="Daily Horoscope">Horoscope ✨</button>
+                <!-- Creative/Story Apps -->
+                <button id="app-story-button" title="Let's tell a story!">Story Time 📖</button>
                 <button id="app-rpg-button" title="Start RPG Adventure!">RPG Adventure 🎲</button>
-                <button id="app-jetpack-button" title="Play Kitty Jet Pack!">Jetpack 🚀</button>
-                 <!-- *** NEW COMIC BUTTON *** -->
                 <button id="app-comic-button" title="Get a Daily Comic Strip!">Comic Strip 😂</button>
-                 <!-- *** END NEW BUTTON *** -->
+                <!-- Mini-Games -->
+                <button id="app-jetpack-button" title="Play Kitty Jet Pack!">Jetpack 🚀</button>
                 <button id="app-ttt-button" title="Play Tic-Tac-Toe!">Tic-Tac-Toe ♡</button>
                 <button id="app-rps-button" title="Play Rock Paper Scissors!">Rock Paper Scissors!</button>
                 <button id="app-gtn-button" title="Play Guess The Number!">Guess The Number~</button>
-                <button id="app-20q-button" title="Play 20 Questions!">20 Questions? Hehe!</button>
+                <button id="app-20q-button" title="Play 20 Questions!">20 Questions?</button>
+                <!-- *** NEW GOTCHI BUTTON *** -->
+                <button id="app-gotchi-button" title="Take care of me!">Mika-Gotchi! ♡</button>
+                <!-- *** END NEW BUTTON *** -->
                 <p class="no-items" style="display: none;">More apps soon~!</p>
             </div>
             <div id="settings-dropdown" class="dropdown-menu">
@@ -387,7 +401,7 @@
                 </div>
             </div>
             <div id="app-area" style="display: none;">
-                <!-- App content (like TTT board, RPS buttons, iframe) goes here -->
+                <!-- App content goes here -->
             </div>
         </div>
     </div>
@@ -404,14 +418,15 @@
     <script src="horoscope.js"></script>
     <script src="rpg.js"></script>
     <script src="jetpack.js"></script>
-    <!-- *** INCLUDE NEW COMIC SCRIPT *** -->
     <script src="comicstrip.js"></script>
+    <!-- *** INCLUDE NEW GOTCHI SCRIPT *** -->
+    <script src="gotchi.js"></script>
     <!-- Include API script -->
     <script src="api.js"></script>
 
     <!-- Main Application Logic -->
     <script>
-        // Nyaa~! Mika & Kana's Helper & Fun Time App! ♡ (With Camera, Chores, Tracker, Horoscope, RPG, Jetpack, & Comic!)
+        // Nyaa~! Mika & Kana's Helper & Fun Time App! ♡ (With Gotchi!)
 
         // --- DOM Elements ---
         const bodyElement = document.body; const themeColorMeta = document.getElementById('theme-color-meta');
@@ -429,6 +444,7 @@
         const appsButton = document.getElementById('apps-button');
         const historyDropdown = document.getElementById('history-dropdown'); const settingsDropdown = document.getElementById('settings-dropdown');
         const appsDropdown = document.getElementById('apps-dropdown');
+        // App Buttons
         const appTttButton = document.getElementById('app-ttt-button');
         const appRpsButton = document.getElementById('app-rps-button');
         const appGtnButton = document.getElementById('app-gtn-button');
@@ -440,9 +456,12 @@
         const appHoroscopeButton = document.getElementById('app-horoscope-button');
         const appRpgButton = document.getElementById('app-rpg-button');
         const appJetpackButton = document.getElementById('app-jetpack-button');
-        // *** ADD COMIC BUTTON REF ***
         const appComicButton = document.getElementById('app-comic-button');
+        // *** ADD GOTCHI BUTTON REF ***
+        const appGotchiButton = document.getElementById('app-gotchi-button');
+        // Settings Buttons
         const settingsInstallButton = document.getElementById('settings-install-button'); const settingsThemeButton = document.getElementById('settings-theme-button'); const settingsPersonaButton = document.getElementById('settings-persona-button'); const settingsResetButton = document.getElementById('settings-reset-button');
+        // Image Upload
         const imageUploadInput = document.getElementById('image-upload-input'); const imageUploadButton = document.getElementById('image-upload-button'); const cameraButton = document.getElementById('camera-button'); const imagePreviewArea = document.getElementById('image-preview-area'); const imagePreview = document.getElementById('image-preview'); const removeImageButton = document.getElementById('remove-image-button');
         const deleteAllHistoryButtonTemplate = document.createElement('button'); deleteAllHistoryButtonTemplate.className = 'delete-history'; deleteAllHistoryButtonTemplate.textContent = 'Delete ALL History'; deleteAllHistoryButtonTemplate.title = 'Permanently delete all saved chats!';
 
@@ -454,7 +473,7 @@
 
         // --- Utility Functions ---
         const getTimestamp = () => Date.now();
-        const sanitizeHTML = (str) => { if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) { return DOMPurify.sanitize(str, { USE_PROFILES: { html: true }, ALLOWED_TAGS: ['strong', 'em', 'code', 'br', 'del', 'pre', 'span', 'div', 'p', 'h3', 'h4', 'label', 'button', 'input', 'strong', 'i'], KEEP_CONTENT: true }); } else { console.warn("DOMPurify missing, basic fallback."); return str.replace(/</g, '&lt;').replace(/>/g, '&gt;'); } };
+        const sanitizeHTML = (str) => { if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) { return DOMPurify.sanitize(str, { USE_PROFILES: { html: true }, ALLOWED_TAGS: ['strong', 'em', 'code', 'br', 'del', 'pre', 'span', 'div', 'p', 'h3', 'h4', 'label', 'button', 'input', 'strong', 'i'], KEEP_CONTENT: true }); } else { console.warn("DOMPurify missing, basic fallback."); return str.replace(/</g, '<').replace(/>/g, '>'); } };
 
         // --- Local Storage ---
         function saveToLocalStorage(key, value) { try { localStorage.setItem(key, value); return true; } catch (e) { console.error(`Save LS Error [${key}]:`, e); return false; } }
@@ -513,22 +532,19 @@
         function setupAppAreaBase(titleText) { if (!appArea) return null; clearAppAreaContent(); return appArea; }
         function displayAppMessage(sender, text) {
             // Skip message display for specific apps handled internally or don't need it
-            const noLogModules = [MikaDiary, StoryTime, ChoreHelper, PeriodTracker, HoroscopeApp, RpgApp, JetpackGame, ComicStripApp]; // Added ComicStripApp
+            const noLogModules = [MikaDiary, StoryTime, ChoreHelper, PeriodTracker, HoroscopeApp, RpgApp, JetpackGame, ComicStripApp, MikaGotchi]; // Added MikaGotchi
             if (noLogModules.some(mod => currentActiveAppModule === mod)) {
                 console.log(`Skipping displayAppMessage for ${sender} in ${currentActiveAppModule?.constructor?.name || 'current app'}.`);
                 return;
             }
 
-            // Use shared log for other games (TTT, RPS, GTN, 20Q)
             let log = document.getElementById('app-message-log');
             if (!log) {
                  console.warn("Shared app message log not found, creating.");
-                 log = document.createElement('div');
-                 log.id = 'app-message-log';
+                 log = document.createElement('div'); log.id = 'app-message-log';
                  log.style.cssText = `width: calc(100% - 20px); max-width: 600px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin: 10px auto 10px auto; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0;`;
                  const backButton = appArea.querySelector('#back-to-chat-button');
-                 if(backButton) { appArea.insertBefore(log, backButton); }
-                 else { appArea.appendChild(log); }
+                 if(backButton) { appArea.insertBefore(log, backButton); } else { appArea.appendChild(log); }
             }
             log.style.display = 'block';
 
@@ -552,18 +568,19 @@
          function loadHoroscopeApp() { const module = HoroscopeApp; const appTitle = "Daily Horoscope ✨"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("Horoscope App load fail"); switchToChatView(); appendMessage('system', 'Mrow! Horoscope App failed...'); } }
          function loadRpgApp() { const module = RpgApp; const appTitle = "RPG Adventure 🎲"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("RPG App load fail"); switchToChatView(); appendMessage('system', 'Meeeow! RPG App failed...'); } }
          function loadJetpackGame() { const module = JetpackGame; const appTitle = "Kitty Jet Pack 🚀"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, null, currentUserName, currentPersona); } else { console.error("Jetpack Game load fail"); switchToChatView(); appendMessage('system', 'Meeeow! Jetpack game failed to load...'); } }
-         // *** NEW FUNCTION TO LOAD COMIC STRIP APP ***
-         function loadComicStripApp() {
-             const module = ComicStripApp; // Assumes ComicStripApp object in comicstrip.js
-             const appTitle = "Daily Comic Strip 😂";
+         function loadComicStripApp() { const module = ComicStripApp; const appTitle = "Daily Comic Strip 😂"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("Comic Strip App load fail"); switchToChatView(); appendMessage('system', 'Meeeow! Comic Strip app failed to load...'); } }
+         // *** NEW FUNCTION TO LOAD GOTCHI ***
+         function loadMikaGotchi() {
+             const module = MikaGotchi; // Assumes MikaGotchi object in gotchi.js
+             const appTitle = "Mika-Gotchi! ♡";
              switchToAppView(module, appTitle); // Switch view, pass module reference
              if (appArea && module?.init) {
-                 // Pass the appArea container, messageCallback (for system messages), apiCaller, username, persona
+                 // Pass the appArea container, messageCallback, apiCaller, username, persona
                  module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona);
              } else {
-                 console.error("Comic Strip App load fail");
+                 console.error("MikaGotchi App load fail");
                  switchToChatView(); // Go back if failed
-                 appendMessage('system', 'Meeeow! Comic Strip app failed to load...');
+                 appendMessage('system', 'Meeeow! Mika-Gotchi app failed to load...');
              }
          }
          function clearAppAreaContent() { if (appArea) appArea.innerHTML = ''; }
@@ -583,8 +600,8 @@
         function initializeApp() { console.log("Initializing App..."); registerServiceWorker(); setupInstallPromptHandler(); const theme = loadThemePreference(); applyTheme(theme || 'light'); currentPersona = loadPersonaPreference() || 'Mika'; if (hasAgreedToDisclaimer()) { console.log("Disclaimer agreed."); checkNameAndProceed(); } else { console.log("Showing disclaimer."); if (disclaimerPopup) disclaimerPopup.style.display = 'flex'; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; if (namePopup) namePopup.style.display = 'none'; if (chatContainer) chatContainer.style.display = 'none'; if (appArea) appArea.style.display = 'none'; if (chatArea) chatArea.style.display = 'none'; } updateChatTitle(); updateInputPlaceholder(); }
 
         // --- Event Listeners ---
-        // Reset listener updated to clear Comic data
-        if (settingsResetButton) settingsResetButton.addEventListener('click', () => { closeAllDropdowns(); const confirmMsg = `⚠️ Reset ALL Settings for ${currentUserName}? Clears API Key, Name, Persona, Disclaimer, Theme, Install status, All Chats, AND All Chores/Diary/Stories/Tracker/Horoscope/RPG/Comic Data & reloads. Sure, ${currentUserName}?!`; if (confirm(confirmMsg)) { console.log("Resetting all application data..."); clearApiKey(); clearUserName(); clearPersonaPreference(); clearDisclaimerAgreement(); clearInstallPromptShown(); clearThemePreference(); clearFromLocalStorage('mikaHelper_allChats'); clearFromLocalStorage('mikaChores_list_v2'); /* Updated chore key */ clearFromLocalStorage('mikaChores_balance_v1'); clearFromLocalStorage('mikaChores_history_v1'); clearFromLocalStorage('mikaChores_pinHash_v1'); clearFromLocalStorage('mikaChores_lockedDate_v1'); /* Added lock key */ clearFromLocalStorage('mikaChores_bonusEnabled_v1'); clearFromLocalStorage('mikaChores_bonusTiers_v1'); clearFromLocalStorage('mikaStoryLibrary_v1'); clearFromLocalStorage('mikaDiaryEntries_v1'); clearFromLocalStorage('mikaPeriodTrackerData_v1'); clearFromLocalStorage('mikaHoroscopeCache_v1'); clearFromLocalStorage('mikaHoroscopeUserSign_v1'); clearFromLocalStorage('mikaRpgLibrary_v1'); clearFromLocalStorage('mikaComicCacheV2'); /* <-- CLEAR COMIC DATA */ window.location.reload(); } });
+        // Reset listener updated
+        if (settingsResetButton) settingsResetButton.addEventListener('click', () => { closeAllDropdowns(); const confirmMsg = `⚠️ Reset ALL Settings for ${currentUserName}? Clears API Key, Name, Persona, Disclaimer, Theme, Install status, All Chats, AND All Chores/Diary/Stories/Tracker/Horoscope/RPG/Comic/Gotchi Data & reloads. Sure, ${currentUserName}?!`; if (confirm(confirmMsg)) { console.log("Resetting all application data..."); clearApiKey(); clearUserName(); clearPersonaPreference(); clearDisclaimerAgreement(); clearInstallPromptShown(); clearThemePreference(); clearFromLocalStorage('mikaHelper_allChats'); clearFromLocalStorage('mikaChores_list_v2'); clearFromLocalStorage('mikaChores_balance_v1'); clearFromLocalStorage('mikaChores_history_v1'); clearFromLocalStorage('mikaChores_pinHash_v1'); clearFromLocalStorage('mikaChores_lockedDate_v1'); clearFromLocalStorage('mikaChores_bonusEnabled_v1'); clearFromLocalStorage('mikaChores_bonusTiers_v1'); clearFromLocalStorage('mikaStoryLibrary_v1'); clearFromLocalStorage('mikaDiaryEntries_v1'); clearFromLocalStorage('mikaPeriodTrackerData_v1'); clearFromLocalStorage('mikaHoroscopeCache_v1'); clearFromLocalStorage('mikaHoroscopeUserSign_v1'); clearFromLocalStorage('mikaRpgLibrary_v1'); clearFromLocalStorage('mikaComicCacheV2'); clearFromLocalStorage('mikaComicThemes_v1'); clearFromLocalStorage('mikaComicGenCount_v1'); clearFromLocalStorage('mikaGotchiData_v1_Mika'); /* <-- CLEAR MIKA GOTCHI DATA */ clearFromLocalStorage('mikaGotchiData_v1_Kana'); /* <-- CLEAR KANA GOTCHI DATA */ window.location.reload(); } });
         if (disclaimerAgreeButton) disclaimerAgreeButton.addEventListener('click', () => { saveDisclaimerAgreement(); disclaimerPopup.style.display = 'none'; checkNameAndProceed(); });
         if (saveApiKeyButton) saveApiKeyButton.addEventListener('click', () => { if (!apiKeyInput) return; const key = apiKeyInput.value.trim(); if (key) { if (saveApiKey(key)) { currentApiKey = key; apiKeyPopup.style.display = 'none'; apiKeyError.style.display = 'none'; proceedToChat(); } else { apiKeyError.textContent = "Save failed?"; apiKeyError.style.display = 'block'; } } else { apiKeyError.textContent = "Key needed!"; apiKeyError.style.display = 'block'; } });
         if (apiKeyInput) apiKeyInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveApiKeyButton?.click(); if (apiKeyError) apiKeyError.style.display = 'none'; });
@@ -613,8 +630,9 @@
         if (appHoroscopeButton) appHoroscopeButton.addEventListener('click', () => { closeAllDropdowns(); loadHoroscopeApp(); });
         if (appRpgButton) appRpgButton.addEventListener('click', () => { closeAllDropdowns(); loadRpgApp(); });
         if (appJetpackButton) appJetpackButton.addEventListener('click', () => { closeAllDropdowns(); loadJetpackGame(); });
-        // *** ADD COMIC LISTENER ***
         if (appComicButton) appComicButton.addEventListener('click', () => { closeAllDropdowns(); loadComicStripApp(); });
+        // *** ADD GOTCHI LISTENER ***
+        if (appGotchiButton) appGotchiButton.addEventListener('click', () => { closeAllDropdowns(); loadMikaGotchi(); });
         // Settings Listeners
         if (settingsInstallButton) settingsInstallButton.addEventListener('click', handleManualInstall);
         if (settingsThemeButton) settingsThemeButton.addEventListener('click', toggleTheme);

@@ -272,7 +272,7 @@ const MikaDiary = (() => {
             ? `Diary open, ${currentUserName}. What is it?`
             : `Welcome to our Secret Diary, ${currentUserName}! Tell me anything... I'm listening! ♡`;
         appendDiaryMessage(currentPersonaInGame, welcomeMessage); // Appends welcome message
-        if (diaryInput) diaryInput.focus();
+        // if (diaryInput) diaryInput.focus(); //
     }
 
     // ** UPDATED ** onExit uses currentUserName
@@ -300,6 +300,6 @@ const MikaDiary = (() => {
 // Fallback Sanitizer (Keep this at the end)
 if (typeof DOMPurify === 'undefined') {
     console.warn("DOMPurify not loaded. Using basic HTML escaping as fallback for diary.");
-    window.DOMPurify = { sanitize: (str) => str.replace(/</g, '&lt;').replace(/>/g, '&gt;') };
+    window.DOMPurify = { sanitize: (str) => str.replace(/</g, '<').replace(/>/g, '>') };
 }
 // --- END OF FILE diary.js ---
