@@ -1,17 +1,21 @@
 // --- START OF FILE gotchi.js ---
 
 // Nyaa~! Mika-Gotchi (and... Kana-Gotchi?) - Take Care of Me, {user}! ♡
-// Version 1.4.1 - Background Color Fix (Based on v1.4.0)
+// Version 1.5.5 - Removed Bubble Background, Adjusted Text
 
 const MikaGotchi = (() => {
     // --- Settings & Constants ---
     const STORAGE_KEY = 'mikaGotchiData_v1';
     const UPDATE_INTERVAL_MS = 5000;
-    const MESSAGE_POPUP_INTERVAL_MS = 45000;
-    const API_MESSAGE_BATCH_SIZE = 7;
+    const MESSAGE_POPUP_INTERVAL_MS = 20000; // Timer for general mood messages
+    const API_MESSAGE_BATCH_SIZE = 7; // For fetching background messages
     const MAX_STAT_VALUE = 100;
     const MIN_STAT_VALUE = 0;
-    const POO_INCIDENT_CHANCE_PER_DAY = 0.25; // 25% chance each day
+    const POO_INCIDENT_CHANCE_PER_DAY = 0.25;
+    // Thresholds for critical state messages
+    const HUNGER_THRESHOLD = 25;
+    const HAPPINESS_THRESHOLD = 35;
+    const ENERGY_THRESHOLD = 30;
 
     // Stat decay/gain rates
     const HUNGER_DECAY_RATE = 1; const HAPPINESS_DECAY_RATE = 1; const ENERGY_DECAY_RATE = 0.5; const AFFECTION_DECAY_RATE = 0.2;
@@ -33,7 +37,7 @@ const MikaGotchi = (() => {
     let gameUiContainer = null; let messageCallback = null; let apiCaller = null;
     let currentUserName = "User"; let currentPersonaInGame = 'Mika';
     let hunger = 80; let happiness = 80; let energy = 90; let affection = 70;
-    let lastUpdateTime = Date.now(); let lastMessageTime = Date.now();
+    let lastUpdateTime = Date.now();
     let isNapping = false; let currentMessages = []; let isApiFetchingMessages = false;
     let lastMemory = "neutral"; let dailyTasks = { greeted: false, fed_check: false, played_check: false, checked_in: false, tidied: false };
     let dailyStreak = 0; let lastCheckinDay = null;
@@ -41,6 +45,12 @@ const MikaGotchi = (() => {
     let gameLoopIntervalId = null; let messagePopupIntervalId = null; let musicAudioElement = null;
     let pooIncidentActive = false; // Is there an active mess?
     let blamedPersona = null; // Who is being blamed ('Mika' or 'Kana')
+    // Flags to track if critical state message has been shown
+    let lowHungerNotified = false;
+    let lowHappinessNotified = false;
+    let lowEnergyNotified = false;
+    // State for direct chat
+    let isGotchiResponding = false; // Is the Gotchi generating a direct chat response?
 
     // Fallback Messages (Structured by persona and mood)
     const fallbackMessages = {
@@ -73,6 +83,10 @@ const MikaGotchi = (() => {
     let bounceAnimation = null; let walkAnimation = null;
     let tasksPopupOverlay = null; let tasksPopupContent = null; let tasksPopupCloseButton = null; let tasksPopupStreakDisplay = null;
     let pooVisualElement = null; // Reference for the visual cue
+    // Direct Chat UI References
+    let gotchiChatInput = null;
+    let gotchiSendButton = null;
+    let gotchiChatArea = null;
 
     // --- Helper Functions ---
     function _getCurrentTimestamp() { return Date.now(); }
@@ -80,12 +94,12 @@ const MikaGotchi = (() => {
     function _clampStat(value) { return Math.max(MIN_STAT_VALUE, Math.min(MAX_STAT_VALUE, value)); }
 
     // --- Persistence ---
-    // Save/Load includes poo state
+    // Save/Load includes poo state and notification flags
     function _saveState() {
         const state = {
             hunger, happiness, energy, affection, lastMemory, dailyTasks, dailyStreak, lastCheckinDay, lastUpdateTime, isNapping,
-            pooIncidentActive, // Save new state
-            blamedPersona      // Save new state
+            pooIncidentActive, blamedPersona,
+            lowHungerNotified, lowHappinessNotified, lowEnergyNotified // Save flags
         };
         try { localStorage.setItem(STORAGE_KEY + `_${currentPersonaInGame}`, JSON.stringify(state)); }
         catch (e) { console.error("Failed to save Gotchi state:", e); }
@@ -96,14 +110,20 @@ const MikaGotchi = (() => {
             const saved = localStorage.getItem(STORAGE_KEY + `_${currentPersonaInGame}`);
             if (saved) {
                 const state = JSON.parse(saved);
+                // Load base stats
                 hunger = state.hunger ?? 80; happiness = state.happiness ?? 80; energy = state.energy ?? 90; affection = state.affection ?? 70;
                 lastMemory = state.lastMemory ?? "neutral"; dailyTasks = state.dailyTasks ?? { greeted: false, fed_check: false, played_check: false, checked_in: false, tidied: false };
                 dailyStreak = state.dailyStreak ?? 0; lastCheckinDay = state.lastCheckinDay ?? null; lastUpdateTime = state.lastUpdateTime ?? Date.now(); isNapping = state.isNapping ?? false;
-                // --- Load Poo State ---
+                // Load poo state
                 pooIncidentActive = state.pooIncidentActive ?? false;
                 blamedPersona = state.blamedPersona ?? null;
-                // --- End Load Poo State ---
+                // Load notification flags
+                lowHungerNotified = state.lowHungerNotified ?? (hunger < HUNGER_THRESHOLD); // Set flag based on loaded state if missing
+                lowHappinessNotified = state.lowHappinessNotified ?? (happiness < HAPPINESS_THRESHOLD);
+                lowEnergyNotified = state.lowEnergyNotified ?? (energy < ENERGY_THRESHOLD);
+
                 console.log(`Gotchi state loaded for ${currentPersonaInGame}. Poo Active: ${pooIncidentActive}`);
+                // Simulate decay since last save
                 const now = _getCurrentTimestamp(); const secondsSinceLastSave = (now - lastUpdateTime) / 1000;
                 if (secondsSinceLastSave > 0) {
                     console.log(`Simulating decay for ${secondsSinceLastSave.toFixed(0)}s since last save.`);
@@ -114,75 +134,119 @@ const MikaGotchi = (() => {
                     } else {
                         hunger = _clampStat(hunger - HUNGER_DECAY_RATE * intervalsToSimulate); happiness = _clampStat(happiness - HAPPINESS_DECAY_RATE * intervalsToSimulate); energy = _clampStat(energy - ENERGY_DECAY_RATE * intervalsToSimulate); affection = _clampStat(affection - AFFECTION_DECAY_RATE * intervalsToSimulate);
                     }
-                    lastUpdateTime = now; console.log(`Simulated decay complete. New stats: H:${hunger.toFixed(0)}, Hap:${happiness.toFixed(0)}, E:${energy.toFixed(0)}, Aff:${affection.toFixed(0)}`);
-                } return true;
+                     lastUpdateTime = now; console.log(`Simulated decay complete.`);
+                     // Re-check notification flags after decay simulation
+                     lowHungerNotified = hunger < HUNGER_THRESHOLD;
+                     lowHappinessNotified = happiness < HAPPINESS_THRESHOLD;
+                     lowEnergyNotified = energy < ENERGY_THRESHOLD;
+                     console.log(`Stats after decay: H:${hunger.toFixed(0)}, Hap:${happiness.toFixed(0)}, E:${energy.toFixed(0)}, Aff:${affection.toFixed(0)}`);
+                }
+                return true;
             }
         } catch (e) { console.error("Failed to load Gotchi state:", e); localStorage.removeItem(STORAGE_KEY + `_${currentPersonaInGame}`); }
-        // Reset defaults including poo state if load fails
+        // Reset defaults including flags if load fails
         lastUpdateTime = Date.now(); lastCheckinDay = _getCurrentDateString();
-        pooIncidentActive = false; blamedPersona = null; // Ensure poo state is reset on failed load
+        pooIncidentActive = false; blamedPersona = null;
+        lowHungerNotified = false; lowHappinessNotified = false; lowEnergyNotified = false;
         console.log(`No saved state found for ${currentPersonaInGame}, using defaults.`); return false;
     }
 
+
     // --- Core Game Logic ---
-    // Mood check considers poo state
+    // _updateStats checks thresholds and triggers messages
     function _updateStats() {
         const now = _getCurrentTimestamp(); const elapsedSeconds = (now - lastUpdateTime) / 1000; const intervalsPassed = elapsedSeconds / (UPDATE_INTERVAL_MS / 1000);
         if (intervalsPassed < 0.1) return;
+
         if (isNapping) {
             energy = _clampStat(energy + NAP_ENERGY_GAIN_RATE * intervalsPassed); happiness = _clampStat(happiness - NAP_HAPPINESS_LOSS * intervalsPassed); hunger = _clampStat(hunger - (HUNGER_DECAY_RATE / 2) * intervalsPassed);
-            if (energy >= MAX_STAT_VALUE) { _handleNapToggle(); } // Auto-wake if fully rested
+            if (energy >= MAX_STAT_VALUE) { _handleNapToggle(); } // Auto-wake
         } else {
-            hunger = _clampStat(hunger - HUNGER_DECAY_RATE * intervalsPassed); happiness = _clampStat(happiness - HAPPINESS_DECAY_RATE * intervalsPassed); energy = _clampStat(energy - ENERGY_DECAY_RATE * intervalsPassed); affection = _clampStat(affection - AFFECTION_DECAY_RATE * intervalsPassed);
+            hunger = _clampStat(hunger - HUNGER_DECAY_RATE * intervalsPassed);
+            happiness = _clampStat(happiness - HAPPINESS_DECAY_RATE * intervalsPassed);
+            energy = _clampStat(energy - ENERGY_DECAY_RATE * intervalsPassed);
+            affection = _clampStat(affection - AFFECTION_DECAY_RATE * intervalsPassed);
+
+            // Check Critical Thresholds
+            if (hunger < HUNGER_THRESHOLD && !lowHungerNotified) {
+                lowHungerNotified = true;
+                console.log("Hunger critical threshold reached!");
+                _fetchNewMessages(); // Fetch potentially hungry messages
+                setTimeout(() => _displayGotchiMessage(_getRandomMessage()), 300); // Display a message shortly after
+            } else if (hunger >= HUNGER_THRESHOLD && lowHungerNotified) {
+                lowHungerNotified = false; // Reset flag when recovered
+            }
+
+            if (happiness < HAPPINESS_THRESHOLD && !lowHappinessNotified) {
+                lowHappinessNotified = true;
+                console.log("Happiness critical threshold reached!");
+                _fetchNewMessages(); // Fetch potentially sad messages
+                setTimeout(() => _displayGotchiMessage(_getRandomMessage()), 300);
+            } else if (happiness >= HAPPINESS_THRESHOLD && lowHappinessNotified) {
+                lowHappinessNotified = false;
+            }
+
+            if (energy < ENERGY_THRESHOLD && !lowEnergyNotified) {
+                lowEnergyNotified = true;
+                console.log("Energy critical threshold reached!");
+                _fetchNewMessages(); // Fetch potentially tired messages
+                setTimeout(() => _displayGotchiMessage(_getRandomMessage()), 300);
+            } else if (energy >= ENERGY_THRESHOLD && lowEnergyNotified) {
+                lowEnergyNotified = false;
+            }
         }
+
         lastUpdateTime = now; _updateStatBars(); _calculateMoodAndEmoji(); _updateCharacterVisuals(); _updateCommandButtons();
     }
 
-    // _calculateMoodAndEmoji prioritizes poo state
+    // _calculateMoodAndEmoji drives background fetches
     function _calculateMoodAndEmoji() {
         let calculatedMood = "content"; let emoji = "😊"; if (currentPersonaInGame === 'Kana') emoji = "😑";
         if (isNapping) { calculatedMood = "sleepy"; emoji = "😴"; }
         // Check poo state first for mood override
         else if (pooIncidentActive) { calculatedMood = "grumpy"; emoji = currentPersonaInGame === 'Mika' ? "😠" : "💢"; }
         // Then check other states
-        else if (hunger < 25) { calculatedMood = "hungry"; emoji = currentPersonaInGame === 'Mika' ? "🥺" : "😠"; }
-        else if (happiness < 35) { calculatedMood = "grumpy"; emoji = currentPersonaInGame === 'Mika' ? "😠" : "💢"; }
+        else if (hunger < HUNGER_THRESHOLD) { calculatedMood = "hungry"; emoji = currentPersonaInGame === 'Mika' ? "🥺" : "😠"; } // Use thresholds
+        else if (happiness < HAPPINESS_THRESHOLD) { calculatedMood = "grumpy"; emoji = currentPersonaInGame === 'Mika' ? "😠" : "💢"; }
         else if (affection < 40 && happiness < 50) { calculatedMood = "needy"; emoji = currentPersonaInGame === 'Mika' ? "🥺" : "😒"; }
-        else if (energy < 30) { calculatedMood = "sleepy"; emoji = currentPersonaInGame === 'Mika' ? "🥱" : "😩"; }
+        else if (energy < ENERGY_THRESHOLD) { calculatedMood = "sleepy"; emoji = currentPersonaInGame === 'Mika' ? "🥱" : "😩"; }
         else if (happiness > 80 && energy > 60) { calculatedMood = "playful"; emoji = currentPersonaInGame === 'Mika' ? "🥳" : "😼"; }
         else if (happiness > 70 && affection > 70) { calculatedMood = "happy"; emoji = currentPersonaInGame === 'Mika' ? "💖" : "😌"; }
 
         if (currentMood !== calculatedMood || currentMoodEmoji !== emoji) {
             currentMood = calculatedMood; currentMoodEmoji = emoji;
-            // Fetch messages if mood changed significantly OR if poo is active
-            if (!isApiFetchingMessages && (pooIncidentActive || (calculatedMood !== "content" && calculatedMood !== "happy"))) {
-                console.log("Mood/Poo state change, fetching messages.");
+            // Fetch new messages if mood changes significantly OR if poo active OR if a critical threshold *might* have been crossed
+            if (!isApiFetchingMessages && (pooIncidentActive || (calculatedMood !== "content" && calculatedMood !== "happy") || lowHungerNotified || lowHappinessNotified || lowEnergyNotified )) {
+                console.log("Mood/Poo/Threshold state change, fetching background messages.");
                 _fetchNewMessages();
             }
         }
     }
 
-    // Handle daily reset and potential poo incident
+    // _handleDailyReset handles poo and triggers important messages
     function _handleDailyReset() {
         const today = _getCurrentDateString();
         if (lastCheckinDay && lastCheckinDay !== today) {
             console.log(`Daily Reset Triggered. Last: ${lastCheckinDay}, Today: ${today}`);
 
+            // Reset notification flags for the new day
+            lowHungerNotified = false; lowHappinessNotified = false; lowEnergyNotified = false;
+
             // Check for Poo Incident Chance
             let newPooOccurred = false;
             if (!pooIncidentActive && Math.random() < POO_INCIDENT_CHANCE_PER_DAY) {
                 pooIncidentActive = true;
-                blamedPersona = (currentPersonaInGame === 'Mika') ? 'Kana' : 'Mika'; // Blame the *other* one
-                happiness = _clampStat(happiness - 15); // Penalty for the mess
+                blamedPersona = (currentPersonaInGame === 'Mika') ? 'Kana' : 'Mika';
+                happiness = _clampStat(happiness - 15);
                 newPooOccurred = true;
                 console.log(`💩 Oh no! A poo incident occurred! Blaming ${blamedPersona}.`);
-                lastMemory = "poo_incident_occurred"; // Specific memory
+                lastMemory = "poo_incident_occurred";
             }
 
             // Memory/streak logic
-            if (!newPooOccurred) { // Don't overwrite poo memory
-                 if (hunger < 30) { lastMemory = "neglected_hunger"; }
-                 else if (happiness < 40) { lastMemory = "neglected_happiness"; }
+            if (!newPooOccurred) {
+                 if (hunger < HUNGER_THRESHOLD) { lastMemory = "neglected_hunger"; }
+                 else if (happiness < HAPPINESS_THRESHOLD) { lastMemory = "neglected_happiness"; }
                  else if (affection < 50) { lastMemory = "neglected_affection"; }
                  else if (dailyTasks.fed_check && dailyTasks.played_check && dailyTasks.greeted) { lastMemory = "cared_for_well"; }
                  else { lastMemory = "neutral"; }
@@ -197,13 +261,17 @@ const MikaGotchi = (() => {
             dailyTasks = { greeted: false, fed_check: false, played_check: false, checked_in: false, tidied: false };
             lastCheckinDay = today;
             _saveState();
-            _fetchNewMessages(true); // Force fetch relevant messages
-            _displayRandomMessage(); // Show a relevant message
-            _updatePooVisual(); // Update visual
+            _fetchNewMessages(true); // Always fetch on new day
+
+            if(newPooOccurred) {
+                 setTimeout(() => _displayGotchiMessage(_getRandomMessage()), 500); // <<< Display blaming message soon
+            }
+            _updatePooVisual();
 
         } else if (!lastCheckinDay) { // First ever check-in
             lastCheckinDay = today; lastMemory = "first_meeting";
-            pooIncidentActive = false; blamedPersona = null; // No poo on first day
+            pooIncidentActive = false; blamedPersona = null;
+            lowHungerNotified = false; lowHappinessNotified = false; lowEnergyNotified = false; // Init flags
             _saveState();
             _fetchNewMessages(true);
             _updatePooVisual();
@@ -213,11 +281,11 @@ const MikaGotchi = (() => {
     }
 
     // --- API & Message Handling ---
-    // _fetchNewMessages includes poo incident context in prompt
+    // _fetchNewMessages for background messages
     async function _fetchNewMessages(forceRefresh = false) {
         if (!apiCaller || (isApiFetchingMessages && !forceRefresh)) return;
         isApiFetchingMessages = true;
-        console.log(`Fetching messages for ${currentPersonaInGame}. Mood: ${currentMood}, Mem: ${lastMemory}, PooActive: ${pooIncidentActive}`);
+        console.log(`Fetching background messages for ${currentPersonaInGame}. Mood: ${currentMood}, Mem: ${lastMemory}, PooActive: ${pooIncidentActive}`);
         const personaDesc = currentPersonaInGame === 'Mika' ? `You are Mika: bubbly, playful, possessive, energetic catgirl.` : `You are Kana: sarcastic, grumpy, aloof, witty catgirl.`;
 
         // Build prompt with conditional poo instructions
@@ -236,14 +304,14 @@ Instructions: Generate a list of ${API_MESSAGE_BATCH_SIZE} distinct, short (5-15
             const response = await apiCaller(prompt, []);
             if (response) {
                 const lines = response.split('\n'); const newMessages = lines.map(line => line.replace(/^\d+\.\s*/, '').trim()).filter(line => line.length > 1 && line.length < 100);
-                if (newMessages.length > 0) { currentMessages = newMessages; console.log(`Fetched ${currentMessages.length} messages (Poo Active: ${pooIncidentActive}).`); }
-                else { console.warn("API returned no valid messages."); currentMessages = []; }
-            } else { console.warn("API empty response for messages."); currentMessages = []; }
-        } catch (error) { console.error("Failed to fetch messages:", error); currentMessages = []; }
+                if (newMessages.length > 0) { currentMessages = newMessages; console.log(`Fetched ${currentMessages.length} background messages.`); }
+                else { console.warn("API returned no valid background messages."); currentMessages = []; }
+            } else { console.warn("API empty response for background messages."); currentMessages = []; }
+        } catch (error) { console.error("Failed to fetch background messages:", error); currentMessages = []; }
         finally { isApiFetchingMessages = false; }
     }
 
-    // _getRandomMessage prioritizes grumpy if poo active
+    // _getRandomMessage for timed messages
     function _getRandomMessage() {
         if (currentMessages.length > 0) { return currentMessages[Math.floor(Math.random() * currentMessages.length)].replace(/{user}/g, currentUserName); }
         // Fallback logic
@@ -254,14 +322,36 @@ Instructions: Generate a list of ${API_MESSAGE_BATCH_SIZE} distinct, short (5-15
         return moodFallbacks[Math.floor(Math.random() * moodFallbacks.length)].replace(/{user}/g, currentUserName);
     }
 
-    function _displayRandomMessage() {
+    // Display a specific message in the bubble
+    function _displayGotchiMessage(message) {
         if (isNapping || !messageDisplayArea) return;
-        const message = _getRandomMessage();
-        console.log(`Displaying message (Poo Active: ${pooIncidentActive}):`, message);
-        messageDisplayArea.textContent = message; messageDisplayArea.style.transition = 'opacity 0.3s ease-in'; messageDisplayArea.style.opacity = '1';
+
+        console.log(`Displaying Gotchi Msg: ${message}`);
+        messageDisplayArea.textContent = message;
+        // Determine text color based on persona
+        messageDisplayArea.style.color = (currentPersonaInGame === 'Kana') ? 'var(--kana-popup-border, #b39ddb)' : 'var(--mika-message-name, #f06292)';
+        messageDisplayArea.style.transition = 'opacity 0.3s ease-in';
+        messageDisplayArea.style.opacity = '1';
+
         if (messageDisplayArea.fadeTimeout) clearTimeout(messageDisplayArea.fadeTimeout);
-        messageDisplayArea.fadeTimeout = setTimeout(() => { if (messageDisplayArea) { messageDisplayArea.style.transition = 'opacity 1s ease-out'; messageDisplayArea.style.opacity = '0'; } }, 4000);
-        // Fetch new messages if running low or if poo state requires specific blaming messages
+        if (messageDisplayArea.clearTimeout) clearTimeout(messageDisplayArea.clearTimeout);
+
+        messageDisplayArea.fadeTimeout = setTimeout(() => {
+            if (messageDisplayArea) {
+                messageDisplayArea.style.transition = 'opacity 1s ease-out';
+                messageDisplayArea.style.opacity = '0';
+                messageDisplayArea.clearTimeout = setTimeout(() => {
+                    if (messageDisplayArea) messageDisplayArea.textContent = '';
+                }, 1000);
+            }
+        }, 4000);
+    }
+
+    // Function for the timed message interval
+    function _showTimedRandomMessage() {
+        if (isGotchiResponding) return;
+        const randomMsg = _getRandomMessage();
+        _displayGotchiMessage(randomMsg);
         if ((pooIncidentActive || currentMessages.length < 2) && !isApiFetchingMessages) {
              _fetchNewMessages();
         }
@@ -283,174 +373,133 @@ Instructions: Generate a list of ${API_MESSAGE_BATCH_SIZE} distinct, short (5-15
     }
 
     // --- UI Rendering ---
-    // _clearUI no longer removes specific background classes
+    // _clearUI clears new chat elements
     function _clearUI() {
-        if (gameUiContainer) {
-            // No longer need to remove specific classes here
-            gameUiContainer.innerHTML = '';
-        }
+        if (gameUiContainer) { gameUiContainer.innerHTML = ''; }
         moodEmojiDisplay = hungerBarFill = happinessBarFill = energyBarFill = affectionBarFill = feedButton = playButton = cleanButton = napButton = headpatButton = messageDisplayArea = dailyTaskButton = characterGraphicContainer = charBody = charEarLeft = charEarRight = charEyeLeft = charEyeRight = charTail = tasksPopupOverlay = tasksPopupContent = tasksPopupCloseButton = tasksPopupStreakDisplay = null;
-        pooVisualElement = null;
-        if (bounceAnimation) bounceAnimation.cancel(); bounceAnimation = null;
-        if (walkAnimation) walkAnimation.cancel(); walkAnimation = null;
+        pooVisualElement = null; gotchiChatInput = null; gotchiSendButton = null; gotchiChatArea = null;
+        if (bounceAnimation) bounceAnimation.cancel(); bounceAnimation = null; if (walkAnimation) walkAnimation.cancel(); walkAnimation = null;
     }
 
-    // _createMainUI no longer adds specific background classes
+    // _createMainUI final layout adjustments
     function _createMainUI() {
         _clearUI();
         if (!gameUiContainer) return;
 
-        // No background class addition here
-
-        // Base container styles (Background inherited from app-area's theme)
+        // Base container styles
         gameUiContainer.style.cssText = `width: 100%; height: 100%; display: flex; flex-direction: column; padding: 10px; box-sizing: border-box; align-items: center; position: relative; overflow: hidden;`;
 
-        // 1. Stat Bars Area (Use class for color)
-        const statsArea = document.createElement('div');
-        statsArea.classList.add('gotchi-stats-area'); // Class for text color
-        statsArea.style.cssText = `width: 90%; max-width: 400px; display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; margin-bottom: 15px; font-size: 0.8em; flex-shrink: 0;`;
-        const createBar = (label, id) => {
-            const labelNode = document.createElement('span');
-            labelNode.textContent = label;
-            labelNode.style.textAlign = 'right';
-            statsArea.appendChild(labelNode);
-            const barBg = document.createElement('div');
-            barBg.style.cssText = `height: 12px; background-color: rgba(0,0,0,0.2); border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);`;
-            const barFill = document.createElement('div');
-            barFill.id = id;
-            barFill.style.cssText = `height: 100%; width: 50%; background: linear-gradient(to right, #f06292, #ff8a80); border-radius: 6px 0 0 6px; transition: width 0.5s ease-out;`;
-            barBg.appendChild(barFill);
-            statsArea.appendChild(barBg);
-            return barFill;
-        };
-        hungerBarFill = createBar('Hunger 🍖:', 'gotchi-hunger-fill');
-        happinessBarFill = createBar('Happy ✨:', 'gotchi-happiness-fill');
-        energyBarFill = createBar('Energy ⚡:', 'gotchi-energy-fill');
-        affectionBarFill = createBar('Affection ♡:', 'gotchi-affection-fill');
-        // Assign specific bar gradients
-        if (hungerBarFill) hungerBarFill.style.background = 'linear-gradient(to right, #ffcc80, #ffab40)';
-        if (happinessBarFill) happinessBarFill.style.background = 'linear-gradient(to right, #a5d6a7, #66bb6a)';
-        if (energyBarFill) energyBarFill.style.background = 'linear-gradient(to right, #90caf9, #42a5f5)';
-        if (affectionBarFill) affectionBarFill.style.background = 'linear-gradient(to right, #f48fb1, #f06292)';
-        gameUiContainer.appendChild(statsArea);
+        // --- Top Area Wrapper (Stats + Emoji) ---
+        const topArea = document.createElement('div');
+        topArea.style.cssText = `width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-shrink: 0; position: relative;`;
 
-        // 2. Character Display Area
-        const characterArea = document.createElement('div');
-        characterArea.style.cssText = `flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 100%; min-height: 150px;`;
+        // 1. Stat Bars Area
+        const statsArea = document.createElement('div');
+        statsArea.classList.add('gotchi-stats-area');
+        statsArea.style.cssText = `flex-grow: 1; display: grid; grid-template-columns: auto 1fr; gap: 3px 8px; font-size: 0.8em; margin-right: 45px;`;
+        const createBar = (label, id) => {
+            const labelNode = document.createElement('span'); labelNode.textContent = label; labelNode.style.textAlign = 'right'; statsArea.appendChild(labelNode);
+            const barBg = document.createElement('div'); barBg.style.cssText = `height: 10px; background-color: rgba(0,0,0,0.2); border-radius: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);`;
+            const barFill = document.createElement('div'); barFill.id = id; barFill.style.cssText = `height: 100%; width: 50%; background: linear-gradient(to right, #f06292, #ff8a80); border-radius: 5px 0 0 5px; transition: width 0.5s ease-out;`; barBg.appendChild(barFill); statsArea.appendChild(barBg); return barFill;
+        };
+        hungerBarFill = createBar('Hunger 🍖:', 'gotchi-hunger-fill'); happinessBarFill = createBar('Happy ✨:', 'gotchi-happiness-fill'); energyBarFill = createBar('Energy ⚡:', 'gotchi-energy-fill'); affectionBarFill = createBar('Affection ♡:', 'gotchi-affection-fill');
+        if (hungerBarFill) hungerBarFill.style.background = 'linear-gradient(to right, #ffcc80, #ffab40)'; if (happinessBarFill) happinessBarFill.style.background = 'linear-gradient(to right, #a5d6a7, #66bb6a)'; if (energyBarFill) energyBarFill.style.background = 'linear-gradient(to right, #90caf9, #42a5f5)'; if (affectionBarFill) affectionBarFill.style.background = 'linear-gradient(to right, #f48fb1, #f06292)';
+        topArea.appendChild(statsArea);
+
+        // 2. Mood Emoji Display (Top Right)
         moodEmojiDisplay = document.createElement('div');
         moodEmojiDisplay.id = 'gotchi-mood-emoji';
-        moodEmojiDisplay.style.cssText = `position: absolute; top: -5px; font-size: 2.5em; text-shadow: 0 0 5px rgba(0,0,0,0.3); z-index: 2; transition: opacity 0.3s;`;
-        characterArea.appendChild(moodEmojiDisplay);
+        moodEmojiDisplay.style.cssText = `position: absolute; top: 0px; right: 0px; font-size: 2.5em; text-shadow: 0 0 5px rgba(0,0,0,0.3); z-index: 2; transition: opacity 0.3s; width: 40px; text-align: center;`;
+        topArea.appendChild(moodEmojiDisplay);
+
+        gameUiContainer.appendChild(topArea);
+
+        // 3. Character Display Area (Wrapper for graphic and bubble)
+        const characterArea = document.createElement('div');
+        characterArea.style.cssText = `flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 100%; min-height: 180px;`;
+        // Message Display Area (Floating Text) - Positioned within characterArea, above graphic
+        messageDisplayArea = document.createElement('div');
+        messageDisplayArea.id = 'gotchi-message-display';
+        // *** MODIFICATION START: Removed background, adjusted position, color, shadow ***
+        messageDisplayArea.style.cssText = `position: absolute; top: 5px; /* Raised slightly more */ left: 50%; transform: translateX(-50%); color: var(--mika-message-name, #f06292); /* Default to Mika pink */ font-weight: bold; padding: 5px; /* Minimal padding */ border-radius: 5px; /* Can keep for potential future use */ font-size: 1em; /* Slightly larger text */ text-align: center; opacity: 0; transition: opacity 0.3s ease-in, color 0.3s ease; z-index: 3; max-width: 90%; white-space: normal; pointer-events: none; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Added shadow for visibility */`;
+        characterArea.appendChild(messageDisplayArea);
+        // Character Graphic Container - Adjusted margin-top
         characterGraphicContainer = document.createElement('div');
         characterGraphicContainer.id = 'gotchi-graphic-container';
-        characterGraphicContainer.style.cssText = `width: 80px; height: 100px; position: relative; margin-top: 30px;`;
-        // Determine colors based on persona
+        characterGraphicContainer.style.cssText = `width: 80px; height: 100px; position: relative; margin-top: 45px; /* Adjusted to make space for text */`;
+        // *** MODIFICATION END ***
         const colors = (currentPersonaInGame === 'Kana') ? KANA_COLORS : MIKA_COLORS;
         const bodySize = 60; const earSize = 20; const eyeSize = 8; const tailWidth = 8; const tailHeight = 35;
-        // Create body and parts
         charBody = document.createElement('div'); charBody.id = 'gotchi-body'; charBody.style.cssText = `position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: ${bodySize}px; height: ${bodySize}px; background-color: ${colors.body}; border-radius: 10px; border: 1px solid ${colors.accent};`; characterGraphicContainer.appendChild(charBody);
         charEarLeft = document.createElement('div'); charEarLeft.id = 'gotchi-ear-left'; charEarLeft.style.cssText = `position: absolute; top: -${earSize * 0.8}px; left: ${bodySize * 0.1}px; width: 0; height: 0; border-left: ${earSize / 2}px solid transparent; border-right: ${earSize / 2}px solid transparent; border-bottom: ${earSize}px solid ${colors.accent};`; charBody.appendChild(charEarLeft);
         charEarRight = document.createElement('div'); charEarRight.id = 'gotchi-ear-right'; charEarRight.style.cssText = `position: absolute; top: -${earSize * 0.8}px; right: ${bodySize * 0.1}px; width: 0; height: 0; border-left: ${earSize / 2}px solid transparent; border-right: ${earSize / 2}px solid transparent; border-bottom: ${earSize}px solid ${colors.accent};`; charBody.appendChild(charEarRight);
         charEyeLeft = document.createElement('div'); charEyeLeft.id = 'gotchi-eye-left'; charEyeLeft.style.cssText = `position: absolute; top: ${bodySize * 0.3}px; left: ${bodySize * 0.25}px; width: ${eyeSize}px; height: ${eyeSize}px; background-color: ${colors.eyes}; border-radius: 50%; transition: all 0.2s ease;`; charBody.appendChild(charEyeLeft);
         charEyeRight = document.createElement('div'); charEyeRight.id = 'gotchi-eye-right'; charEyeRight.style.cssText = `position: absolute; top: ${bodySize * 0.3}px; right: ${bodySize * 0.25}px; width: ${eyeSize}px; height: ${eyeSize}px; background-color: ${colors.eyes}; border-radius: 50%; transition: all 0.2s ease;`; charBody.appendChild(charEyeRight);
         charTail = document.createElement('div'); charTail.id = 'gotchi-tail'; charTail.style.cssText = `position: absolute; bottom: ${bodySize * 0.1}px; left: -${tailWidth * 1.5}px; width: ${tailWidth}px; height: ${tailHeight}px; border-radius: 4px 4px 10px 10px / 50px 50px 10px 10px; background-color: ${colors.accent}; transform-origin: bottom right; animation: tail-sway 2s ease-in-out infinite alternate;`;
-        // Apply animations
-        const tailSwayKeyframes = [{ transform: 'rotate(-10deg)' }, { transform: 'rotate(10deg)' }];
-        charTail.animate(tailSwayKeyframes, { duration: 1500 + Math.random() * 500, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out' });
-        charBody.appendChild(charTail);
-        // Ensure keyframes are added if not present
-        if (!document.getElementById('gotchi-animations')) {
-            const styleSheet = document.createElement("style");
-            styleSheet.id = 'gotchi-animations';
-            styleSheet.innerText = `@keyframes tail-sway { 0% { transform: rotate(-10deg); } 100% { transform: rotate(10deg); } } @keyframes walk-left-right { 0%, 100% { transform: translateX(-15px); } 50% { transform: translateX(15px); } }`;
-            document.head.appendChild(styleSheet);
-        }
+        const tailSwayKeyframes = [{ transform: 'rotate(-10deg)' }, { transform: 'rotate(10deg)' }]; charTail.animate(tailSwayKeyframes, { duration: 1500 + Math.random() * 500, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out' }); charBody.appendChild(charTail);
+        if (!document.getElementById('gotchi-animations')) { const styleSheet = document.createElement("style"); styleSheet.id = 'gotchi-animations'; styleSheet.innerText = `@keyframes tail-sway { 0% { transform: rotate(-10deg); } 100% { transform: rotate(10deg); } } @keyframes walk-left-right { 0%, 100% { transform: translateX(-15px); } 50% { transform: translateX(15px); } }`; document.head.appendChild(styleSheet); }
         bounceAnimation = characterGraphicContainer.animate([{ transform: 'translateY(0px)' }, { transform: 'translateY(-4px)' }, { transform: 'translateY(0px)' }], { duration: 900 + Math.random() * 200, iterations: Infinity, easing: 'ease-in-out' });
         walkAnimation = characterGraphicContainer.animate([ { marginLeft: '-15px' }, { marginLeft: '15px' } ], { duration: 3000 + Math.random()*1000, direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' });
         characterArea.appendChild(characterGraphicContainer);
-
-        // Poo Visual Element (Hidden Initially)
+        // Poo Visual Element
         pooVisualElement = document.createElement('div');
-        pooVisualElement.id = 'gotchi-poo-visual';
-        pooVisualElement.textContent = '💩'; // The emoji visual
-        pooVisualElement.style.cssText = `
-            position: absolute;
-            bottom: 5px; /* Position near the 'floor' */
-            left: 60%; /* Offset slightly from center */
-            font-size: 1.8em;
-            opacity: 0; /* Hidden by default */
-            transition: opacity 0.5s ease-in-out;
-            z-index: 1; /* Behind character/mood */
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
-            cursor: default; /* Not directly interactable */
-        `;
+        pooVisualElement.id = 'gotchi-poo-visual'; pooVisualElement.textContent = '💩';
+        pooVisualElement.style.cssText = `position: absolute; bottom: 5px; left: 60%; font-size: 1.8em; opacity: 0; transition: opacity 0.5s ease-in-out; z-index: 1; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); cursor: default;`;
         characterArea.appendChild(pooVisualElement);
-
         gameUiContainer.appendChild(characterArea);
-
-        // 3. Message Display Area
-        messageDisplayArea = document.createElement('div');
-        messageDisplayArea.id = 'gotchi-message-display';
-        messageDisplayArea.style.cssText = `position: absolute; bottom: 110px; left: 50%; transform: translateX(-50%); background-color: rgba(0, 0, 0, 0.7); color: white; padding: 8px 15px; border-radius: 15px; font-size: 0.9em; text-align: center; opacity: 0; transition: opacity 0.3s ease-in; z-index: 3; max-width: 80%; white-space: normal;`;
-        gameUiContainer.appendChild(messageDisplayArea);
 
         // 4. Command Buttons Area
         const commandsArea = document.createElement('div');
-        commandsArea.style.cssText = `display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 10px 0; flex-shrink: 0; width: 100%; max-width: 450px;`;
+        commandsArea.style.cssText = `display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 10px 0; margin-bottom: 5px; flex-shrink: 0; width: 100%; max-width: 450px;`;
         const createButton = (text, id, handler, icon) => {
-            const button = document.createElement('button');
-            button.id = id;
-            button.className = 'rps-choice-button';
-            button.style.fontSize = '0.9em';
-            button.style.padding = '8px 12px';
-            button.innerHTML = `${icon ? icon + ' ' : ''}${text}`;
-            button.onclick = handler;
-            commandsArea.appendChild(button);
-            return button;
+            const button = document.createElement('button'); button.id = id; button.className = 'rps-choice-button'; button.style.fontSize = '0.9em'; button.style.padding = '8px 12px'; button.innerHTML = `${icon ? icon + ' ' : ''}${text}`; button.onclick = handler; commandsArea.appendChild(button); return button;
         };
-        feedButton = createButton('Feed', 'gotchi-feed-btn', _handleFeed, '🍖');
-        playButton = createButton('Play', 'gotchi-play-btn', _handlePlay, '🧶');
-        cleanButton = createButton('Clean', 'gotchi-clean-btn', _handleClean, '✨');
-        napButton = createButton('Nap', 'gotchi-nap-btn', _handleNapToggle, '💤');
-        headpatButton = createButton('Headpat', 'gotchi-headpat-btn', _handleHeadpat, '♡');
+        feedButton = createButton('Feed', 'gotchi-feed-btn', _handleFeed, '🍖'); playButton = createButton('Play', 'gotchi-play-btn', _handlePlay, '🧶'); cleanButton = createButton('Clean', 'gotchi-clean-btn', _handleClean, '✨'); napButton = createButton('Nap', 'gotchi-nap-btn', _handleNapToggle, '💤'); headpatButton = createButton('Headpat', 'gotchi-headpat-btn', _handleHeadpat, '♡');
         gameUiContainer.appendChild(commandsArea);
 
-        // 5. Daily Task Button
+        // 5. Direct Chat Input Area
+        gotchiChatArea = document.createElement('div');
+        gotchiChatArea.id = 'gotchi-chat-input-area';
+        gotchiChatArea.style.cssText = `display: flex; align-items: center; width: 100%; max-width: 350px; padding: 5px; box-sizing: border-box; flex-shrink: 0; margin-bottom: 10px;`;
+        gotchiChatInput = document.createElement('input');
+        gotchiChatInput.type = 'text'; gotchiChatInput.id = 'gotchi-chat-input'; gotchiChatInput.placeholder = 'Talk to me... ♡';
+        gotchiChatInput.style.cssText = `flex-grow: 1; padding: 8px 12px; border: 1px solid var(--chat-input-border); background-color: var(--chat-input-bg); color: var(--chat-input-text); border-radius: 15px 0 0 15px; font-family: inherit; font-size: 0.95em; outline: none; transition: all 0.2s ease;`;
+        gotchiChatInput.onkeypress = (e) => { if (e.key === 'Enter' && !isGotchiResponding && !isNapping) { e.preventDefault(); _handleUserChat(); } };
+        gotchiSendButton = document.createElement('button');
+        gotchiSendButton.id = 'gotchi-send-button'; gotchiSendButton.textContent = 'Send';
+        gotchiSendButton.style.cssText = `padding: 8px 15px; border: 1px solid var(--chat-input-border); border-left: none; background: linear-gradient(45deg, var(--send-button-bg-1), var(--send-button-bg-2)); color: white; font-weight: bold; cursor: pointer; border-radius: 0 15px 15px 0; transition: background 0.2s; font-size: 0.95em;`;
+        gotchiSendButton.onclick = _handleUserChat;
+        gotchiChatArea.appendChild(gotchiChatInput); gotchiChatArea.appendChild(gotchiSendButton);
+        gameUiContainer.appendChild(gotchiChatArea);
+
+        // 6. Daily Task Button (Positioned absolutely, bottom-right, above chat)
         dailyTaskButton = document.createElement('button');
-        dailyTaskButton.id = 'gotchi-daily-tasks';
-        dailyTaskButton.textContent = `Daily (X/Y)`;
+        dailyTaskButton.id = 'gotchi-daily-tasks'; dailyTaskButton.textContent = `Daily (X/Y)`;
         dailyTaskButton.className = 'rps-choice-button secondary';
-        dailyTaskButton.style.cssText = `font-size: 0.8em; position: absolute; bottom: 10px; right: 10px; padding: 4px 8px; z-index: 5;`;
+        dailyTaskButton.style.cssText = `font-size: 0.8em; position: absolute; bottom: 65px; /* Adjusted */ right: 10px; padding: 4px 8px; z-index: 5;`;
         dailyTaskButton.onclick = _showDailyTasksPopup;
         gameUiContainer.appendChild(dailyTaskButton);
 
-        // Create Daily Tasks Popup (Hidden Initially)
+        // Create Daily Tasks Popup
         _createTasksPopup();
 
-        // Ensure Gotchi CSS is present (for stat text color)
+        // Ensure Gotchi CSS is present
          if (!document.getElementById('gotchi-styles')) {
-             const styleSheet = document.createElement("style");
-             styleSheet.id = 'gotchi-styles';
-             styleSheet.innerText = `
-                /* Base text color for stats */
-                .gotchi-stats-area { color: var(--chat-log-text, #ffe0f0); }
-                /* No background color rules here anymore */
-             `;
+             const styleSheet = document.createElement("style"); styleSheet.id = 'gotchi-styles';
+             styleSheet.innerText = `.gotchi-stats-area { color: var(--chat-log-text, #ffe0f0); }`;
              document.head.appendChild(styleSheet);
          }
 
         // Final Setup
         _updateStatBars(); _calculateMoodAndEmoji(); _updateCharacterVisuals(); _updateCommandButtons(); _updateDailyTaskDisplay();
-        _updatePooVisual(); // Initial check for poo visual state
+        _updatePooVisual();
+        _updateChatInputState();
     }
 
     // Create Tasks Popup
     function _createTasksPopup() {
         let existingPopup = document.getElementById('gotchi-tasks-popup-overlay');
-        if (existingPopup) {
-            tasksPopupOverlay = existingPopup; tasksPopupContent = document.getElementById('gotchi-tasks-popup-content'); tasksPopupCloseButton = tasksPopupOverlay.querySelector('.popup-button'); tasksPopupStreakDisplay = document.getElementById('gotchi-tasks-popup-streak');
-             tasksPopupOverlay.style.display = 'none'; console.log("Reusing existing tasks popup."); return;
-        }
+        if (existingPopup) { tasksPopupOverlay = existingPopup; tasksPopupContent = document.getElementById('gotchi-tasks-popup-content'); tasksPopupCloseButton = tasksPopupOverlay.querySelector('.popup-button'); tasksPopupStreakDisplay = document.getElementById('gotchi-tasks-popup-streak'); tasksPopupOverlay.style.display = 'none'; console.log("Reusing existing tasks popup."); return; }
         tasksPopupOverlay = document.createElement('div'); tasksPopupOverlay.id = 'gotchi-tasks-popup-overlay'; tasksPopupOverlay.className = 'popup-overlay'; tasksPopupOverlay.style.display = 'none'; tasksPopupOverlay.style.zIndex = '210';
         const modal = document.createElement('div'); modal.id = 'gotchi-tasks-popup-modal'; modal.className = 'popup-modal'; modal.style.textAlign = 'left';
         const title = document.createElement('h2'); title.textContent = "Today's Care Tasks ♡"; title.style.textAlign = 'center'; modal.appendChild(title);
@@ -481,20 +530,23 @@ Instructions: Generate a list of ${API_MESSAGE_BATCH_SIZE} distinct, short (5-15
             charEyeLeft.style.cssText = `${baseEyeStyle} left: ${bodySize * 0.25 - (isNapping ? eyeSize*0.1 : 0)}px; ${currentEyeStyle}`;
             charEyeRight.style.cssText = `${baseEyeStyle} right: ${bodySize * 0.25 - (isNapping ? eyeSize*0.1 : 0)}px; ${currentEyeStyle}`;
         }
-        // Update animation states
         const playState = isNapping ? 'paused' : 'running';
         if (bounceAnimation && bounceAnimation.playState !== playState) { isNapping ? bounceAnimation.pause() : bounceAnimation.play(); }
         if (walkAnimation && walkAnimation.playState !== playState) { isNapping ? walkAnimation.pause() : walkAnimation.play(); }
+        // Update message text color based on persona too
+        if (messageDisplayArea) {
+           messageDisplayArea.style.color = (currentPersonaInGame === 'Kana') ? 'var(--kana-popup-border, #b39ddb)' : 'var(--mika-message-name, #f06292)';
+        }
     }
 
-    // _updateCommandButtons disables others if poo is active
+    // _updateCommandButtons disables based on nap/poo/responding
     function _updateCommandButtons() {
-        const disableMostButtons = isNapping || pooIncidentActive; // Disable if napping OR if there's a mess
+        const disableMostButtons = isNapping || pooIncidentActive || isGotchiResponding;
 
         if (feedButton) feedButton.disabled = disableMostButtons || hunger > 85;
         if (playButton) playButton.disabled = disableMostButtons || energy < 20 || happiness > 90;
-        if (cleanButton) cleanButton.disabled = isNapping; // Clean button is ONLY disabled if napping, enabled if poo active
-        if (napButton) { napButton.innerHTML = isNapping ? '☀️ Wake Up!' : '💤 Nap'; napButton.disabled = pooIncidentActive || (!isNapping && energy > 90); } // Disable nap if poo active
+        if (cleanButton) cleanButton.disabled = isNapping || isGotchiResponding;
+        if (napButton) { napButton.innerHTML = isNapping ? '☀️ Wake Up!' : '💤 Nap'; napButton.disabled = pooIncidentActive || isGotchiResponding || (!isNapping && energy > 90); }
         if (headpatButton) headpatButton.disabled = disableMostButtons || affection > 95;
     }
 
@@ -508,11 +560,7 @@ Instructions: Generate a list of ${API_MESSAGE_BATCH_SIZE} distinct, short (5-15
     }
 
     function _showDailyTasksPopup() {
-        if (!tasksPopupOverlay || !tasksPopupContent || !tasksPopupStreakDisplay) {
-             console.error("Task popup elements not found! Attempting to recreate...");
-             _createTasksPopup();
-             if (!tasksPopupOverlay) { alert("Error showing task details."); return; }
-        }
+        if (!tasksPopupOverlay || !tasksPopupContent || !tasksPopupStreakDisplay) { /* ... recreate if needed ... */ }
         tasksPopupContent.innerHTML = `
             <p>${dailyTasks.greeted ? '✅' : '❌'} Greeted ${currentPersonaInGame}</p>
             <p>${dailyTasks.fed_check ? '✅' : '❌'} Fed ${currentPersonaInGame} Today</p>
@@ -532,36 +580,94 @@ Instructions: Generate a list of ${API_MESSAGE_BATCH_SIZE} distinct, short (5-15
         }
     }
 
-    // --- Event Handlers ---
-    // Add pooIncidentActive check to handlers
-    function _handleFeed() { if (isNapping || pooIncidentActive || hunger > 85) return; hunger = _clampStat(hunger + FEED_HUNGER_GAIN); happiness = _clampStat(happiness + FEED_HAPPINESS_GAIN); if (!dailyTasks.fed_check) affection = _clampStat(affection + 5); dailyTasks.fed_check = true; lastMemory = "fed_well"; _updateStats(); _saveState(); _displayRandomMessage(); if (!isApiFetchingMessages) _fetchNewMessages(); }
-    function _handlePlay() { if (isNapping || pooIncidentActive || energy < 20 || happiness > 90) return; happiness = _clampStat(happiness + PLAY_HAPPINESS_GAIN); energy = _clampStat(energy - PLAY_ENERGY_LOSS); if (!dailyTasks.played_check) affection = _clampStat(affection + DAILY_TASK_AFFECTION_GAIN / 2); dailyTasks.played_check = true; lastMemory = "played_with"; _updateStats(); _saveState(); _displayRandomMessage(); if (!isApiFetchingMessages) _fetchNewMessages(); }
-    function _handleNapToggle() { if (pooIncidentActive) return; isNapping = !isNapping; if (isNapping) { if (messagePopupIntervalId) clearInterval(messagePopupIntervalId); messagePopupIntervalId = null; _stopMusic(); if(messageDisplayArea) { if(messageDisplayArea.fadeTimeout) clearTimeout(messageDisplayArea.fadeTimeout); messageDisplayArea.style.transition = 'none'; messageDisplayArea.style.opacity = '0'; } } else { if (!messagePopupIntervalId) messagePopupIntervalId = setInterval(_displayRandomMessage, MESSAGE_POPUP_INTERVAL_MS); _updateMusic(); lastMemory = "woke_up"; _fetchNewMessages(); _displayRandomMessage(); } lastUpdateTime = Date.now(); _updateCharacterVisuals(); _updateCommandButtons(); _saveState(); console.log("Nap toggled:", isNapping); }
-    function _handleHeadpat() { if (isNapping || pooIncidentActive || affection > 95) return; happiness = _clampStat(happiness + HEADPAT_HAPPINESS_GAIN); affection = _clampStat(affection + HEADPAT_AFFECTION_GAIN); if (!dailyTasks.greeted) affection = _clampStat(affection + 5); dailyTasks.greeted = true; lastMemory = "got_headpats"; _updateStats(); _saveState(); if (moodEmojiDisplay) moodEmojiDisplay.textContent = '💖'; if (characterGraphicContainer) characterGraphicContainer.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.05)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' }); setTimeout(() => _updateCharacterVisuals(), 400); _displayRandomMessage(); if (!isApiFetchingMessages) _fetchNewMessages(); }
+    // Function to enable/disable chat input
+    function _updateChatInputState() {
+        const disable = isNapping || isGotchiResponding;
+        if (gotchiChatInput) {
+            gotchiChatInput.disabled = disable;
+            gotchiChatInput.placeholder = isNapping ? 'Zzzz...' : (isGotchiResponding ? 'Thinking...' : (currentPersonaInGame === 'Kana' ? 'What.' : 'Talk to me... ♡'));
+        }
+        if (gotchiSendButton) {
+            gotchiSendButton.disabled = disable;
+        }
+    }
 
-    // _handleClean checks for poo incident first
+    // --- Event Handlers ---
+    // Action handlers don't call message display directly
+    function _handleFeed() {
+        if (isNapping || pooIncidentActive || isGotchiResponding || hunger > 85) return;
+        hunger = _clampStat(hunger + FEED_HUNGER_GAIN); happiness = _clampStat(happiness + FEED_HAPPINESS_GAIN);
+        if (!dailyTasks.fed_check) affection = _clampStat(affection + 5);
+        dailyTasks.fed_check = true; lastMemory = "fed_well";
+        _updateStats(); _saveState();
+        if (hunger >= HUNGER_THRESHOLD && lowHungerNotified) { lowHungerNotified = false; }
+    }
+    function _handlePlay() {
+        if (isNapping || pooIncidentActive || isGotchiResponding || energy < 20 || happiness > 90) return;
+        happiness = _clampStat(happiness + PLAY_HAPPINESS_GAIN); energy = _clampStat(energy - PLAY_ENERGY_LOSS);
+        if (!dailyTasks.played_check) affection = _clampStat(affection + DAILY_TASK_AFFECTION_GAIN / 2);
+        dailyTasks.played_check = true; lastMemory = "played_with";
+        _updateStats(); _saveState();
+        if (happiness >= HAPPINESS_THRESHOLD && lowHappinessNotified) { lowHappinessNotified = false; }
+        if (energy >= ENERGY_THRESHOLD && lowEnergyNotified) { lowEnergyNotified = false; }
+    }
+    function _handleNapToggle() { // Waking up IS an important event
+        if (pooIncidentActive || isGotchiResponding) return;
+        isNapping = !isNapping;
+        if (isNapping) {
+            if (messagePopupIntervalId) clearInterval(messagePopupIntervalId); messagePopupIntervalId = null;
+            _stopMusic();
+            if(messageDisplayArea) {
+                 if(messageDisplayArea.fadeTimeout) clearTimeout(messageDisplayArea.fadeTimeout);
+                 if (messageDisplayArea.clearTimeout) clearTimeout(messageDisplayArea.clearTimeout);
+                 messageDisplayArea.style.transition = 'none'; messageDisplayArea.style.opacity = '0';
+                 messageDisplayArea.textContent = ''; // Clear text on nap start
+            }
+        } else {
+            if (!messagePopupIntervalId) messagePopupIntervalId = setInterval(_showTimedRandomMessage, MESSAGE_POPUP_INTERVAL_MS);
+            _updateMusic(); lastMemory = "woke_up";
+            _fetchNewMessages(); // Fetch messages on wake-up
+            setTimeout(() => _displayGotchiMessage(_getRandomMessage()), 500); // <<< Display wake-up message
+            if (energy >= ENERGY_THRESHOLD && lowEnergyNotified) { lowEnergyNotified = false; } // Reset flag if recovered
+        }
+        lastUpdateTime = Date.now(); _updateCharacterVisuals(); _updateCommandButtons(); _saveState();
+        _updateChatInputState(); // Update chat input based on nap state
+        console.log("Nap toggled:", isNapping);
+    }
+    function _handleHeadpat() {
+        if (isNapping || pooIncidentActive || isGotchiResponding || affection > 95) return;
+        happiness = _clampStat(happiness + HEADPAT_HAPPINESS_GAIN); affection = _clampStat(affection + HEADPAT_AFFECTION_GAIN);
+        if (!dailyTasks.greeted) affection = _clampStat(affection + 5);
+        dailyTasks.greeted = true; lastMemory = "got_headpats";
+        _updateStats(); _saveState();
+        // Visual feedback for headpat
+        if (moodEmojiDisplay) moodEmojiDisplay.textContent = '💖';
+        if (characterGraphicContainer) characterGraphicContainer.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.05)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' });
+        setTimeout(() => _updateCharacterVisuals(), 400);
+        if (happiness >= HAPPINESS_THRESHOLD && lowHappinessNotified) { lowHappinessNotified = false; }
+    }
+    // _handleClean triggers important message AFTER poo cleanup
     function _handleClean() {
-        if (isNapping) return;
+        if (isNapping || isGotchiResponding) return; // Cannot clean if responding
 
         if (pooIncidentActive) {
-            // Clean up the poo incident
+            // Poo cleanup logic
             console.log("Cleaning up poo incident!");
-            pooIncidentActive = false;
-            blamedPersona = null;
-            happiness = _clampStat(happiness + CLEAN_POO_HAPPINESS_GAIN); // Bigger boost!
-            affection = _clampStat(affection + CLEAN_POO_AFFECTION_GAIN); // Affection boost!
+            pooIncidentActive = false; blamedPersona = null;
+            happiness = _clampStat(happiness + CLEAN_POO_HAPPINESS_GAIN);
+            affection = _clampStat(affection + CLEAN_POO_AFFECTION_GAIN);
             lastMemory = "cleaned_up_mess";
-
-            // Update tasks if not already done
             if (!dailyTasks.tidied) affection = _clampStat(affection + 3);
             dailyTasks.tidied = true;
-
-            _updatePooVisual(); // Hide the visual cue
-            _updateStats();     // Recalculate mood etc. AFTER boosts
+            _updatePooVisual();
+            _updateStats();
             _saveState();
-            _showSimpleConfirmation(`Thank you for cleaning that up, ${currentUserName}! ${currentPersonaInGame === 'Mika' ? '*Phew!* Must have been Kana...' : '*Hmph*. Finally.'} `); // Specific message
-            _fetchNewMessages(true); // Get normal messages again
-            _updateDailyTaskDisplay(); // Update task button after cleaning
+            _showSimpleConfirmation(`Thank you for cleaning that up, ${currentUserName}! ${currentPersonaInGame === 'Mika' ? '*Phew!* Must have been Kana...' : '*Hmph*. Finally.'} `);
+            _fetchNewMessages(true); // Fetch normal messages now
+            setTimeout(() => _displayGotchiMessage(_getRandomMessage()), 500); // <<< Display a message after cleaning
+            _updateDailyTaskDisplay();
+            // Reset notification flags if relevant stats recovered
+            if (happiness >= HAPPINESS_THRESHOLD && lowHappinessNotified) { lowHappinessNotified = false; }
         } else {
             // Normal cleaning
             happiness = _clampStat(happiness + CLEAN_HAPPINESS_GAIN);
@@ -570,90 +676,115 @@ Instructions: Generate a list of ${API_MESSAGE_BATCH_SIZE} distinct, short (5-15
             lastMemory = "cleaned_space";
             _updateStats();
             _saveState();
-            _displayRandomMessage(); // Show a standard message
-            _updateDailyTaskDisplay(); // Update task button after cleaning
-            if (!isApiFetchingMessages) _fetchNewMessages(); // Fetch standard messages if needed
+            _updateDailyTaskDisplay();
+            if (happiness >= HAPPINESS_THRESHOLD && lowHappinessNotified) { lowHappinessNotified = false; }
+        }
+        _updateChatInputState(); // Re-enable buttons potentially disabled by poo
+    }
+
+    // Handler for direct user chat input
+    async function _handleUserChat() {
+        if (isNapping || isGotchiResponding || !gotchiChatInput || !gotchiChatInput.value.trim()) {
+            return;
+        }
+        if (!apiCaller) {
+             _displayGotchiMessage("Mrow! My chat magic isn't working!");
+             return;
+        }
+
+        const userText = gotchiChatInput.value.trim();
+        gotchiChatInput.value = '';
+        isGotchiResponding = true;
+        _updateChatInputState(); // Disable input & buttons
+        _updateCommandButtons(); // Update command buttons too
+
+        // Pause timed messages while responding
+        if (messagePopupIntervalId) clearInterval(messagePopupIntervalId);
+        messagePopupIntervalId = null;
+
+        // Construct prompt for API
+        const personaDesc = currentPersonaInGame === 'Mika' ? `You are Mika: bubbly, playful, possessive, energetic catgirl.` : `You are Kana: sarcastic, grumpy, aloof, witty catgirl.`;
+        let pooContext = ""; if (pooIncidentActive && blamedPersona) { pooContext = ` IMPORTANTLY, there is currently a mess (💩) that you are blaming on ${blamedPersona}. Keep acting innocent and maybe subtly work the blame into your response if relevant.`; }
+        const stateSummary = `My current state: Mood=${currentMood}, Hunger=${hunger.toFixed(0)}/100, Happiness=${happiness.toFixed(0)}/100, Energy=${energy.toFixed(0)}/100.${pooContext}`;
+        const prompt = `[ROLE: You are the Gotchi character ${currentPersonaInGame} (${personaDesc}). ${stateSummary}] The user (${currentUserName}) just said to you: "${userText}" Respond directly to the user's message in character, keeping your current state/situation in mind. Keep your response short and suitable for a small thought bubble (1-2 sentences max). Just output the response text.`;
+
+        try {
+            const response = await apiCaller(prompt, []);
+            if (response) { _displayGotchiMessage(response); }
+            else { _displayGotchiMessage(currentPersonaInGame === 'Kana' ? '...' : '*confused meow*'); }
+        } catch (error) { console.error("Error getting Gotchi chat response:", error); _displayGotchiMessage(currentPersonaInGame === 'Kana' ? 'Error.' : 'Mrow?'); }
+        finally {
+            isGotchiResponding = false; _updateChatInputState(); _updateCommandButtons();
+            if (!isNapping) { // Restart timed messages
+                if (messagePopupIntervalId) clearInterval(messagePopupIntervalId);
+                messagePopupIntervalId = setInterval(_showTimedRandomMessage, MESSAGE_POPUP_INTERVAL_MS);
+            }
         }
     }
 
     // --- Initialization and Exit ---
-    // init log message updated
     function init(_gameUiContainer, _messageCallback, _apiCaller, userName, persona) {
-         console.log(`Initializing MikaGotchi (v1.4.1 BG Fix) for ${userName}, Persona: ${persona}`); // Updated log
+         console.log(`Initializing MikaGotchi (v1.5.5 Bubble Fix 2) for ${userName}, Persona: ${persona}`); // Updated log
          gameUiContainer = _gameUiContainer; messageCallback = _messageCallback; apiCaller = _apiCaller;
          currentUserName = userName || "User"; currentPersonaInGame = persona || 'Mika';
          isApiFetchingMessages = false; currentMessages = [];
-         pooIncidentActive = false; blamedPersona = null; // Reset poo state
-
+         pooIncidentActive = false; blamedPersona = null;
+         lowHungerNotified = false; lowHappinessNotified = false; lowEnergyNotified = false;
+         isGotchiResponding = false;
          if (!gameUiContainer) { console.error("Gotchi UI container missing!"); if(messageCallback) messageCallback('System', 'Error: Gotchi UI container missing!'); return; }
          if (gameLoopIntervalId) clearInterval(gameLoopIntervalId); if (messagePopupIntervalId) clearInterval(messagePopupIntervalId);
-
          _loadState();
          _handleDailyReset();
-         _createMainUI();
-
+         _createMainUI(); // Creates UI with adjusted layout
          gameLoopIntervalId = setInterval(_updateStats, UPDATE_INTERVAL_MS);
-         if (!isNapping) {
-             messagePopupIntervalId = setInterval(_displayRandomMessage, MESSAGE_POPUP_INTERVAL_MS);
-             setTimeout(_displayRandomMessage, 1500);
+         if (!isNapping) { // Setup timed messages
+             messagePopupIntervalId = setInterval(_showTimedRandomMessage, MESSAGE_POPUP_INTERVAL_MS);
+             setTimeout(_showTimedRandomMessage, 1500);
          }
-
-         // Fetch messages immediately unless poo incident just happened
-         if (!pooIncidentActive && !isApiFetchingMessages) {
-            _fetchNewMessages(true);
-         } else if (pooIncidentActive && !isApiFetchingMessages) {
-             console.log("Poo is active on init, messages should have been fetched by daily reset.");
-         }
-
+         // Initial fetch if needed
+         if (!pooIncidentActive && !lowHungerNotified && !lowHappinessNotified && !lowEnergyNotified && !isApiFetchingMessages) { _fetchNewMessages(true); }
          _updateMusic();
-         console.log(`MikaGotchi initialized. Mood: ${currentMood}, Napping: ${isNapping}, Poo Active: ${pooIncidentActive}`);
+         console.log(`MikaGotchi initialized. Mood: ${currentMood}, Napping: ${isNapping}, Poo Active: ${pooIncidentActive}.`);
      }
 
-    // onExit no longer removes specific background classes
     function onExit() {
         console.log("MikaGotchi onExit called.");
         if (gameLoopIntervalId) { clearInterval(gameLoopIntervalId); gameLoopIntervalId = null; }
         if (messagePopupIntervalId) { clearInterval(messagePopupIntervalId); messagePopupIntervalId = null; }
         if (messageDisplayArea && messageDisplayArea.fadeTimeout) { clearTimeout(messageDisplayArea.fadeTimeout); }
+        if (messageDisplayArea && messageDisplayArea.clearTimeout) clearTimeout(messageDisplayArea.clearTimeout); // Clear this too
         const containerRef = gameUiContainer;
         _stopMusic();
         _saveState();
         let popup = document.getElementById('gotchi-tasks-popup-overlay'); if (popup?.parentNode === document.body) { document.body.removeChild(popup); } tasksPopupOverlay = null;
-
-        // No longer need to remove specific classes from containerRef
-
         _clearUI();
         console.log("MikaGotchi cleanup complete."); return Promise.resolve(true);
     }
 
-    // _showSimpleConfirmation (Needed by _handleClean)
+    // _showSimpleConfirmation
     function _showSimpleConfirmation(message) {
         if (!gameUiContainer) { console.warn("Cannot show confirmation, UI container missing."); return; }
         const existingConfirmationArea = document.getElementById('gotchi-confirmation');
         let confirmationArea = existingConfirmationArea;
-
         if (!confirmationArea || !confirmationArea.parentNode) {
             confirmationArea = document.createElement('div');
             confirmationArea.id = 'gotchi-confirmation';
             confirmationArea.style.cssText = `
-                position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
-                background-color: rgba(0, 150, 136, 0.85); /* Teal confirmation color */
-                color: white; padding: 8px 15px; border-radius: 10px; font-size: 0.9em;
-                text-align: center; opacity: 0; transition: opacity 0.5s ease-in-out;
-                z-index: 4; max-width: 80%; pointer-events: none;
+                position: absolute; top: 60px; /* Adjust if needed based on emoji position */ left: 50%; transform: translateX(-50%);
+                background-color: rgba(0, 150, 136, 0.85); /* Teal */ color: white;
+                padding: 8px 15px; border-radius: 10px; font-size: 0.9em; text-align: center;
+                opacity: 0; transition: opacity 0.5s ease-in-out; z-index: 4; max-width: 80%;
+                pointer-events: none;
             `;
             gameUiContainer.appendChild(confirmationArea);
         }
-
         if (confirmationArea.fadeTimeout) clearTimeout(confirmationArea.fadeTimeout);
         if (confirmationArea.clearTimeout) clearTimeout(confirmationArea.clearTimeout);
-
         confirmationArea.textContent = message;
         confirmationArea.style.opacity = '1';
-
         confirmationArea.fadeTimeout = setTimeout(() => {
             if (confirmationArea) { confirmationArea.style.opacity = '0'; }
-        }, 2500); // Show message for 2.5 seconds
+        }, 2500);
     }
 
     // --- Public Interface ---
