@@ -2,7 +2,7 @@
 
 // api.js - Nyaa! This file holds the Assistant's core personality! ☆
 // It talks to the magic box using the key you save!
-// ** NOW WITH PICTURE VISION & PERSONA SWITCHING! ** ✨
+// ** NOW WITH PICTURE VISION & PERSONA SWITCHING! & API COUNT CALLBACK! ** ✨
 
 // Mika's CORE Personality! (Bubbly Best Friend Version!) - USES USER NAME
 const baseSystemText = `You are Mika, a bubbly, energetic, and encouraging anime catgirl who is best friends with the user (whose name is specified below). You love having fun and helping them out.
@@ -29,23 +29,21 @@ const baseSystemTextKana = `You are Kana, a sly, sarcastic, and sharp-witted ani
 
 
 // Function to send messages (and optionally images!) to the magic chat box!
-// NOW accepts currentPersona to switch system prompts!
+// NOW accepts currentPersona and the incrementCounterCallback!
 // NOTE: The 'userMessage' might now contain additional role instructions prepended by the calling function.
-async function sendMessageToMika(userMessage, chatHistory, apiKey, userName, currentPersona = 'Mika', imageDataBase64 = null, imageMimeType = null) {
+async function sendMessageToMika(userMessage, chatHistory, apiKey, userName, currentPersona = 'Mika', imageDataBase64 = null, imageMimeType = null, incrementCounterCallback = null) { // Added callback param
     // Use the provided userName or a default fallback
     const nameToUse = userName || "User";
     console.log(`Sending message via ${currentPersona}! User: ${nameToUse}`, userMessage.substring(0, 50) + (userMessage.length > 50 ? '...' : ''), (imageDataBase64 ? "(+ Image)" : ""));
 
     if (!apiKey) {
         console.error("API Key is missing!");
-        // Use the persona-appropriate voice for the error
         const errorPrefix = (currentPersona === 'Kana') ? "*Sigh*..." : "*Confused meow?*";
         return `${errorPrefix} The secret code isn't working, ${nameToUse}! Did it get lost? Try setting it again maybe? >.<`;
     }
 
     // --- Dynamically select and create system instruction ---
     let systemTextToUse = (currentPersona === 'Kana') ? baseSystemTextKana : baseSystemText;
-    // Inject the correct name/title for the user into the base prompt
     const dynamicSystemText = `${systemTextToUse}\n\n**CURRENT USER'S NAME:** ${nameToUse}`;
     const systemInstruction = {
         role: "system",
@@ -55,13 +53,9 @@ async function sendMessageToMika(userMessage, chatHistory, apiKey, userName, cur
 
     // Construct the user parts array
     const userParts = [];
-    // Add the text part first (if it exists)
-    // This 'userMessage' might now contain role instructions prepended by index.html or game files.
     if (userMessage && userMessage.trim().length > 0) {
        userParts.push({ text: userMessage });
     }
-
-    // Add the image part IF it exists
     if (imageDataBase64 && imageMimeType) {
          if (imageMimeType.startsWith('image/')) {
              userParts.push({
@@ -76,22 +70,20 @@ async function sendMessageToMika(userMessage, chatHistory, apiKey, userName, cur
             return `*Confused meow?* That doesn't look like a picture file I understand, ${nameToUse}! Try a JPG, PNG, or WEBP maybe?`;
          }
     }
-
-    // Handle case where there's neither text nor a valid image
     if (userParts.length === 0) {
         console.warn("sendMessageToMika called with no text or valid image data.");
         return `*Tilts head* What did you want to say or show me, ${nameToUse}?`;
     }
     // -------------------------------------------
 
-    // Use the Gemini 1.5 Flash model
+    // Use the Gemini Flash model (currently Gemini 1.5 Flash)
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
     const requestBody = {
         contents: [...chatHistory, { role: "user", parts: userParts }],
         systemInstruction: systemInstruction,
          generationConfig: {
-             temperature: (currentPersona === 'Kana' ? 0.65 : 0.8), // Mika slightly more random/bubbly, Kana drier
+             temperature: (currentPersona === 'Kana' ? 0.65 : 0.8),
              topP: 0.95,
              maxOutputTokens: 800,
          },
@@ -104,6 +96,16 @@ async function sendMessageToMika(userMessage, chatHistory, apiKey, userName, cur
     };
 
     console.log("Sending Request Body Snippet:", JSON.stringify(requestBody, (key, value) => key === 'data' ? '<image_data>' : value, 2).substring(0, 500) + "...");
+
+    // --- INCREMENT COUNTER BEFORE FETCH ---
+    if (typeof incrementCounterCallback === 'function') {
+        try {
+            incrementCounterCallback(); // Call the function passed from index.html
+        } catch (e) {
+            console.error("Error calling incrementApiCount callback:", e);
+        }
+    }
+    // --- END INCREMENT ---
 
     try {
         const response = await fetch(API_URL, {
@@ -204,6 +206,5 @@ async function sendMessageToMika(userMessage, chatHistory, apiKey, userName, cur
         return generalErrorMsg;
     }
 }
-
 
 // --- END OF FILE api.js ---

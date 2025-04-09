@@ -8,6 +8,8 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" id="theme-color-meta" content="#d81b60">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.0/purify.min.js" integrity="sha512-SYy493affPOnekyryF+CeRmcM7JS0ZQifMRnbRGoAL1BX3+zwQMG5mygzSScpPA7MSQixX+j3gy7jMXKx6hIgw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- ADDED Version Script -->
+    <script src="version.js"></script>
 
     <style>
         /* --- CSS Variables --- */
@@ -56,6 +58,11 @@
          #kana-warning-popup .popup-modal h2 { color: var(--popup-header); }
          #mika-warning-popup .popup-modal { border-color: var(--kana-popup-border); }
          #mika-warning-popup .popup-modal h2 { color: var(--kana-popup-header); }
+         /* Style for About Popup (can share or be unique) */
+         #about-popup .popup-modal { border-color: var(--popup-border); } /* Default to Mika style? */
+         #about-popup .popup-modal h2 { color: var(--popup-header); }
+         #about-popup ul { padding-left: 20px; margin-top: 5px; margin-bottom: 15px; }
+         #about-popup li { margin-bottom: 8px; }
 
         /* Base Styles */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -64,7 +71,7 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; margin: 0; padding: 15px; box-sizing: border-box; transition: background-color 0.3s ease, color 0.3s ease; }
         /* Popup Styles */
         .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 200; backdrop-filter: blur(5px); animation: fadeIn 0.3s ease-out; }
-        .popup-modal { background: var(--popup-bg); padding: 30px 40px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5); text-align: center; border: 4px solid var(--popup-border); max-width: 450px; width: 90%; animation: fadeIn 0.4s ease-out 0.1s backwards; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        .popup-modal { background: var(--popup-bg); padding: 30px 40px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5); text-align: center; border: 4px solid var(--popup-border); max-width: 450px; width: 90%; animation: fadeIn 0.4s ease-out 0.1s backwards; transition: background-color 0.3s ease, border-color 0.3s ease; max-height: 85vh; overflow-y: auto; } /* Added max-height and overflow */
         .popup-modal h2 { margin: 0 0 15px; font-size: 1.6em; } .popup-modal p { color: var(--popup-text); margin-bottom: 15px; line-height: 1.5; font-size: 0.95em; }
         .popup-modal input[type="text"], .popup-modal input[type="password"] { width: 100%; padding: 12px 15px; margin-bottom: 15px; border: 2px solid var(--input-border); border-radius: 8px; font-size: 1em; box-sizing: border-box; background-color: var(--input-bg); color: var(--text-color); transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
         .popup-modal input:focus { outline: none; border-color: var(--input-focus-border); box-shadow: 0 0 8px var(--input-focus-shadow); animation: subtlePulse 1.5s infinite; }
@@ -251,9 +258,11 @@
         .comic-history-item span:first-child { color: var(--chat-text); }
         .comic-history-item span:last-child { color: var(--system-message-text); font-size: 0.9em; }
         /* ... Gotchi Styles ... */
-        /* (Styles for bars, buttons, etc., are mostly covered by reused classes) */
-        /* Add keyframes for tail sway here or ensure they are loaded */
-        @keyframes tail-sway { 0% { transform: rotate(-10deg); } 100% { transform: rotate(10deg); } }
+        /* (Keyframe animations defined within Gotchi creation) */
+        /* Base text color for stats area */
+        .gotchi-stats-area { color: var(--chat-log-text, #ffe0f0); }
+        #gotchi-poo-visual { position: absolute; bottom: 5px; left: 60%; font-size: 1.8em; opacity: 0; transition: opacity 0.5s ease-in-out; z-index: 1; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); cursor: default; }
+        #gotchi-confirmation { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); background-color: rgba(0, 150, 136, 0.85); color: white; padding: 8px 15px; border-radius: 10px; font-size: 0.9em; text-align: center; opacity: 0; transition: opacity 0.5s ease-in-out; z-index: 4; max-width: 80%; pointer-events: none; }
 
         /* Shared App Message Log */
         #app-message-log { width: calc(100% - 20px); max-width: 600px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin: 10px auto 10px auto; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0; display: none; }
@@ -321,7 +330,6 @@
              #quest-display-area { padding: 8px 10px; font-size: 0.95em; }
               /* Responsive Jetpack */
              #jetpack-commentary { font-size: 0.8em; min-height: 1.3em; }
-             #jetpack-game-iframe { height: calc(100% - 55px); /* Adjust height slightly for smaller screens */ }
              /* Responsive Comic */
              #comic-display-area { flex-direction: column; align-items: center; overflow-x: hidden; overflow-y: auto; }
              .comic-panel { width: 90%; margin-bottom: 10px; }
@@ -330,7 +338,6 @@
              /* Responsive Gotchi */
              #gotchi-graphic-container { width: 60px; height: 80px; } /* Slightly smaller */
              #gotchi-message-display { bottom: 95px; /* Adjust message position */ font-size: 0.85em; padding: 6px 10px; }
-             /* Adjust commands slightly */
         }
     </style>
 </head>
@@ -343,6 +350,19 @@
     <div id="install-popup" class="popup-overlay"> <div class="popup-modal"> <h2>☆ Install Helper? ☆</h2> <p>Want to add me (or Kana, *hmph*) to your Home Screen like a real app? Nyaa~!</p> <div class="popup-buttons"> <button id="install-button" class="popup-button">Install! ♡</button> <button id="install-later-button" class="popup-button secondary">Maybe Later</button> </div> </div> </div>
     <div id="kana-warning-popup" class="popup-overlay"> <div class="popup-modal"> <h2>⚠️ Wait a Sec! ⚠️</h2> <p>Are you... are you *sure* you want to switch to... <em>Kana</em>, <span class="popup-user-name-placeholder">[User Name]</span>? (*huffs*) She's all sarcastic and grumpy! Not cute and playful like <em>me</em>! She won't call you cute names, and she might even be mean! (*pouts*)</p> <p>Are you <em>really</em> gonna leave your favorite Mika behind for <em>her</em>?! Don't you like *my* attention anymore? ♡</p> <div class="popup-buttons"> <button id="kana-switch-confirm-button" class="popup-button">Ugh, fine. Switch to Kana.</button> <button id="kana-switch-cancel-button" class="popup-button secondary">Stay with my Mika! ♡</button> </div> </div> </div>
     <div id="mika-warning-popup" class="popup-overlay"> <div class="popup-modal"> <h2>Hold Up.</h2> <p>Switching back to Mika? *Scoffs* Really, <span class="popup-user-name-placeholder">[User Name]</span>? You sure you can handle all that... *bouncing* and *nyaa-ing* again? Don't come crying back to me when you need actual help.</p> <p>Fine. Go back to your precious cheerleader. See if I care. *rolls eyes*</p> <div class="popup-buttons"> <button id="mika-switch-confirm-button" class="popup-button">Yeah, Switch to Mika!</button> <button id="mika-switch-cancel-button" class="popup-button secondary">Stay with Kana.</button> </div> </div> </div>
+    <!-- ADDED About Popup -->
+    <div id="about-popup" class="popup-overlay">
+        <div class="popup-modal">
+            <h2 id="about-title">About Me! ♡</h2>
+            <div id="about-content" style="text-align: left; font-size: 0.9em; line-height: 1.6;">
+                <!-- Content will be generated by JavaScript -->
+                <p>Loading info...</p>
+            </div>
+            <div class="popup-buttons">
+                <button id="about-close-button" class="popup-button">Okay! ♡</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Interface -->
     <div id="chat-container">
@@ -371,14 +391,14 @@
                 <button id="app-rps-button" title="Play Rock Paper Scissors!">Rock Paper Scissors!</button>
                 <button id="app-gtn-button" title="Play Guess The Number!">Guess The Number~</button>
                 <button id="app-20q-button" title="Play 20 Questions!">20 Questions?</button>
-                <!-- *** NEW GOTCHI BUTTON *** -->
                 <button id="app-gotchi-button" title="Take care of me!">Mika-Gotchi! ♡</button>
-                <!-- *** END NEW BUTTON *** -->
                 <p class="no-items" style="display: none;">More apps soon~!</p>
             </div>
             <div id="settings-dropdown" class="dropdown-menu">
                 <button id="settings-install-button" title="Install Helper as an App">♡ Install App</button>
                 <button id="settings-theme-button" title="Toggle between Light and Dark Mode">✨ Toggle Theme</button>
+                 <!-- ADDED About Button -->
+                <button id="settings-about-button" title="About this Helper!">ℹ️ About</button>
                 <button id="settings-persona-button" title="Switch Assistant Persona">Switch to Kana</button>
                 <button id="settings-reset-button" class="reset-settings" title="Clear API Key, Name, etc., and Reload">⚠️ Reset All & Reload</button>
             </div>
@@ -419,14 +439,13 @@
     <script src="rpg.js"></script>
     <script src="jetpack.js"></script>
     <script src="comicstrip.js"></script>
-    <!-- *** INCLUDE NEW GOTCHI SCRIPT *** -->
     <script src="gotchi.js"></script>
     <!-- Include API script -->
     <script src="api.js"></script>
 
     <!-- Main Application Logic -->
     <script>
-        // Nyaa~! Mika & Kana's Helper & Fun Time App! ♡ (With Gotchi!)
+        // Nyaa~! Mika & Kana's Helper & Fun Time App! ♡ (With Gotchi & About!)
 
         // --- DOM Elements ---
         const bodyElement = document.body; const themeColorMeta = document.getElementById('theme-color-meta');
@@ -436,10 +455,17 @@
         const installPopup = document.getElementById('install-popup'); const installButton = document.getElementById('install-button'); const installLaterButton = document.getElementById('install-later-button');
         const kanaWarningPopup = document.getElementById('kana-warning-popup'); const kanaSwitchConfirmButton = document.getElementById('kana-switch-confirm-button'); const kanaSwitchCancelButton = document.getElementById('kana-switch-cancel-button');
         const mikaWarningPopup = document.getElementById('mika-warning-popup'); const mikaSwitchConfirmButton = document.getElementById('mika-switch-confirm-button'); const mikaSwitchCancelButton = document.getElementById('mika-switch-cancel-button');
+        // ADDED About Popup Elements
+        const aboutPopup = document.getElementById('about-popup');
+        const aboutTitle = document.getElementById('about-title');
+        const aboutContent = document.getElementById('about-content');
+        const aboutCloseButton = document.getElementById('about-close-button');
+        // Chat Elements
         const chatContainer = document.getElementById('chat-container'); const chatTitle = document.getElementById('chat-title');
         const mainContentArea = document.getElementById('main-content-area'); const chatArea = document.getElementById('chat-area');
         const appArea = document.getElementById('app-area');
         const chatLog = document.getElementById('chat-log'); const chatInput = document.getElementById('chat-input'); const sendButton = document.getElementById('send-button');
+        // Header & Dropdown Elements
         const settingsButton = document.getElementById('settings-button'); const homeButton = document.getElementById('home-button'); const historyButton = document.getElementById('history-button');
         const appsButton = document.getElementById('apps-button');
         const historyDropdown = document.getElementById('history-dropdown'); const settingsDropdown = document.getElementById('settings-dropdown');
@@ -457,10 +483,11 @@
         const appRpgButton = document.getElementById('app-rpg-button');
         const appJetpackButton = document.getElementById('app-jetpack-button');
         const appComicButton = document.getElementById('app-comic-button');
-        // *** ADD GOTCHI BUTTON REF ***
         const appGotchiButton = document.getElementById('app-gotchi-button');
         // Settings Buttons
-        const settingsInstallButton = document.getElementById('settings-install-button'); const settingsThemeButton = document.getElementById('settings-theme-button'); const settingsPersonaButton = document.getElementById('settings-persona-button'); const settingsResetButton = document.getElementById('settings-reset-button');
+        const settingsInstallButton = document.getElementById('settings-install-button'); const settingsThemeButton = document.getElementById('settings-theme-button');
+        const settingsAboutButton = document.getElementById('settings-about-button'); // Added About Button Ref
+        const settingsPersonaButton = document.getElementById('settings-persona-button'); const settingsResetButton = document.getElementById('settings-reset-button');
         // Image Upload
         const imageUploadInput = document.getElementById('image-upload-input'); const imageUploadButton = document.getElementById('image-upload-button'); const cameraButton = document.getElementById('camera-button'); const imagePreviewArea = document.getElementById('image-preview-area'); const imagePreview = document.getElementById('image-preview'); const removeImageButton = document.getElementById('remove-image-button');
         const deleteAllHistoryButtonTemplate = document.createElement('button'); deleteAllHistoryButtonTemplate.className = 'delete-history'; deleteAllHistoryButtonTemplate.textContent = 'Delete ALL History'; deleteAllHistoryButtonTemplate.title = 'Permanently delete all saved chats!';
@@ -470,10 +497,15 @@
         let isAppActive = false;
         let currentActiveAppModule = null;
         let currentPersona = 'Mika'; const PERSONA_PREFERENCE_KEY = 'mikaPersonaPreference_v1';
+        // --- NEW API Call Tracking State ---
+        const API_COUNT_STORAGE_KEY = 'mikaApiCallTracker_v1';
+        let apiCallCountData = { date: '', count: 0 }; // { date: 'YYYY-MM-DD', count: number }
 
         // --- Utility Functions ---
         const getTimestamp = () => Date.now();
-        const sanitizeHTML = (str) => { if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) { return DOMPurify.sanitize(str, { USE_PROFILES: { html: true }, ALLOWED_TAGS: ['strong', 'em', 'code', 'br', 'del', 'pre', 'span', 'div', 'p', 'h3', 'h4', 'label', 'button', 'input', 'strong', 'i'], KEEP_CONTENT: true }); } else { console.warn("DOMPurify missing, basic fallback."); return str.replace(/</g, '<').replace(/>/g, '>'); } };
+        const sanitizeHTML = (str) => { if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) { return DOMPurify.sanitize(str, { USE_PROFILES: { html: true }, ALLOWED_TAGS: ['strong', 'em', 'code', 'br', 'del', 'pre', 'span', 'div', 'p', 'h3', 'h4', 'label', 'button', 'input', 'strong', 'i', 'ul', 'li'], KEEP_CONTENT: true }); } else { console.warn("DOMPurify missing, basic fallback."); return str.replace(/</g, '<').replace(/>/g, '>'); } };
+        // Added helper for current date string
+        function _getCurrentDateString() { return new Date().toISOString().slice(0, 10); }
 
         // --- Local Storage ---
         function saveToLocalStorage(key, value) { try { localStorage.setItem(key, value); return true; } catch (e) { console.error(`Save LS Error [${key}]:`, e); return false; } }
@@ -518,7 +550,7 @@
         function loadChat(chatId) { switchToChatView(); if (currentChatId && currentChatHistory.length > 0 && currentChatId !== chatId) { allChats[currentChatId] = currentChatHistory; } if (allChats[chatId]) { currentChatId = chatId; currentChatHistory = allChats[chatId]; clearChatDisplay(); const loadMsg = (currentPersona === 'Kana') ? `Loaded chat from ${new Date(parseInt(chatId)).toLocaleString()}. Try to keep up, ${currentUserName}.` : `Loaded chat from ${new Date(parseInt(chatId)).toLocaleString()}. Welcome back, ${currentUserName}! ♡`; appendMessage('system', loadMsg); currentChatHistory.forEach(msg => { let displayMsg = msg.parts.find(p => p.text)?.text || ""; let displayImgPlaceholder = msg.parts.some(p => p.placeholder === "[Image Sent]"); let senderName = (msg.role === 'user') ? 'user' : currentPersona; appendMessage(senderName, displayMsg, false, displayImgPlaceholder ? "[Image Placeholder]" : null); }); removeSelectedImage(); enableChatInput(); console.log(`Loaded chat: ${chatId}`); } else { console.error(`Chat ID ${chatId} not found.`); appendMessage('system', `${currentPersona === 'Kana' ? 'Can\'t find that chat. Idiot.' : 'Mrow! Couldn\'t find that chat, ' + currentUserName + '!'}`); } closeAllDropdowns(); saveAllChats(); }
 
         // --- Dropdowns ---
-        function closeAllDropdowns() { if (historyDropdown) historyDropdown.style.display = 'none'; if (settingsDropdown) settingsDropdown.style.display = 'none'; if (appsDropdown) appsDropdown.style.display = 'none'; }
+        function closeAllDropdowns() { if (historyDropdown) historyDropdown.style.display = 'none'; if (settingsDropdown) settingsDropdown.style.display = 'none'; if (appsDropdown) appsDropdown.style.display = 'none'; if (aboutPopup && aboutPopup.style.display === 'flex') aboutPopup.style.display = 'none'; /* Close About popup too */ }
         function toggleDropdown(dd) { const isOpen = dd.style.display === 'block'; closeAllDropdowns(); if (!isOpen) { dd.style.display = 'block'; if (dd === historyDropdown) updateHistoryDropdown(); if (dd === settingsDropdown) updateSettingsDropdown(); if (dd === appsDropdown) updateAppsDropdown(); } }
         function updateHistoryDropdown() { if (!historyDropdown) return; historyDropdown.innerHTML = ''; const ids = Object.keys(allChats).sort((a, b) => b - a); if (ids.length === 0) { const p = document.createElement('p'); p.className = 'no-items'; p.textContent = 'No past chats!'; historyDropdown.appendChild(p); } else { ids.forEach(id => { const chat = allChats[id]; if (chat && chat.length > 0) { const btn = document.createElement('button'); const firstMsg = chat.find(m => m.role === 'user'); const txt = firstMsg?.parts.find(p => p.text)?.text || 'Chat'; const img = firstMsg?.parts.some(p => p.placeholder === "[Image Sent]"); const prev = sanitizeHTML(txt.substring(0, 20)) + (img ? ' [📷]' : '') + '...'; const date = new Date(parseInt(id)).toLocaleString(); btn.textContent = `${date} - ${prev}`; btn.title = `Load: ${date}`; btn.onclick = () => loadChat(id); historyDropdown.appendChild(btn); } }); } if (ids.length > 0) { const delBtn = deleteAllHistoryButtonTemplate.cloneNode(true); delBtn.onclick = deleteAllChats; historyDropdown.appendChild(delBtn); } }
         function updateSettingsDropdown() { if (!settingsInstallButton || !settingsPersonaButton) return; settingsInstallButton.disabled = !deferredInstallPrompt; applyTheme(loadThemePreference() || 'light'); settingsPersonaButton.textContent = (currentPersona === 'Mika') ? "Switch to Kana" : "Switch to Mika"; }
@@ -531,30 +563,19 @@
         // --- App Loading ---
         function setupAppAreaBase(titleText) { if (!appArea) return null; clearAppAreaContent(); return appArea; }
         function displayAppMessage(sender, text) {
-            // Skip message display for specific apps handled internally or don't need it
-            const noLogModules = [MikaDiary, StoryTime, ChoreHelper, PeriodTracker, HoroscopeApp, RpgApp, JetpackGame, ComicStripApp, MikaGotchi]; // Added MikaGotchi
-            if (noLogModules.some(mod => currentActiveAppModule === mod)) {
-                console.log(`Skipping displayAppMessage for ${sender} in ${currentActiveAppModule?.constructor?.name || 'current app'}.`);
-                return;
-            }
-
+            const noLogModules = [MikaDiary, StoryTime, ChoreHelper, PeriodTracker, HoroscopeApp, RpgApp, JetpackGame, ComicStripApp, MikaGotchi];
+            if (noLogModules.some(mod => currentActiveAppModule === mod)) { console.log(`Skipping displayAppMessage for ${sender} in ${currentActiveAppModule?.constructor?.name || 'current app'}.`); return; }
             let log = document.getElementById('app-message-log');
-            if (!log) {
-                 console.warn("Shared app message log not found, creating.");
-                 log = document.createElement('div'); log.id = 'app-message-log';
-                 log.style.cssText = `width: calc(100% - 20px); max-width: 600px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin: 10px auto 10px auto; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0;`;
-                 const backButton = appArea.querySelector('#back-to-chat-button');
-                 if(backButton) { appArea.insertBefore(log, backButton); } else { appArea.appendChild(log); }
-            }
+            if (!log) { console.warn("Shared app message log not found, creating."); log = document.createElement('div'); log.id = 'app-message-log'; log.style.cssText = `width: calc(100% - 20px); max-width: 600px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin: 10px auto 10px auto; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0;`; const backButton = appArea.querySelector('#back-to-chat-button'); if(backButton) { appArea.insertBefore(log, backButton); } else { appArea.appendChild(log); } }
             log.style.display = 'block';
-
             const el = document.createElement('p'); let msg = sanitizeHTML(text); let css = 'system-gamemsg'; const userNameForDisplay = sanitizeHTML(currentUserName);
             if (sender === 'Mika' || sender === 'Kana') { css = 'mika-gamemsg'; msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); el.innerHTML = `<strong>${sender}:</strong> ${msg}`; }
             else if (sender === 'User') { css = 'user-gamemsg'; el.innerHTML = `<strong>${userNameForDisplay}:</strong> ${msg}`; }
             else { css = 'system-gamemsg'; el.innerHTML = msg; }
             el.className = css; log.appendChild(el); setTimeout(() => { if(log) log.scrollTop = log.scrollHeight; }, 50);
         }
-        async function callMikaApiForApp(prompt, context = []) { if (!currentApiKey) { displayAppMessage('System', 'Error: API Key missing!'); return Promise.reject("API Key missing!"); } const user = currentUserName || "User"; console.log(`API app call (${currentPersona} for ${user}): ${prompt.substring(0,60)}...`); try { const resp = await sendMessageToMika(prompt, context, currentApiKey, user, currentPersona); return (typeof resp === 'string' && resp.trim()) ? resp : null; } catch (err) { console.error("API app error:", err); displayAppMessage('System', `API Error: ${err}`); return Promise.reject(`API error: ${err}`); } }
+        // UPDATED: Pass incrementApiCount callback
+        async function callMikaApiForApp(prompt, context = []) { if (!currentApiKey) { displayAppMessage('System', 'Error: API Key missing!'); return Promise.reject("API Key missing!"); } const user = currentUserName || "User"; console.log(`API app call (${currentPersona} for ${user}): ${prompt.substring(0,60)}...`); try { const resp = await sendMessageToMika(prompt, context, currentApiKey, user, currentPersona, null, null, incrementApiCount); /* Passed callback */ return (typeof resp === 'string' && resp.trim()) ? resp : null; } catch (err) { console.error("API app error:", err); displayAppMessage('System', `API Error: ${err}`); return Promise.reject(`API error: ${err}`); } }
 
         // --- Load Specific Apps ---
          function loadTicTacToe() { const module = TicTacToe; const appTitle = "Tic-Tac-Toe"; switchToAppView(module, appTitle); const container = setupAppAreaBase(); if (container && module?.init) { const uiWrapper = document.createElement('div'); uiWrapper.style.cssText=`display: flex; flex-direction: column; align-items: center; width:100%; flex-grow:1; justify-content:center;`; const boardElement = document.createElement('div'); boardElement.id = 'ttt-board'; uiWrapper.appendChild(boardElement); container.appendChild(uiWrapper); const appLog = document.createElement('div'); appLog.id = 'app-message-log'; appLog.style.display = 'none'; container.appendChild(appLog); const backBtn = document.createElement('button'); backBtn.id = 'back-to-chat-button'; backBtn.textContent = 'Back to Chat'; backBtn.onclick = switchToChatView; container.appendChild(backBtn); module.init(boardElement, displayAppMessage, currentUserName, currentPersona); } else { console.error("TTT load fail"); switchToChatView(); appendMessage('system', 'Mrow! TTT failed...'); } }
@@ -569,20 +590,7 @@
          function loadRpgApp() { const module = RpgApp; const appTitle = "RPG Adventure 🎲"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("RPG App load fail"); switchToChatView(); appendMessage('system', 'Meeeow! RPG App failed...'); } }
          function loadJetpackGame() { const module = JetpackGame; const appTitle = "Kitty Jet Pack 🚀"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, null, currentUserName, currentPersona); } else { console.error("Jetpack Game load fail"); switchToChatView(); appendMessage('system', 'Meeeow! Jetpack game failed to load...'); } }
          function loadComicStripApp() { const module = ComicStripApp; const appTitle = "Daily Comic Strip 😂"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("Comic Strip App load fail"); switchToChatView(); appendMessage('system', 'Meeeow! Comic Strip app failed to load...'); } }
-         // *** NEW FUNCTION TO LOAD GOTCHI ***
-         function loadMikaGotchi() {
-             const module = MikaGotchi; // Assumes MikaGotchi object in gotchi.js
-             const appTitle = "Mika-Gotchi! ♡";
-             switchToAppView(module, appTitle); // Switch view, pass module reference
-             if (appArea && module?.init) {
-                 // Pass the appArea container, messageCallback, apiCaller, username, persona
-                 module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona);
-             } else {
-                 console.error("MikaGotchi App load fail");
-                 switchToChatView(); // Go back if failed
-                 appendMessage('system', 'Meeeow! Mika-Gotchi app failed to load...');
-             }
-         }
+         function loadMikaGotchi() { const module = MikaGotchi; const appTitle = "Mika-Gotchi! ♡"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("MikaGotchi App load fail"); switchToChatView(); appendMessage('system', 'Meeeow! Mika-Gotchi app failed to load...'); } }
          function clearAppAreaContent() { if (appArea) appArea.innerHTML = ''; }
 
         // --- Image Handling ---
@@ -591,17 +599,92 @@
         function removeSelectedImage() { selectedImageData = null; selectedImageMimeType = null; if (imageUploadInput) imageUploadInput.value = null; if (imagePreviewArea) imagePreviewArea.style.display = 'none'; if (imagePreview) imagePreview.src = '#'; enableChatInput(); console.log("Image removed."); }
 
         // --- API Call & Message Handling ---
-        async function handleSendMessage() { if (isAppActive || isAssistantTyping || !currentApiKey) return; const userInputText = chatInput.value.trim(); const hasTxt = userInputText.length > 0; const hasImg = !!selectedImageData; if (!hasTxt && !hasImg) return; let roleInstruction = ""; if (!isAppActive) { if (currentPersona === 'Mika') { roleInstruction = `[ROLE: You are Mika, acting as a helpful assistant for ${currentUserName}. Focus on assisting with their request (likely homework help), but maintain your bubbly, playful, teasing, and possessive catgirl personality described in the system prompt. Use cute cat noises and actions. Address the user as '${currentUserName}'. Keep responses helpful but fun.]\n\n`; } else { roleInstruction = `[ROLE: You are Kana, acting as a sarcastic assistant for ${currentUserName}. Assist them with their request (likely homework help) in your characteristic sly, witty, and begrudging manner described in the system prompt. Address the user as '${currentUserName}' or a sarcastic nickname. Keep responses sharp and concise.]\n\n`; } } const messageToSend = roleInstruction + userInputText; const imgData = selectedImageData; const imgMime = selectedImageMimeType; const imgPreviewUrl = hasImg ? imagePreview.src : null; removeSelectedImage(); appendMessage('user', userInputText || "[Image Attached]", false, imgPreviewUrl); const userParts = []; if (hasTxt) userParts.push({ text: userInputText }); if (hasImg) userParts.push({ placeholder: "[Image Sent]", mimeType: imgMime }); currentChatHistory.push({ role: 'user', parts: userParts }); chatInput.value = ''; isAssistantTyping = true; disableChatInput(); showTypingIndicator(); const historyContext = currentChatHistory.slice(0, -1).map(msg => ({ role: msg.role, parts: msg.parts.filter(p => p.text).map(p => ({ text: p.text })) })).filter(msg => msg.parts.length > 0); const trimmedHistoryContext = historyContext.length > MAX_HISTORY_LENGTH ? historyContext.slice(-MAX_HISTORY_LENGTH) : historyContext; if (historyContext.length > MAX_HISTORY_LENGTH) { console.log("Chat history pruned for API context."); } try { const userForApi = currentUserName || "User"; const resp = await sendMessageToMika(messageToSend, trimmedHistoryContext, currentApiKey, userForApi, currentPersona, imgData, imgMime); removeTypingIndicator(); appendMessage(currentPersona, resp); currentChatHistory.push({ role: 'model', parts: [{ text: resp }] }); saveAllChats(); } catch (err) { console.error("Send error:", err); removeTypingIndicator(); const errorMsg = err.message || `${currentPersona === 'Kana' ? 'Connection error. Whatever.' : 'Mrow! Error talking, ' + currentUserName + '...'}`; appendMessage('system', errorMsg); } finally { isAssistantTyping = false; if (currentApiKey) enableChatInput(); else disableChatInput("API Key needed!"); } }
+        // UPDATED: Pass incrementApiCount
+        async function handleSendMessage() { if (isAppActive || isAssistantTyping || !currentApiKey) return; const userInputText = chatInput.value.trim(); const hasTxt = userInputText.length > 0; const hasImg = !!selectedImageData; if (!hasTxt && !hasImg) return; let roleInstruction = ""; if (!isAppActive) { if (currentPersona === 'Mika') { roleInstruction = `[ROLE: You are Mika, acting as a helpful assistant for ${currentUserName}. Focus on assisting with their request (likely homework help), but maintain your bubbly, playful, teasing, and possessive catgirl personality described in the system prompt. Use cute cat noises and actions. Address the user as '${currentUserName}'. Keep responses helpful but fun.]\n\n`; } else { roleInstruction = `[ROLE: You are Kana, acting as a sarcastic assistant for ${currentUserName}. Assist them with their request (likely homework help) in your characteristic sly, witty, and begrudging manner described in the system prompt. Address the user as '${currentUserName}' or a sarcastic nickname. Keep responses sharp and concise.]\n\n`; } } const messageToSend = roleInstruction + userInputText; const imgData = selectedImageData; const imgMime = selectedImageMimeType; const imgPreviewUrl = hasImg ? imagePreview.src : null; removeSelectedImage(); appendMessage('user', userInputText || "[Image Attached]", false, imgPreviewUrl); const userParts = []; if (hasTxt) userParts.push({ text: userInputText }); if (hasImg) userParts.push({ placeholder: "[Image Sent]", mimeType: imgMime }); currentChatHistory.push({ role: 'user', parts: userParts }); chatInput.value = ''; isAssistantTyping = true; disableChatInput(); showTypingIndicator(); const historyContext = currentChatHistory.slice(0, -1).map(msg => ({ role: msg.role, parts: msg.parts.filter(p => p.text).map(p => ({ text: p.text })) })).filter(msg => msg.parts.length > 0); const trimmedHistoryContext = historyContext.length > MAX_HISTORY_LENGTH ? historyContext.slice(-MAX_HISTORY_LENGTH) : historyContext; if (historyContext.length > MAX_HISTORY_LENGTH) { console.log("Chat history pruned for API context."); } try { const userForApi = currentUserName || "User"; const resp = await sendMessageToMika(messageToSend, trimmedHistoryContext, currentApiKey, userForApi, currentPersona, imgData, imgMime, incrementApiCount); /* Passed callback */ removeTypingIndicator(); appendMessage(currentPersona, resp); currentChatHistory.push({ role: 'model', parts: [{ text: resp }] }); saveAllChats(); } catch (err) { console.error("Send error:", err); removeTypingIndicator(); const errorMsg = err.message || `${currentPersona === 'Kana' ? 'Connection error. Whatever.' : 'Mrow! Error talking, ' + currentUserName + '...'}`; appendMessage('system', errorMsg); } finally { isAssistantTyping = false; if (currentApiKey) enableChatInput(); else disableChatInput("API Key needed!"); } }
+
+        // --- NEW API Call Tracking Functions ---
+        function loadApiCount() { try { const storedData = loadFromLocalStorage(API_COUNT_STORAGE_KEY); if (storedData) { const parsedData = JSON.parse(storedData); if (parsedData && typeof parsedData.date === 'string' && typeof parsedData.count === 'number') { apiCallCountData = parsedData; console.log(`Loaded API call count: ${apiCallCountData.count} for date ${apiCallCountData.date}`); } else { console.warn("Invalid API count data found, resetting."); apiCallCountData = { date: '', count: 0 }; } } else { apiCallCountData = { date: '', count: 0 }; console.log("No previous API call count found."); } } catch (e) { console.error("Failed to load API call count:", e); apiCallCountData = { date: '', count: 0 }; clearFromLocalStorage(API_COUNT_STORAGE_KEY); } }
+        function incrementApiCount() { const today = _getCurrentDateString(); if (apiCallCountData.date === today) { apiCallCountData.count++; } else { apiCallCountData.date = today; apiCallCountData.count = 1; console.log("API count reset for new day."); } try { saveToLocalStorage(API_COUNT_STORAGE_KEY, JSON.stringify(apiCallCountData)); console.log(`API call count for ${today} updated to: ${apiCallCountData.count}`); } catch (e) { console.error("Failed to save API call count:", e); } }
+
+        // --- NEW Function to Show About Popup ---
+        function showAboutPopup() {
+            if (!aboutPopup || !aboutContent || !aboutTitle) return;
+            const version = (typeof APP_VERSION !== 'undefined') ? APP_VERSION : 'Unknown';
+            const updateNote = (typeof APP_UPDATE_NOTE !== 'undefined') ? APP_UPDATE_NOTE : 'No details available.';
+            // Determine API Usage Display (Rounded)
+            let usageDisplay = "Not Tracked Yet";
+            const today = _getCurrentDateString();
+            if (apiCallCountData.date === today) { const count = apiCallCountData.count; if (count === 0) { usageDisplay = "<100 calls today"; } else { const upperBound = Math.ceil(count / 100) * 100; usageDisplay = `<${upperBound} calls today`; } } else { usageDisplay = "<100 calls today"; }
+            // Generate content based on persona
+            let appInfo = ""; let storageInfo = ""; let aiInfo = ""; let usageInfo = ""; let popupTitle = "";
+            if (currentPersona === 'Mika') {
+                popupTitle = "About Your Helper! ♡";
+                appInfo = `Hiii ${currentUserName}! ♡ I'm Mika (and sometimes... *that other one*, Kana 💢), your super fun and helpful AI assistant and best friend! I'm here to help with homework, play games, keep secrets in our diary, manage chores, and just hang out! I use magic AI from Google (called Gemini!) to chat and help you. Let's have fun together! (=^･ω･^=)`;
+                storageInfo = `Remember, Master! Your secret API key, your name, our chat history, and all our app data (like diary entries, chores, stories, etc.) are saved *only* in *your* browser's local storage! Super safe! ♡`;
+                aiInfo = `I'm powered by Google's Gemini AI! ✨ It's pretty smart, but sometimes AI can be a little silly or make mistakes, nyaa~! So always think critically!`;
+                usageInfo = `Just a little note! I use your secret API key to talk to the magic AI box! ✨ Using the AI might have limits or costs depending on your key, so just be mindful! This little counter isn't purrfectly accurate, but it gives a rough idea of usage today: [Approx. Usage Today: ${usageDisplay}].`;
+            } else { // Kana
+                popupTitle = "About This App.";
+                appInfo = `*Tsk*. This is an 'assistant' app featuring me, Kana, and occasionally the overly enthusiastic pink one. We use Google's Gemini AI. I suppose it can help with homework, chores, or whatever else you bother us with, ${currentUserName}. Try not to waste my time.`;
+                storageInfo = `Data like your API key, name, and app stuff stays in your browser's local storage. Don't blame me if you clear it.`;
+                aiInfo = `Powered by Google Gemini. It's AI, don't expect miracles or perfection.`;
+                usageInfo = `Regarding your API key: This app uses it to function. Usage might be tracked or limited by Google. Don't overuse it unless you know what you're doing. [Approx. Usage Today: ${usageDisplay}].`;
+            }
+            // Construct the HTML content
+            aboutContent.innerHTML = `
+                <p>${sanitizeHTML(appInfo)}</p>
+                <hr style="border: none; border-top: 1px dashed var(--popup-border); margin: 15px 0;">
+                <p><strong>Important Notes:</strong></p>
+                <ul>
+                    <li>${sanitizeHTML(storageInfo)}</li>
+                    <li>${sanitizeHTML(aiInfo)}</li>
+                </ul>
+                <hr style="border: none; border-top: 1px dashed var(--popup-border); margin: 15px 0;">
+                <p><strong>API Usage:</strong> ${sanitizeHTML(usageInfo)}</p>
+                <hr style="border: none; border-top: 1px dashed var(--popup-border); margin: 15px 0;">
+                <p style="font-size: 0.85em; text-align: center; color: var(--system-message-text);">
+                    Version: <strong>${sanitizeHTML(version)}</strong><br>
+                    Latest Update: ${sanitizeHTML(updateNote)}
+                </p>
+            `;
+            aboutTitle.textContent = popupTitle;
+            aboutPopup.style.display = 'flex';
+        }
+// ... (Previous JavaScript code in index.html ends here) ...
 
         // --- Initialization Flow ---
         function proceedToChat() { if (!chatContainer) return; chatContainer.style.display = 'flex'; chatArea.style.display = 'flex'; appArea.style.display = 'none'; isAppActive = false; currentActiveAppModule = null; if (homeButton) { homeButton.textContent = '➕ New Chat'; homeButton.title = 'Start a New Chat'; homeButton.onclick = () => startNewChat(true); } const chatId = loadAllChats(); if (chatId) { loadChat(chatId); } else { clearChatDisplay(); const welcomeMsg = (currentPersona === 'Kana') ? `Ready when you are, ${currentUserName}. What homework have you got?` : `Ready for your homework, ${currentUserName}! Ask me anything! ♡`; appendMessage('system', welcomeMsg); enableChatInput(); } updateChatTitle(); updateInputPlaceholder(); updateHistoryDropdown(); if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred install prompt."); installPopup.style.display = 'flex'; } }
         function checkNameAndProceed() { const name = loadUserName(); if (name) { currentUserName = name; if (namePopup) namePopup.style.display = 'none'; applyPersona(currentPersona, true); checkApiKeyAndProceed(); } else { if (namePopup && nameInput) { if(apiKeyPopup) apiKeyPopup.style.display = 'none'; if(disclaimerPopup) disclaimerPopup.style.display = 'none'; nameInput.value = "Study Buddy"; namePopup.style.display = 'flex'; nameInput.focus(); nameInput.select(); } } }
         function checkApiKeyAndProceed() { const key = loadApiKey(); if (key) { currentApiKey = key; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; proceedToChat(); } else { if (apiKeyPopup && chatContainer && apiKeyInput) { if (namePopup) namePopup.style.display = 'none'; if(disclaimerPopup) disclaimerPopup.style.display = 'none'; chatContainer.style.display = 'none'; apiKeyPopup.style.display = 'flex'; disableChatInput("API Key needed!"); apiKeyInput.focus(); } } }
-        function initializeApp() { console.log("Initializing App..."); registerServiceWorker(); setupInstallPromptHandler(); const theme = loadThemePreference(); applyTheme(theme || 'light'); currentPersona = loadPersonaPreference() || 'Mika'; if (hasAgreedToDisclaimer()) { console.log("Disclaimer agreed."); checkNameAndProceed(); } else { console.log("Showing disclaimer."); if (disclaimerPopup) disclaimerPopup.style.display = 'flex'; if (apiKeyPopup) apiKeyPopup.style.display = 'none'; if (namePopup) namePopup.style.display = 'none'; if (chatContainer) chatContainer.style.display = 'none'; if (appArea) appArea.style.display = 'none'; if (chatArea) chatArea.style.display = 'none'; } updateChatTitle(); updateInputPlaceholder(); }
+        function initializeApp() {
+            console.log("Initializing App...");
+            registerServiceWorker();
+            setupInstallPromptHandler();
+            const theme = loadThemePreference();
+            applyTheme(theme || 'light');
+            currentPersona = loadPersonaPreference() || 'Mika';
+            loadApiCount(); // <<< Load the API count
+
+            if (hasAgreedToDisclaimer()) {
+                console.log("Disclaimer agreed.");
+                checkNameAndProceed();
+            } else {
+                console.log("Showing disclaimer.");
+                if (disclaimerPopup) disclaimerPopup.style.display = 'flex';
+                if (apiKeyPopup) apiKeyPopup.style.display = 'none';
+                if (namePopup) namePopup.style.display = 'none';
+                if (chatContainer) chatContainer.style.display = 'none';
+                if (appArea) appArea.style.display = 'none';
+                if (chatArea) chatArea.style.display = 'none';
+            }
+            // Initial UI updates even before popups resolve
+            updateChatTitle();
+            updateInputPlaceholder();
+        }
 
         // --- Event Listeners ---
         // Reset listener updated
-        if (settingsResetButton) settingsResetButton.addEventListener('click', () => { closeAllDropdowns(); const confirmMsg = `⚠️ Reset ALL Settings for ${currentUserName}? Clears API Key, Name, Persona, Disclaimer, Theme, Install status, All Chats, AND All Chores/Diary/Stories/Tracker/Horoscope/RPG/Comic/Gotchi Data & reloads. Sure, ${currentUserName}?!`; if (confirm(confirmMsg)) { console.log("Resetting all application data..."); clearApiKey(); clearUserName(); clearPersonaPreference(); clearDisclaimerAgreement(); clearInstallPromptShown(); clearThemePreference(); clearFromLocalStorage('mikaHelper_allChats'); clearFromLocalStorage('mikaChores_list_v2'); clearFromLocalStorage('mikaChores_balance_v1'); clearFromLocalStorage('mikaChores_history_v1'); clearFromLocalStorage('mikaChores_pinHash_v1'); clearFromLocalStorage('mikaChores_lockedDate_v1'); clearFromLocalStorage('mikaChores_bonusEnabled_v1'); clearFromLocalStorage('mikaChores_bonusTiers_v1'); clearFromLocalStorage('mikaStoryLibrary_v1'); clearFromLocalStorage('mikaDiaryEntries_v1'); clearFromLocalStorage('mikaPeriodTrackerData_v1'); clearFromLocalStorage('mikaHoroscopeCache_v1'); clearFromLocalStorage('mikaHoroscopeUserSign_v1'); clearFromLocalStorage('mikaRpgLibrary_v1'); clearFromLocalStorage('mikaComicCacheV2'); clearFromLocalStorage('mikaComicThemes_v1'); clearFromLocalStorage('mikaComicGenCount_v1'); clearFromLocalStorage('mikaGotchiData_v1_Mika'); /* <-- CLEAR MIKA GOTCHI DATA */ clearFromLocalStorage('mikaGotchiData_v1_Kana'); /* <-- CLEAR KANA GOTCHI DATA */ window.location.reload(); } });
+        if (settingsResetButton) settingsResetButton.addEventListener('click', () => { closeAllDropdowns(); const confirmMsg = `⚠️ Reset ALL Settings for ${currentUserName}? Clears API Key, Name, Persona, Disclaimer, Theme, Install status, All Chats, AND All Chores/Diary/Stories/Tracker/Horoscope/RPG/Comic/Gotchi Data & reloads. Sure, ${currentUserName}?!`; if (confirm(confirmMsg)) { console.log("Resetting all application data..."); clearApiKey(); clearUserName(); clearPersonaPreference(); clearDisclaimerAgreement(); clearInstallPromptShown(); clearThemePreference(); clearFromLocalStorage('mikaHelper_allChats'); clearFromLocalStorage('mikaChores_list_v2'); clearFromLocalStorage('mikaChores_balance_v1'); clearFromLocalStorage('mikaChores_history_v1'); clearFromLocalStorage('mikaChores_pinHash_v1'); clearFromLocalStorage('mikaChores_lockedDate_v1'); clearFromLocalStorage('mikaChores_bonusEnabled_v1'); clearFromLocalStorage('mikaChores_bonusTiers_v1'); clearFromLocalStorage('mikaStoryLibrary_v1'); clearFromLocalStorage('mikaDiaryEntries_v1'); clearFromLocalStorage('mikaPeriodTrackerData_v1'); clearFromLocalStorage('mikaHoroscopeCache_v1'); clearFromLocalStorage('mikaHoroscopeUserSign_v1'); clearFromLocalStorage('mikaRpgLibrary_v1'); clearFromLocalStorage('mikaComicCacheV2'); clearFromLocalStorage('mikaComicThemes_v1'); clearFromLocalStorage('mikaComicGenCount_v1'); clearFromLocalStorage('mikaGotchiData_v1_Mika'); clearFromLocalStorage('mikaGotchiData_v1_Kana'); clearFromLocalStorage(API_COUNT_STORAGE_KEY); /* <-- Clear API Count */ window.location.reload(); } });
         if (disclaimerAgreeButton) disclaimerAgreeButton.addEventListener('click', () => { saveDisclaimerAgreement(); disclaimerPopup.style.display = 'none'; checkNameAndProceed(); });
         if (saveApiKeyButton) saveApiKeyButton.addEventListener('click', () => { if (!apiKeyInput) return; const key = apiKeyInput.value.trim(); if (key) { if (saveApiKey(key)) { currentApiKey = key; apiKeyPopup.style.display = 'none'; apiKeyError.style.display = 'none'; proceedToChat(); } else { apiKeyError.textContent = "Save failed?"; apiKeyError.style.display = 'block'; } } else { apiKeyError.textContent = "Key needed!"; apiKeyError.style.display = 'block'; } });
         if (apiKeyInput) apiKeyInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveApiKeyButton?.click(); if (apiKeyError) apiKeyError.style.display = 'none'; });
@@ -631,20 +714,31 @@
         if (appRpgButton) appRpgButton.addEventListener('click', () => { closeAllDropdowns(); loadRpgApp(); });
         if (appJetpackButton) appJetpackButton.addEventListener('click', () => { closeAllDropdowns(); loadJetpackGame(); });
         if (appComicButton) appComicButton.addEventListener('click', () => { closeAllDropdowns(); loadComicStripApp(); });
-        // *** ADD GOTCHI LISTENER ***
         if (appGotchiButton) appGotchiButton.addEventListener('click', () => { closeAllDropdowns(); loadMikaGotchi(); });
         // Settings Listeners
         if (settingsInstallButton) settingsInstallButton.addEventListener('click', handleManualInstall);
         if (settingsThemeButton) settingsThemeButton.addEventListener('click', toggleTheme);
+        if (settingsAboutButton) settingsAboutButton.addEventListener('click', () => { closeAllDropdowns(); showAboutPopup(); }); // Added About Listener
         if (settingsPersonaButton) settingsPersonaButton.addEventListener('click', (e) => { e.stopPropagation(); closeAllDropdowns(); applyPersona(currentPersona, true); if (currentPersona === 'Mika') { if(kanaWarningPopup) kanaWarningPopup.style.display = 'flex'; } else { if(mikaWarningPopup) mikaWarningPopup.style.display = 'flex'; } });
         // Persona Popup Button Listeners
         if (kanaSwitchConfirmButton) kanaSwitchConfirmButton.addEventListener('click', () => { if (kanaWarningPopup) kanaWarningPopup.style.display = 'none'; applyPersona('Kana'); closeAllDropdowns(); });
         if (kanaSwitchCancelButton) kanaSwitchCancelButton.addEventListener('click', () => { if (kanaWarningPopup) kanaWarningPopup.style.display = 'none'; closeAllDropdowns(); });
         if (mikaSwitchConfirmButton) mikaSwitchConfirmButton.addEventListener('click', () => { if (mikaWarningPopup) mikaWarningPopup.style.display = 'none'; applyPersona('Mika'); closeAllDropdowns(); });
         if (mikaSwitchCancelButton) mikaSwitchCancelButton.addEventListener('click', () => { if (mikaWarningPopup) mikaWarningPopup.style.display = 'none'; closeAllDropdowns(); });
+        // About Popup Close Button Listener
+        if (aboutCloseButton) aboutCloseButton.addEventListener('click', () => { if (aboutPopup) aboutPopup.style.display = 'none'; });
 
-        // Close dropdowns on outside click
-        document.addEventListener('click', (e) => { if (historyDropdown?.style.display === 'block' && !historyDropdown.contains(e.target) && e.target !== historyButton) historyDropdown.style.display = 'none'; if (settingsDropdown?.style.display === 'block' && !settingsDropdown.contains(e.target) && e.target !== settingsButton) settingsDropdown.style.display = 'none'; if (appsDropdown?.style.display === 'block' && !appsDropdown.contains(e.target) && e.target !== appsButton) appsDropdown.style.display = 'none'; });
+        // Close dropdowns AND About popup on outside click
+        document.addEventListener('click', (e) => {
+            if (historyDropdown?.style.display === 'block' && !historyDropdown.contains(e.target) && e.target !== historyButton) historyDropdown.style.display = 'none';
+            if (settingsDropdown?.style.display === 'block' && !settingsDropdown.contains(e.target) && e.target !== settingsButton) settingsDropdown.style.display = 'none';
+            if (appsDropdown?.style.display === 'block' && !appsDropdown.contains(e.target) && e.target !== appsButton) appsDropdown.style.display = 'none';
+            // Close About Popup on outside click
+            const aboutModal = aboutPopup?.querySelector('.popup-modal');
+            if (aboutPopup?.style.display === 'flex' && aboutModal && !aboutModal.contains(e.target) && e.target !== settingsAboutButton) {
+                aboutPopup.style.display = 'none';
+            }
+        });
 
         // --- Start the App ---
         document.addEventListener('DOMContentLoaded', initializeApp);
