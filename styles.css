@@ -1,332 +1,357 @@
-        /* --- CSS Variables --- */
-        :root {
-            --bg-color: #ffe0f0; --text-color: #333; --popup-bg: #ffe0f0; --popup-border: #d81b60; --popup-header: #a32d37; --popup-text: #555;
-            --input-border: #f06292; --input-focus-border: #d81b60; --input-focus-shadow: rgba(216, 27, 96, 0.5); --input-bg: #fff3f7;
-            --button-gradient-1: #d81b60; --button-gradient-2: #f06292; --button-text: white;
-            --secondary-button-bg: #eee; --secondary-button-text: #555; --secondary-button-border: #ccc; --secondary-button-hover-bg: #ddd; --error-color: #c62828;
-            --chat-bg: #1a0d13; --chat-text: #ffacd1; --chat-border: #f06292; --chat-header-bg: rgba(240, 98, 146, 0.2); --chat-header-text: #fce4ec; --chat-header-shadow: #f06292;
-            --chat-log-bg: rgba(20, 0, 10, 0.7); --chat-log-text: #ffe0f0; --user-message-text: #ade8f4; --user-message-name: #48cae4; --mika-message-text: #ffacd1; --mika-message-name: #f06292; /* Use mika-message vars for Kana too for simplicity */
-            --system-message-text: #aaa; --typing-indicator-text: #f06292; --chat-input-area-bg: rgba(240, 98, 146, 0.1); --chat-input-bg: #1a1a2e; --chat-input-text: #ffe0f0;
-            --chat-input-border: #f06292; --chat-input-focus-shadow: rgba(240, 98, 146, 0.6); --send-button-bg-1: #d81b60; --send-button-bg-2: #f06292;
-            --send-button-hover-1: #f06292; --send-button-hover-2: #d81b60; --scrollbar-thumb: #f06292; --scrollbar-track: rgba(26, 13, 19, 0.5); --scrollbar-thumb-hover: #d81b60;
-            --dropdown-bg: #1a0d13; --dropdown-border: #f06292; --dropdown-shadow: rgba(0, 0, 0, 0.4); --dropdown-button-text: #ffacd1; --dropdown-button-hover-bg: rgba(240, 98, 146, 0.2);
-            --dropdown-delete-text: #ff8a80; --dropdown-delete-hover-bg: rgba(255, 138, 128, 0.3); --header-button-bg: #f06292; --header-button-text: #1a0d13; --header-button-hover-bg: #d81b60;
-            /* App Vars (Previously Game Vars) */
-            --game-board-bg: var(--chat-input-bg); --game-board-border: var(--chat-border); --game-cell-border: var(--chat-input-border); --game-cell-hover-bg: var(--chat-header-bg);
-            --game-cell-text: var(--chat-text); --game-cell-taken-text: var(--mika-message-name); --game-message-log-bg: var(--chat-log-bg); --game-message-log-border: var(--chat-input-border);
-            --game-message-log-text: var(--chat-log-text); --game-message-mika: var(--mika-message-text); --game-message-user: var(--user-message-text); --game-message-system: var(--system-message-text);
-            --user-message-text-rgb: 173, 232, 244; /* Define RGB for user message text */
-             /* Kana Theme Elements */
-             --kana-popup-border: #b39ddb; /* Lavender */
-             --kana-popup-header: #673ab7; /* Deep Purple */
-        }
-        body.dark-mode {
-            --bg-color: #1f1a24; --text-color: #e0e0e0; --popup-bg: #3a2f41; --popup-border: #f48fb1; --popup-header: #f8bbd0; --popup-text: #c7c0cc;
-            --input-border: #f48fb1; --input-focus-border: #ffc1e3; --input-focus-shadow: rgba(244, 143, 177, 0.5); --input-bg: #4e3f55;
-            --secondary-button-bg: #555; --secondary-button-text: #ddd; --secondary-button-border: #777; --secondary-button-hover-bg: #666; --error-color: #ff8a80;
-            --chat-bg: #2c1f30; --chat-text: #ffc1e3; --chat-border: #f48fb1; --chat-header-bg: rgba(244, 143, 177, 0.2); --chat-header-text: #fce4ec; --chat-header-shadow: #f48fb1;
-            --chat-log-bg: rgba(30, 20, 35, 0.8); --chat-log-text: #f5e6ef; --user-message-text: #b3e5fc; --user-message-name: #81d4fa; --mika-message-text: #ffc1e3; --mika-message-name: #f48fb1;
-            --system-message-text: #b0aab3; --typing-indicator-text: #f48fb1; --chat-input-area-bg: rgba(244, 143, 177, 0.1); --chat-input-bg: #1e1424; --chat-input-text: #f5e6ef;
-            --chat-input-border: #f48fb1; --chat-input-focus-shadow: rgba(244, 143, 177, 0.6); --scrollbar-thumb: #f48fb1; --scrollbar-track: rgba(44, 31, 48, 0.5); --scrollbar-thumb-hover: #d81b60;
-            --dropdown-bg: #2c1f30; --dropdown-border: #f48fb1; --dropdown-shadow: rgba(0, 0, 0, 0.6); --dropdown-button-text: #ffc1e3; --dropdown-button-hover-bg: rgba(244, 143, 177, 0.2);
-            --dropdown-delete-text: #ff8a80; --dropdown-delete-hover-bg: rgba(255, 138, 128, 0.3); --header-button-bg: #f48fb1; --header-button-text: #2c1f30; --header-button-hover-bg: #d81b60;
-            /* Dark App Vars (Previously Game Vars) */
-            --game-board-bg: var(--chat-input-bg); --game-board-border: var(--chat-border); --game-cell-border: var(--chat-input-border); --game-cell-hover-bg: var(--chat-header-bg);
-            --game-cell-text: var(--chat-text); --game-cell-taken-text: var(--mika-message-name); --game-message-log-bg: var(--chat-log-bg); --game-message-log-border: var(--chat-input-border);
-            --game-message-log-text: var(--chat-log-text); --game-message-mika: var(--mika-message-text); --game-message-user: var(--user-message-text); --game-message-system: var(--system-message-text);
-            --user-message-text-rgb: 179, 229, 252; /* Define RGB for user message text in dark mode */
-             /* Dark Kana Theme */
-             --kana-popup-border: #ce93d8; /* Lighter Purple */
-             --kana-popup-header: #ab47bc; /* Purple */
-        }
-         /* Specific Persona Popup Styling */
-         #kana-warning-popup .popup-modal { border-color: var(--popup-border); }
-         #kana-warning-popup .popup-modal h2 { color: var(--popup-header); }
-         #mika-warning-popup .popup-modal { border-color: var(--kana-popup-border); }
-         #mika-warning-popup .popup-modal h2 { color: var(--kana-popup-header); }
-         /* Style for About Popup (can share or be unique) */
-         #about-popup .popup-modal { border-color: var(--popup-border); } /* Default to Mika style? */
-         #about-popup .popup-modal h2 { color: var(--popup-header); }
-         #about-popup ul { padding-left: 20px; margin-top: 5px; margin-bottom: 15px; }
-         #about-popup li { margin-bottom: 8px; }
-         /* Style for Notifications Popup (Persona dependent) */
-         #notifications-popup .popup-modal { /* Uses theme color */ border-color: var(--popup-border); }
-         #notifications-popup .popup-modal h2 { /* Uses theme color */ color: var(--popup-header); }
+/* --- START OF FILE styles.css --- */
 
-        /* Base Styles */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes subtlePulse { 0%, 100% { box-shadow: 0 0 8px var(--input-focus-shadow); } 50% { box-shadow: 0 0 12px var(--input-focus-shadow); } }
-        html, body { height: 100%; overflow: hidden; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; margin: 0; padding: 15px; box-sizing: border-box; transition: background-color 0.3s ease, color 0.3s ease; }
-        /* Popup Styles */
-        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 200; backdrop-filter: blur(5px); animation: fadeIn 0.3s ease-out; }
-        .popup-modal { background: var(--popup-bg); padding: 30px 40px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5); text-align: center; border: 4px solid var(--popup-border); max-width: 450px; width: 90%; animation: fadeIn 0.4s ease-out 0.1s backwards; transition: background-color 0.3s ease, border-color 0.3s ease; max-height: 85vh; overflow-y: auto; } /* Added max-height and overflow */
-        .popup-modal h2 { margin: 0 0 15px; font-size: 1.6em; } .popup-modal p { color: var(--popup-text); margin-bottom: 15px; line-height: 1.5; font-size: 0.95em; }
-        .popup-modal input[type="text"], .popup-modal input[type="password"] { width: 100%; padding: 12px 15px; margin-bottom: 15px; border: 2px solid var(--input-border); border-radius: 8px; font-size: 1em; box-sizing: border-box; background-color: var(--input-bg); color: var(--text-color); transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
-        .popup-modal input:focus { outline: none; border-color: var(--input-focus-border); box-shadow: 0 0 8px var(--input-focus-shadow); animation: subtlePulse 1.5s infinite; }
-        .popup-buttons { display: flex; justify-content: center; margin-top: 20px; gap: 15px; flex-wrap: wrap; /* Allow wrapping */ }
-        .popup-button { padding: 10px 25px; font-size: 1em; font-weight: bold; border-radius: 20px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease; border: none; color: var(--button-text); background: linear-gradient(45deg, var(--button-gradient-1), var(--button-gradient-2)); }
-        .popup-button.secondary { background: var(--secondary-button-bg); color: var(--secondary-button-text); border: 1px solid var(--secondary-button-border); }
-        .popup-button:hover { transform: scale(1.05); box-shadow: 0 5px 12px rgba(0,0,0,0.3); } .popup-button.secondary:hover { background: var(--secondary-button-hover-bg); } .popup-button:active { transform: scale(0.98); }
-        .popup-error { color: var(--error-color); font-weight: bold; margin-top: 15px; display: none; font-size: 0.9em; }
-        /* Main Container */
-        #chat-container { width: 100%; max-width: 800px; height: 90vh; max-height: 700px; background-color: var(--chat-bg); color: var(--chat-text); border: 3px solid var(--chat-border); border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); display: none; flex-direction: column; align-items: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 15px; line-height: 1.5; overflow: hidden; padding: 0; animation: fadeIn 0.5s ease-out forwards; transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
-        /* Header Area */
-        #chat-header { width: 100%; background-color: var(--chat-header-bg); padding: 10px 15px; box-sizing: border-box; text-align: center; border-bottom: 1px solid var(--chat-border); flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; position: relative; }
-        #chat-header h2 { margin: 0; font-size: 1.3em; color: var(--chat-header-text); text-shadow: 0 0 3px var(--chat-header-shadow); cursor: default; }
-        .header-buttons { display: flex; align-items: center; }
-        .header-button { padding: 5px 10px; font-size: 0.8em; background-color: var(--header-button-bg); color: var(--header-button-text); border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s, transform 0.1s, color 0.3s ease; margin-left: 8px; }
-        .header-button:hover { background-color: var(--header-button-hover-bg); transform: scale(1.05); } .header-button:active { transform: scale(0.98); }
-        /* Dropdown Styles */
-        .dropdown-menu { display: none; position: absolute; top: calc(100% + 5px); background-color: var(--dropdown-bg); border: 1px solid var(--dropdown-border); border-radius: 5px; box-shadow: 0 4px 10px var(--dropdown-shadow); z-index: 10; max-height: 200px; overflow-y: auto; min-width: 160px; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--chat-input-bg); transition: background-color 0.3s ease, border-color 0.3s ease; }
-        #history-dropdown, #apps-dropdown, #settings-dropdown { right: 15px; }
-        .dropdown-menu button { display: block; width: 100%; padding: 8px 12px; background: none; border: none; border-bottom: 1px solid rgba(240, 98, 146, 0.3); color: var(--dropdown-button-text); text-align: left; cursor: pointer; font-size: 0.9em; transition: background-color 0.2s ease, color 0.3s ease; }
-        .dropdown-menu button:last-child { border-bottom: none; } .dropdown-menu button:hover { background-color: var(--dropdown-button-hover-bg); } .dropdown-menu button:disabled { opacity: 0.5; cursor: not-allowed; background-color: transparent !important; }
-        .dropdown-menu button.delete-history, .dropdown-menu button.reset-settings { color: var(--dropdown-delete-text); font-weight: bold; border-top: 1px solid var(--dropdown-border); margin-top: 5px; }
-        .dropdown-menu button.delete-history:hover, .dropdown-menu button.reset-settings:hover { background-color: var(--dropdown-delete-hover-bg); }
-        .dropdown-menu p.no-items { padding: 8px; color: var(--system-message-text); text-align: center; font-size: 0.9em; margin: 0; }
-        /* Main Content Area */
-        #main-content-area { flex-grow: 1; width: 100%; overflow: hidden; display: flex; position: relative; }
-        /* Chat Area Wrapper */
-        #chat-area { display: flex; flex-direction: column; width: 100%; height: 100%; }
-        /* Chat Log */
-        #chat-log { width: 100%; background-color: var(--chat-log-bg); overflow-y: auto; padding: 15px; box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--chat-input-bg); color: var(--chat-log-text); text-align: left; flex-grow: 1; }
-        #chat-log p { margin: 5px 0 10px 0; line-height: 1.5; word-wrap: break-word; max-width: 100%; }
-        #chat-log .user-message { color: var(--user-message-text); text-align: right; margin-left: auto; max-width: 85%; }
-        #chat-log .user-message strong { color: var(--user-message-name); }
-        #chat-log .user-message .message-content img.thumbnail { max-width: 100px; max-height: 100px; border-radius: 5px; margin-top: 5px; border: 1px solid var(--chat-input-border); cursor: pointer; display: block; margin-left: auto; }
-        #chat-log .mika-message { color: var(--mika-message-text); margin-right: auto; max-width: 85%; }
-        #chat-log .mika-message strong { color: var(--mika-message-name); }
-        #chat-log .system-message { color: var(--system-message-text); font-style: italic; font-size: 0.9em; text-align: center; }
-        #chat-log .typing-indicator { color: var(--typing-indicator-text); font-style: italic; font-size: 0.9em; text-align: center; animation: fadeIn 0.3s; }
-        /* Chat Input Area */
-        #chat-input-area { display: flex; align-items: center; width: 100%; padding: 8px 10px; box-sizing: border-box; border-top: 1px solid var(--chat-input-border); background-color: var(--chat-input-area-bg); flex-shrink: 0; }
-        #image-upload-input { display: none; }
-        #image-upload-button, #camera-button { background: none; border: none; color: var(--mika-message-name); font-size: 1.5em; cursor: pointer; padding: 5px 8px; margin-right: 5px; transition: color 0.2s; }
-        #image-upload-button:hover, #camera-button:hover { color: var(--mika-message-text); }
-        #chat-input { flex-grow: 1; padding: 10px 15px; border: 1px solid var(--chat-input-border); background-color: var(--chat-input-bg); color: var(--chat-input-text); border-radius: 20px; font-family: inherit; font-size: 1em; outline: none; transition: all 0.2s ease; }
-        #chat-input:focus { box-shadow: 0 0 8px var(--input-focus-shadow); }
-        #chat-input:disabled { background-color: #444; cursor: not-allowed; }
-        #image-preview-area { display: none; margin-left: 8px; position: relative; }
-        #image-preview-area img { max-height: 36px; max-width: 60px; border-radius: 4px; border: 1px solid var(--chat-input-border); }
-        #remove-image-button { position: absolute; top: -5px; right: -5px; background-color: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; line-height: 16px; text-align: center; cursor: pointer; font-weight: bold; }
-        #send-button { padding: 10px 20px; border: none; background: linear-gradient(45deg, var(--send-button-bg-1), var(--send-button-bg-2)); color: white; font-weight: bold; cursor: pointer; border-radius: 20px; transition: background 0.2s ease, transform 0.1s; margin-left: 8px; }
-        #send-button:hover { background: linear-gradient(45deg, var(--send-button-hover-1), var(--send-button-hover-2)); transform: scale(1.02); }
-        #send-button:active { transform: scale(0.98); }
-        #send-button:disabled { background: #666; cursor: not-allowed; transform: none; opacity: 0.6; }
-        /* App Area Styles */
-        #app-area { display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px; width: 100%; height: 100%; box-sizing: border-box; overflow: hidden; background-color: var(--chat-bg); color: var(--chat-text); }
+/* --- CSS Variables --- */
+:root {
+    --bg-color: #ffe0f0; --text-color: #333; --popup-bg: #ffe0f0; --popup-border: #d81b60; --popup-header: #a32d37; --popup-text: #555;
+    --input-border: #f06292; --input-focus-border: #d81b60; --input-focus-shadow: rgba(216, 27, 96, 0.5); --input-bg: #fff3f7;
+    --button-gradient-1: #d81b60; --button-gradient-2: #f06292; --button-text: white;
+    --secondary-button-bg: #eee; --secondary-button-text: #555; --secondary-button-border: #ccc; --secondary-button-hover-bg: #ddd; --error-color: #c62828;
+    --chat-bg: #1a0d13; --chat-text: #ffacd1; --chat-border: #f06292; --chat-header-bg: rgba(240, 98, 146, 0.2); --chat-header-text: #fce4ec; --chat-header-shadow: #f06292;
+    --chat-log-bg: rgba(20, 0, 10, 0.7); --chat-log-text: #ffe0f0; --user-message-text: #ade8f4; --user-message-name: #48cae4; --mika-message-text: #ffacd1; --mika-message-name: #f06292; /* Use mika-message vars for Kana too for simplicity */
+    --system-message-text: #aaa; --typing-indicator-text: #f06292; --chat-input-area-bg: rgba(240, 98, 146, 0.1); --chat-input-bg: #1a1a2e; --chat-input-text: #ffe0f0;
+    --chat-input-bg-rgb: 26, 26, 46; /* <<< ADDED for light mode advice bubble */
+    --chat-input-border: #f06292; --chat-input-focus-shadow: rgba(240, 98, 146, 0.6); --send-button-bg-1: #d81b60; --send-button-bg-2: #f06292;
+    --send-button-hover-1: #f06292; --send-button-hover-2: #d81b60; --scrollbar-thumb: #f06292; --scrollbar-track: rgba(26, 13, 19, 0.5); --scrollbar-thumb-hover: #d81b60;
+    --dropdown-bg: #1a0d13; --dropdown-border: #f06292; --dropdown-shadow: rgba(0, 0, 0, 0.4); --dropdown-button-text: #ffacd1; --dropdown-button-hover-bg: rgba(240, 98, 146, 0.2);
+    --dropdown-delete-text: #ff8a80; --dropdown-delete-hover-bg: rgba(255, 138, 128, 0.3); --header-button-bg: #f06292; --header-button-text: #1a0d13; --header-button-hover-bg: #d81b60;
+    /* App Vars (Previously Game Vars) */
+    --game-board-bg: var(--chat-input-bg); --game-board-border: var(--chat-border); --game-cell-border: var(--chat-input-border); --game-cell-hover-bg: var(--chat-header-bg);
+    --game-cell-text: var(--chat-text); --game-cell-taken-text: var(--mika-message-name); --game-message-log-bg: var(--chat-log-bg); --game-message-log-border: var(--chat-input-border);
+    --game-message-log-text: var(--chat-log-text); --game-message-mika: var(--mika-message-text); --game-message-user: var(--user-message-text); --game-message-system: var(--system-message-text);
+    --user-message-text-rgb: 173, 232, 244; /* Define RGB for user message text */
+     /* Kana Theme Elements */
+     --kana-popup-border: #b39ddb; /* Lavender */
+     --kana-popup-header: #673ab7; /* Deep Purple */
+}
+body.dark-mode {
+    --bg-color: #1f1a24; --text-color: #e0e0e0; --popup-bg: #3a2f41; --popup-border: #f48fb1; --popup-header: #f8bbd0; --popup-text: #c7c0cc;
+    --input-border: #f48fb1; --input-focus-border: #ffc1e3; --input-focus-shadow: rgba(244, 143, 177, 0.5); --input-bg: #4e3f55;
+    --secondary-button-bg: #555; --secondary-button-text: #ddd; --secondary-button-border: #777; --secondary-button-hover-bg: #666; --error-color: #ff8a80;
+    --chat-bg: #2c1f30; --chat-text: #ffc1e3; --chat-border: #f48fb1; --chat-header-bg: rgba(244, 143, 177, 0.2); --chat-header-text: #fce4ec; --chat-header-shadow: #f48fb1;
+    --chat-log-bg: rgba(30, 20, 35, 0.8); --chat-log-text: #f5e6ef; --user-message-text: #b3e5fc; --user-message-name: #81d4fa; --mika-message-text: #ffc1e3; --mika-message-name: #f48fb1;
+    --system-message-text: #b0aab3; --typing-indicator-text: #f48fb1; --chat-input-area-bg: rgba(244, 143, 177, 0.1); --chat-input-bg: #1e1424; --chat-input-text: #f5e6ef;
+    --chat-input-bg-rgb: 30, 20, 38; /* <<< ADDED for dark mode advice bubble */
+    --chat-input-border: #f48fb1; --chat-input-focus-shadow: rgba(244, 143, 177, 0.6); --scrollbar-thumb: #f48fb1; --scrollbar-track: rgba(44, 31, 48, 0.5); --scrollbar-thumb-hover: #d81b60;
+    --dropdown-bg: #2c1f30; --dropdown-border: #f48fb1; --dropdown-shadow: rgba(0, 0, 0, 0.6); --dropdown-button-text: #ffc1e3; --dropdown-button-hover-bg: rgba(244, 143, 177, 0.2);
+    --dropdown-delete-text: #ff8a80; --dropdown-delete-hover-bg: rgba(255, 138, 128, 0.3); --header-button-bg: #f48fb1; --header-button-text: #2c1f30; --header-button-hover-bg: #d81b60;
+    /* Dark App Vars (Previously Game Vars) */
+    --game-board-bg: var(--chat-input-bg); --game-board-border: var(--chat-border); --game-cell-border: var(--chat-input-border); --game-cell-hover-bg: var(--chat-header-bg);
+    --game-cell-text: var(--chat-text); --game-cell-taken-text: var(--mika-message-name); --game-message-log-bg: var(--chat-log-bg); --game-message-log-border: var(--chat-input-border);
+    --game-message-log-text: var(--chat-log-text); --game-message-mika: var(--mika-message-text); --game-message-user: var(--user-message-text); --game-message-system: var(--system-message-text);
+    --user-message-text-rgb: 179, 229, 252; /* Define RGB for user message text in dark mode */
+     /* Dark Kana Theme */
+     --kana-popup-border: #ce93d8; /* Lighter Purple */
+     --kana-popup-header: #ab47bc; /* Purple */
+}
+ /* Specific Persona Popup Styling */
+ #kana-warning-popup .popup-modal { border-color: var(--popup-border); }
+ #kana-warning-popup .popup-modal h2 { color: var(--popup-header); }
+ #mika-warning-popup .popup-modal { border-color: var(--kana-popup-border); }
+ #mika-warning-popup .popup-modal h2 { color: var(--kana-popup-header); }
+ /* Style for About Popup (can share or be unique) */
+ #about-popup .popup-modal { border-color: var(--popup-border); } /* Default to Mika style? */
+ #about-popup .popup-modal h2 { color: var(--popup-header); }
+ #about-popup ul { padding-left: 20px; margin-top: 5px; margin-bottom: 15px; }
+ #about-popup li { margin-bottom: 8px; }
+ /* Style for Notifications Popup (Persona dependent) */
+ #notifications-popup .popup-modal { /* Uses theme color */ border-color: var(--popup-border); }
+ #notifications-popup .popup-modal h2 { /* Uses theme color */ color: var(--popup-header); }
 
-        /* --- App Specific Styles --- */
-        /* ... TTT Styles ... */
-        #ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 240px; height: 240px; margin: 10px auto; border: 3px solid var(--game-board-border); border-radius: 8px; background-color: var(--game-board-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); flex-shrink: 0; }
-        .ttt-cell { border: 1px solid var(--game-cell-border); display: flex; justify-content: center; align-items: center; font-size: 2.5em; font-weight: bold; cursor: pointer; color: var(--game-cell-text); transition: background-color 0.2s, color 0.2s; user-select: none; }
-        .ttt-cell:hover { background-color: var(--game-cell-hover-bg); } .ttt-cell.taken { cursor: not-allowed; color: var(--game-cell-taken-text); } .ttt-cell.taken:hover { background-color: transparent; }
-        /* ... RPS Styles ... */
-        .rps-choice-button { font-family: inherit; padding: 10px 20px; font-size: 1.1em; border-radius: 10px; border: none; cursor: pointer; background: var(--header-button-bg, #f06292); color: var(--header-button-text, #1a0d13); transition: transform 0.1s ease, background-color 0.2s, color 0.2s; flex-shrink: 0; margin: 5px; }
-        .rps-choice-button:hover { transform: scale(1.05); background: var(--header-button-hover-bg, #d81b60); } .rps-choice-button:active { transform: scale(0.98); }
-        .rps-choice-button.secondary { background: var(--secondary-button-bg); color: var(--secondary-button-text); border: 1px solid var(--secondary-button-border); } .rps-choice-button.secondary:hover { background: var(--secondary-button-hover-bg); }
-        #rps-result-display { margin-top: 10px; padding: 10px; min-height: 30px; text-align: center; font-weight: bold; border: 1px dashed var(--game-cell-border, #f06292); border-radius: 5px; background-color: rgba(0,0,0,0.1); opacity: 0.6; transition: opacity 0.3s ease; color: var(--game-cell-text); width: 90%; max-width: 350px; }
-        /* ... GTN Styles ... */
-        #gtn-input { padding: 8px 12px; border: 1px solid var(--input-border, #ccc); border-radius: 5px; width: 150px; background-color: var(--input-bg); color: var(--text-color); text-align: center; font-size: 1em; margin-right: 5px; }
-        #gtn-input::-webkit-outer-spin-button, #gtn-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; } #gtn-input[type=number] { -moz-appearance: textfield; }
-        #gtn-submit { padding: 8px 15px; } #gtn-feedback { min-height: 20px; font-weight: bold; margin-bottom: 5px; text-align: center; font-size: 1.1em; color: var(--game-cell-text); transition: color 0.3s ease; }
-        .gtn-feedback-win { color: var(--mika-message-name, #f06292); } .gtn-feedback-lose, .gtn-feedback-error { color: var(--error-color, #c62828); } .gtn-feedback-warn { color: orange; } .gtn-feedback-info { color: var(--game-cell-text); }
-        #gtn-indicator { padding: 5px 15px; border-radius: 15px; color: white; font-weight: bold; text-align: center; display: inline-block; min-width: 160px; margin-bottom: 10px; transition: background-color 0.5s ease, opacity 0.5s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        #gtn-guesses-left { margin-bottom: 10px; text-align: center; color: var(--system-message-text); font-size: 0.9em; } #gtn-new-game { margin-top: 5px; }
-        /* ... 20Q Styles ... */
-        #tq-question-input, #tq-guess-input { padding: 8px 12px; border: 1px solid var(--input-border, #ccc); border-radius: 5px; width: calc(80% - 70px); max-width: 300px; margin-right: 5px; background-color: var(--input-bg); color: var(--text-color); font-size: 0.95em; display: inline-block; vertical-align: middle; }
-        #tq-ask-button, #tq-guess-button { padding: 8px 10px; font-size: 0.9em; display: inline-block; vertical-align: middle; }
-        #tq-questions-left { margin-bottom: 10px; text-align: center; font-size: 1.1em; color: var(--system-message-text); transition: color 0.3s ease, font-weight 0.3s ease; }
-        #tq-new-game { margin-top: 5px; }
-        /* ... Diary Styles ... */
-        #diary-chat-view, #diary-entries-view { width: 100%; height: 100%; overflow: hidden; display: flex; flex-direction: column; }
-        #diary-entries-view { overflow-y: auto; }
-        .diary-top-notes-area { flex-shrink: 0; height: 90px; overflow-y: auto; border-bottom: 1px solid var(--chat-input-border); padding: 5px; background-color: rgba(0,0,0, 0.1); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; }
-        .diary-notes-empty { color: var(--system-message-text); font-style: italic; text-align: center; margin-top: 15px; font-size: 0.9em;}
-        .diary-note-item { background-color: rgba(255, 255, 255, 0.1); padding: 4px 8px; margin-bottom: 3px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; }
-        .diary-note-item span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-right: 5px; }
-        .diary-note-remove { background: none; border: none; color: var(--error-color, red); font-size: 1.2em; cursor: pointer; padding: 0 5px; line-height: 1; }
-        .diary-controls-area { flex-shrink: 0; padding: 5px; text-align: center; border-bottom: 1px solid var(--chat-input-border); }
-        #diary-add-button, #diary-view-entries-button { margin: 0 5px; padding: 6px 12px; font-size: 0.85em; }
-        #diary-add-button:disabled { opacity: 0.5; cursor: not-allowed; background: var(--secondary-button-bg); color: var(--secondary-button-text); border-color: var(--secondary-button-border); }
-        .diary-chat-log-area { flex-grow: 1; overflow-y: auto; padding: 8px; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; }
-        .diary-chat-log-area p { margin: 4px 0 7px 0; line-height: 1.4; word-wrap: break-word; max-width: 100%; position: relative; padding-right: 25px; }
-        .diary-user-message { color: var(--user-message-text); text-align: right; margin-left: auto; max-width: 90%; } .diary-user-message strong { color: var(--user-message-name); }
-        .diary-mika-message { color: var(--mika-message-text); margin-right: auto; max-width: 90%; }
-        .diary-mika-message strong { color: var(--mika-message-name); }
-        .diary-heart-button { position: absolute; top: 1px; right: 1px; background: none; border: none; color: var(--system-message-text); cursor: pointer; font-size: 1em; padding: 0; line-height: 1; opacity: 0.3; transition: opacity 0.2s, color 0.2s; }
-        .diary-chat-log-area p:hover .diary-heart-button { opacity: 1; } .diary-heart-button.active { color: var(--mika-message-name); opacity: 1; }
-        .diary-input-area { display: flex; padding: 8px; border-top: 1px solid var(--chat-input-border); background-color: var(--chat-input-area-bg); flex-shrink: 0; }
-        .diary-chat-input { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--chat-input-border); background-color: var(--chat-input-bg); color: var(--chat-input-text); border-radius: 15px 0 0 15px; font-size: 0.95em; outline: none; }
-        .diary-send-button { padding: 8px 15px; border: 1px solid var(--chat-input-border); background: linear-gradient(45deg, var(--send-button-bg-1), var(--send-button-bg-2)); color: white; font-weight: bold; cursor: pointer; border-radius: 0 15px 15px 0; transition: background 0.2s; }
-        .diary-send-button:hover { background: linear-gradient(45deg, var(--send-button-hover-1), var(--send-button-hover-2)); }
-        .diary-view-back-button { margin-bottom: 10px; }
-        .diary-entries-title { text-align: center; color: var(--chat-header-text); margin-bottom: 10px; font-size: 1.1em; }
-        .diary-entries-empty { color: var(--system-message-text); font-style: italic; text-align: center; }
-        .diary-entry-item { background-color: rgba(255, 255, 255, 0.05); border: 1px solid var(--chat-input-border); padding: 8px 12px; margin-bottom: 8px; border-radius: 8px; }
-        .diary-entry-date { display: block; font-size: 0.75em; color: var(--system-message-text); margin-bottom: 4px; }
-        .diary-entry-item p { margin: 0; line-height: 1.4; color: var(--chat-log-text); font-size: 0.95em;}
-        /* ... Story Time Styles ... */
-        #story-wrapper { display: flex; flex-direction: column; height: 100%; width: 100%; box-sizing: border-box; }
-        .story-display-area { flex-grow: 1; overflow-y: auto; padding: 10px 15px; margin-bottom: 5px; background-color: rgba(0,0,0, 0.1); border-radius: 8px; border: 1px solid var(--chat-input-border); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; color: var(--chat-log-text); }
-        .story-display-area p { margin: 0 0 10px 0; line-height: 1.5; white-space: pre-wrap; } .story-display-area p:last-child { margin-bottom: 0; }
-        .story-display-area p > strong:first-child { color: var(--mika-message-name); } .story-display-area p > strong { font-weight: bold; } .story-display-area p > em { font-style: italic; }
-        .story-display-area p.user-action { text-align: right; color: var(--user-message-text); font-style: italic; opacity: 0.9; margin: 5px 0; border-top: 1px dashed rgba(var(--user-message-text-rgb), 0.3); padding-top: 5px; margin-top: 5px; }
-        .story-status-area { flex-shrink: 0; text-align: center; padding: 3px; font-style: italic; font-size: 0.9em; color: var(--typing-indicator-text); min-height: 1.2em; display: none; }
-        .story-interaction-area { flex-shrink: 0; padding: 5px 0; border-top: 1px solid var(--chat-input-border); background-color: var(--chat-input-area-bg); }
-        .story-choices-area { text-align: center; margin-bottom: 8px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0 5px; }
-        .story-choice { overflow: hidden; white-space: nowrap; position: relative; text-align: left; max-width: 90%; justify-content: flex-start; box-sizing: border-box; }
-        .story-choice span.scrollable-text { display: inline-block; white-space: nowrap; padding: 0; margin: 0; vertical-align: middle; will-change: transform; transform: translateX(0); }
-        @keyframes scroll-left-right { 0%   { transform: translateX(0); } 15%  { transform: translateX(0); } 65%  { transform: translateX(var(--scroll-distance, -50px)); } 80%  { transform: translateX(var(--scroll-distance, -50px)); } 100% { transform: translateX(0); } }
-        .story-choice.text-overflow-scroll span.scrollable-text { animation: scroll-left-right 10s linear infinite; }
-        @media (prefers-reduced-motion: reduce) { .story-choice.text-overflow-scroll span.scrollable-text { animation: none; transform: translateX(0) !important; text-overflow: ellipsis; overflow: hidden; max-width: 100%; } .story-choice.text-overflow-scroll { text-overflow: initial; } }
-        .story-choice { font-size: 0.9em; padding: 6px 12px; }
-        .story-input-area { display: flex; justify-content: center; align-items: center; padding: 0 10px; }
-        .story-text-input { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--chat-input-border); background-color: var(--chat-input-bg); color: var(--chat-input-text); border-radius: 15px 0 0 15px; font-size: 0.95em; outline: none; }
-        .story-send-button { padding: 8px 15px; border-radius: 0 15px 15px 0; font-size: 0.95em; margin-left: -1px; }
-        #story-initial-prompt { text-align: center; padding: 20px; display: flex; flex-direction: column; align-items: center;}
-        #story-initial-prompt h3 { color: var(--chat-header-text); margin-bottom: 10px; }
-        #story-initial-prompt p { color: var(--chat-text); font-size: 1em; margin-bottom: 15px;}
-        #story-initial-prompt > div { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;}
-        #story-custom-prompt-input { margin-top: 15px; padding: 8px 12px; border: 1px solid var(--input-border, #ccc); border-radius: 5px; width: 80%; max-width: 400px; background-color: var(--input-bg); color: var(--text-color); font-size: 0.95em; display: block; margin-left: auto; margin-right: auto; margin-bottom: 10px; }
-        .length-button { font-size: 0.8em !important; padding: 4px 8px !important; margin: 0 3px !important; }
-        .length-button.selected-length { background: var(--header-button-bg); color: var(--header-button-text); border-color: var(--header-button-bg); }
-        /* Library Styles */
-        .library-view, .story-detail-view { width: 100%; height: 100%; overflow-y: auto; padding: 10px; box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); }
-        .library-title { text-align: center; color: var(--chat-header-text); margin-bottom: 15px; font-size: 1.2em; }
-        .library-item { background-color: rgba(255, 255, 255, 0.05); border: 1px solid var(--chat-input-border); padding: 10px 15px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; transition: background-color 0.2s ease; }
-        .library-item:hover { background-color: rgba(255, 255, 255, 0.1); }
-        .library-item-title { display: block; font-weight: bold; color: var(--chat-text); margin-bottom: 5px; }
-        .library-item-date { display: block; font-size: 0.8em; color: var(--system-message-text); }
-        .story-detail-view h3 { text-align: center; color: var(--chat-header-text); margin-bottom: 10px; }
-        .story-detail-view p { margin: 0 0 10px 0; line-height: 1.5; white-space: pre-wrap; color: var(--chat-log-text); }
-        .story-detail-view p.detail-user-action { text-align: right; color: var(--user-message-text); font-style: italic; opacity: 0.8; border-top: 1px dashed rgba(var(--user-message-text-rgb), 0.3); padding-top: 5px; margin-top: 5px;}
-        .library-back-button { margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; }
-        /* ... Chores Styles ... */
-        #chore-list div { transition: opacity 0.3s ease, text-decoration 0.3s ease; }
-        #chore-commentary { transition: opacity 0.5s ease-out; min-height: 1.5em; height: 1.5em; text-align: center; font-style: italic; font-size: 0.9em; color: var(--mika-message-name); flex-shrink: 0; margin-top: 5px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; opacity: 1; }
-        #parent-management-area input[type=text], #parent-management-area input[type=number], #parent-management-area input[type=password] { background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 4px; margin-bottom: 5px; padding: 5px 8px; }
-        #parent-management-area h4 { margin-top: 15px; margin-bottom: 8px; color: var(--chat-header-text); }
-        #manage-chore-list span { flex-grow: 1; margin-right: 10px; }
-        #chore-history-view #history-list-container { background-color: rgba(0,0,0,0.1); }
-        /* ... Tracker Styles ... */
-        #tracker-prediction { font-size: 1.1em; margin-bottom: 5px; color: var(--mika-message-name); font-weight: bold; text-align: center; }
-        #tracker-stats { font-size: 0.9em; margin-bottom: 15px; color: var(--system-message-text); text-align: center; }
-        #tracker-past-cycles div { padding: 4px 0; font-size: 0.9em; border-bottom: 1px dotted var(--input-border); }
-        #tracker-disclaimer { font-size: 0.85em; font-style: italic; color: var(--error-color); text-align: center; padding: 5px; border: 1px dashed var(--error-color); border-radius: 4px; margin-top: 10px; }
-        /* ... Horoscope Styles ... */
-        #horoscope-display { flex-grow: 1; overflow-y: auto; border: 1px solid var(--input-border); border-radius: 5px; padding: 15px; margin-bottom: 10px; background-color: rgba(0,0,0, 0.1); min-height: 100px; color: var(--chat-log-text); }
-        #horoscope-display p { margin: 0; line-height: 1.5;}
-        #horoscope-loading { text-align: center; font-style: italic; color: var(--typing-indicator-text); margin-bottom: 10px; display: none; min-height: 1.2em; }
-        #horoscope-history-list div { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed var(--input-border); }
-        #horoscope-history-list div p { font-size: 0.95em; margin: 0; color: var(--chat-log-text); }
-        #horoscope-history-list div div { font-size: 0.8em; color: var(--system-message-text); margin-bottom: 3px; display: flex; justify-content: space-between; }
-        /* ... RPG Styles (Reusing StoryTime where applicable) ... */
-        #rpg-initial-prompt select { margin-left: 5px; padding: 5px; border-radius: 4px; background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); }
-        #quest-display-area { /* Reuse story-display-area styles */ }
-        #quest-choices-area { /* Reuse story-choices-area styles */ }
-        #quest-input-area { /* Reuse story-input-area styles */ }
-        #quest-status-area { /* Reuse story-status-area styles */ }
-        /* ... Jetpack Styles ... */
-        #jetpack-commentary { min-height: 1.4em; height: 2.8em; overflow: hidden; text-align: center; font-style: italic; font-size: 0.85em; color: var(--mika-message-name); padding: 3px 0; margin-bottom: 5px; opacity: 1; transition: opacity 0.5s ease-out; flex-shrink: 0; display: flex; align-items: center; justify-content: center; line-height: 1.4em; }
-        #jetpack-iframe-container { width: 100%; flex-grow: 1; position: relative; } /* Added wrapper */
-        #jetpack-game-iframe { width: 100%; height: 100%; border: none; display: block; border-radius: 8px; overflow: hidden; -webkit-overflow-scrolling: touch; }
-        /* ... Comic Strip Styles ... */
-        #comic-main-view { display: flex; flex-direction: column; align-items: center; padding: 10px; box-sizing: border-box; height: 100%; width: 100%; }
-        #comic-controls { margin-bottom: 10px; text-align: center; }
-        #comic-loading { font-style: italic; color: var(--typing-indicator-text); margin-bottom: 10px; }
-        #comic-display-area { display: flex; justify-content: space-around; align-items: flex-start; width: 100%; max-width: 700px; flex-grow: 1; overflow-x: auto; overflow-y: hidden; padding-bottom: 10px; /* Space for scrollbar if needed */ }
-        .comic-panel { width: 30%; border: 1px solid var(--chat-input-border); border-radius: 5px; background-color: rgba(255, 255, 255, 0.05); padding: 8px; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; margin: 0 5px; }
-        .comic-panel pre { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; font-size: 0.8em; line-height: 1.1; margin: 0 0 5px 0; white-space: pre; overflow-x: auto; /* In case ASCII is too wide */ color: var(--chat-text); background-color: var(--game-board-bg); padding: 5px; border-radius: 3px; width: 100%; box-sizing: border-box; }
-        .comic-panel p { font-size: 0.85em; margin: 0; color: var(--chat-log-text); flex-grow: 1; width: 100%; }
-        #comic-history-view { padding: 15px; box-sizing: border-box; height: 100%; overflow-y: auto; }
-        #comic-history-list { margin-top: 10px; }
-        .comic-history-item { background-color: rgba(255, 255, 255, 0.05); border: 1px solid var(--chat-input-border); padding: 8px 12px; margin-bottom: 8px; border-radius: 8px; cursor: pointer; transition: background-color 0.2s ease; display: flex; justify-content: space-between; font-size: 0.9em; }
-        .comic-history-item:hover { background-color: rgba(255, 255, 255, 0.1); }
-        .comic-history-item span:first-child { color: var(--chat-text); }
-        .comic-history-item span:last-child { color: var(--system-message-text); font-size: 0.9em; }
-        /* ... Gotchi Styles ... */
-        /* (Keyframe animations defined within Gotchi creation) */
-        /* Base text color for stats area */
-        .gotchi-stats-area { color: var(--chat-log-text, #ffe0f0); }
-        #gotchi-poo-visual { position: absolute; bottom: 5px; left: 60%; font-size: 1.8em; opacity: 0; transition: opacity 0.5s ease-in-out; z-index: 1; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); cursor: default; }
-        #gotchi-confirmation { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); background-color: rgba(0, 150, 136, 0.85); color: white; padding: 8px 15px; border-radius: 10px; font-size: 0.9em; text-align: center; opacity: 0; transition: opacity 0.5s ease-in-out; z-index: 4; max-width: 80%; pointer-events: none; }
-        /* Floating message text - no background */
-        #gotchi-message-display { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); color: var(--mika-message-name, #f06292); font-weight: bold; padding: 5px; font-size: 1em; text-align: center; opacity: 0; transition: opacity 0.3s ease-in, color 0.3s ease; z-index: 3; max-width: 90%; white-space: normal; pointer-events: none; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); background: none; /* Explicitly no background */ }
+/* Base Styles */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes subtlePulse { 0%, 100% { box-shadow: 0 0 8px var(--input-focus-shadow); } 50% { box-shadow: 0 0 12px var(--input-focus-shadow); } }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; margin: 0; padding: 15px; box-sizing: border-box; transition: background-color 0.3s ease, color 0.3s ease; }
+/* Popup Styles */
+.popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 200; backdrop-filter: blur(5px); animation: fadeIn 0.3s ease-out; }
+.popup-modal { background: var(--popup-bg); padding: 30px 40px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5); text-align: center; border: 4px solid var(--popup-border); max-width: 450px; width: 90%; animation: fadeIn 0.4s ease-out 0.1s backwards; transition: background-color 0.3s ease, border-color 0.3s ease; max-height: 85vh; overflow-y: auto; } /* Added max-height and overflow */
+.popup-modal h2 { margin: 0 0 15px; font-size: 1.6em; } .popup-modal p { color: var(--popup-text); margin-bottom: 15px; line-height: 1.5; font-size: 0.95em; }
+.popup-modal input[type="text"], .popup-modal input[type="password"] { width: 100%; padding: 12px 15px; margin-bottom: 15px; border: 2px solid var(--input-border); border-radius: 8px; font-size: 1em; box-sizing: border-box; background-color: var(--input-bg); color: var(--text-color); transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
+.popup-modal input:focus { outline: none; border-color: var(--input-focus-border); box-shadow: 0 0 8px var(--input-focus-shadow); animation: subtlePulse 1.5s infinite; }
+.popup-buttons { display: flex; justify-content: center; margin-top: 20px; gap: 15px; flex-wrap: wrap; /* Allow wrapping */ }
+.popup-button { padding: 10px 25px; font-size: 1em; font-weight: bold; border-radius: 20px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease; border: none; color: var(--button-text); background: linear-gradient(45deg, var(--button-gradient-1), var(--button-gradient-2)); }
+.popup-button.secondary { background: var(--secondary-button-bg); color: var(--secondary-button-text); border: 1px solid var(--secondary-button-border); }
+.popup-button:hover { transform: scale(1.05); box-shadow: 0 5px 12px rgba(0,0,0,0.3); } .popup-button.secondary:hover { background: var(--secondary-button-hover-bg); } .popup-button:active { transform: scale(0.98); }
+.popup-error { color: var(--error-color); font-weight: bold; margin-top: 15px; display: none; font-size: 0.9em; }
+/* Main Container */
+#chat-container { width: 100%; max-width: 800px; height: 90vh; max-height: 700px; background-color: var(--chat-bg); color: var(--chat-text); border: 3px solid var(--chat-border); border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); display: none; flex-direction: column; align-items: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 15px; line-height: 1.5; overflow: hidden; padding: 0; animation: fadeIn 0.5s ease-out forwards; transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
+/* Header Area */
+#chat-header { width: 100%; background-color: var(--chat-header-bg); padding: 10px 15px; box-sizing: border-box; text-align: center; border-bottom: 1px solid var(--chat-border); flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; position: relative; }
+#chat-header h2 { margin: 0; font-size: 1.3em; color: var(--chat-header-text); text-shadow: 0 0 3px var(--chat-header-shadow); cursor: default; }
+.header-buttons { display: flex; align-items: center; }
+.header-button { padding: 5px 10px; font-size: 0.8em; background-color: var(--header-button-bg); color: var(--header-button-text); border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s, transform 0.1s, color 0.3s ease; margin-left: 8px; }
+.header-button:hover { background-color: var(--header-button-hover-bg); transform: scale(1.05); } .header-button:active { transform: scale(0.98); }
+/* Dropdown Styles */
+.dropdown-menu { display: none; position: absolute; top: calc(100% + 5px); background-color: var(--dropdown-bg); border: 1px solid var(--dropdown-border); border-radius: 5px; box-shadow: 0 4px 10px var(--dropdown-shadow); z-index: 10; max-height: 200px; overflow-y: auto; min-width: 160px; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--chat-input-bg); transition: background-color 0.3s ease, border-color 0.3s ease; }
+#history-dropdown, #apps-dropdown, #settings-dropdown { right: 15px; }
+.dropdown-menu button { display: block; width: 100%; padding: 8px 12px; background: none; border: none; border-bottom: 1px solid rgba(240, 98, 146, 0.3); color: var(--dropdown-button-text); text-align: left; cursor: pointer; font-size: 0.9em; transition: background-color 0.2s ease, color 0.3s ease; }
+.dropdown-menu button:last-child { border-bottom: none; } .dropdown-menu button:hover { background-color: var(--dropdown-button-hover-bg); } .dropdown-menu button:disabled { opacity: 0.5; cursor: not-allowed; background-color: transparent !important; }
+.dropdown-menu button.delete-history, .dropdown-menu button.reset-settings { color: var(--dropdown-delete-text); font-weight: bold; border-top: 1px solid var(--dropdown-border); margin-top: 5px; }
+.dropdown-menu button.delete-history:hover, .dropdown-menu button.reset-settings:hover { background-color: var(--dropdown-delete-hover-bg); }
+.dropdown-menu p.no-items { padding: 8px; color: var(--system-message-text); text-align: center; font-size: 0.9em; margin: 0; }
+/* Main Content Area */
+#main-content-area { flex-grow: 1; width: 100%; overflow: hidden; display: flex; position: relative; }
+/* Chat Area Wrapper */
+#chat-area { display: flex; flex-direction: column; width: 100%; height: 100%; }
+/* Chat Log */
+#chat-log { width: 100%; background-color: var(--chat-log-bg); overflow-y: auto; padding: 15px; box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--chat-input-bg); color: var(--chat-log-text); text-align: left; flex-grow: 1; }
+#chat-log p { margin: 5px 0 10px 0; line-height: 1.5; word-wrap: break-word; max-width: 100%; }
+#chat-log .user-message { color: var(--user-message-text); text-align: right; margin-left: auto; max-width: 85%; }
+#chat-log .user-message strong { color: var(--user-message-name); }
+#chat-log .user-message .message-content img.thumbnail { max-width: 100px; max-height: 100px; border-radius: 5px; margin-top: 5px; border: 1px solid var(--chat-input-border); cursor: pointer; display: block; margin-left: auto; }
+#chat-log .mika-message { color: var(--mika-message-text); margin-right: auto; max-width: 85%; }
+#chat-log .mika-message strong { color: var(--mika-message-name); }
+#chat-log .system-message { color: var(--system-message-text); font-style: italic; font-size: 0.9em; text-align: center; }
+#chat-log .typing-indicator { color: var(--typing-indicator-text); font-style: italic; font-size: 0.9em; text-align: center; animation: fadeIn 0.3s; }
+/* Chat Input Area */
+#chat-input-area { display: flex; align-items: center; width: 100%; padding: 8px 10px; box-sizing: border-box; border-top: 1px solid var(--chat-input-border); background-color: var(--chat-input-area-bg); flex-shrink: 0; }
+#image-upload-input { display: none; }
+#image-upload-button, #camera-button { background: none; border: none; color: var(--mika-message-name); font-size: 1.5em; cursor: pointer; padding: 5px 8px; margin-right: 5px; transition: color 0.2s; }
+#image-upload-button:hover, #camera-button:hover { color: var(--mika-message-text); }
+#chat-input { flex-grow: 1; padding: 10px 15px; border: 1px solid var(--chat-input-border); background-color: var(--chat-input-bg); color: var(--chat-input-text); border-radius: 20px; font-family: inherit; font-size: 1em; outline: none; transition: all 0.2s ease; }
+#chat-input:focus { box-shadow: 0 0 8px var(--input-focus-shadow); }
+#chat-input:disabled { background-color: #444; cursor: not-allowed; }
+#image-preview-area { display: none; margin-left: 8px; position: relative; }
+#image-preview-area img { max-height: 36px; max-width: 60px; border-radius: 4px; border: 1px solid var(--chat-input-border); }
+#remove-image-button { position: absolute; top: -5px; right: -5px; background-color: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; line-height: 16px; text-align: center; cursor: pointer; font-weight: bold; }
+#send-button { padding: 10px 20px; border: none; background: linear-gradient(45deg, var(--send-button-bg-1), var(--send-button-bg-2)); color: white; font-weight: bold; cursor: pointer; border-radius: 20px; transition: background 0.2s ease, transform 0.1s; margin-left: 8px; }
+#send-button:hover { background: linear-gradient(45deg, var(--send-button-hover-1), var(--send-button-hover-2)); transform: scale(1.02); }
+#send-button:active { transform: scale(0.98); }
+#send-button:disabled { background: #666; cursor: not-allowed; transform: none; opacity: 0.6; }
+/* App Area Styles */
+#app-area { display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px; width: 100%; height: 100%; box-sizing: border-box; overflow: hidden; background-color: var(--chat-bg); color: var(--chat-text); }
 
-        /* Shared App Message Log */
-        #app-message-log { width: calc(100% - 20px); max-width: 600px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin: 10px auto 10px auto; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0; display: none; }
-        #app-message-log p { margin: 2px 0; line-height: 1.3; word-wrap: break-word; }
-        #app-message-log .mika-gamemsg { color: var(--game-message-mika); } #app-message-log .mika-gamemsg strong { color: var(--mika-message-name); font-weight: bold; }
-        #app-message-log .user-gamemsg { color: var(--game-message-user); } #app-message-log .system-gamemsg { color: var(--game-message-system); font-style: italic; }
-        /* Shared App Buttons */
-        #ttt-reset-button, #back-to-chat-button { padding: 8px 20px; font-size: 0.9em; font-weight: bold; border-radius: 15px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease; border: none; color: var(--button-text); background: linear-gradient(45deg, var(--button-gradient-1), var(--button-gradient-2)); margin-top: 10px; flex-shrink: 0; display: block; margin-left: auto; margin-right: auto; }
-        #ttt-reset-button:hover, #back-to-chat-button:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.3); background: linear-gradient(45deg, var(--send-button-hover-1), var(--send-button-hover-2)); }
-        #ttt-reset-button:active, #back-to-chat-button:active { transform: scale(0.98); }
-        /* Scrollbar Styles */
-        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: var(--scrollbar-track); border-radius: 10px; } ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; } ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
-        /* Responsive Styles */
-        @media (max-width: 600px) {
-             body { padding: 5px; }
-             .popup-modal { padding: 20px 25px; max-width: 95%; } .popup-modal h2 { font-size: 1.4em; } .popup-modal p { font-size: 0.9em;} .popup-button { padding: 8px 20px; font-size: 0.9em; }
-             #chat-container { height: 95vh; border-radius: 10px; font-size: 14px; }
-             #chat-header h2 { font-size: 1.1em; } .header-button { font-size: 0.75em; padding: 4px 8px; }
-             #chat-log { padding: 10px; } #chat-input-area { padding: 6px 8px; }
-             #image-upload-button, #camera-button { font-size: 1.4em; padding: 4px 6px; }
-             #chat-input { padding: 8px 12px; font-size: 0.9em; } #send-button { padding: 8px 12px; font-size: 0.9em; }
-             #image-preview-area img { max-height: 30px; } #remove-image-button { width: 14px; height: 14px; font-size: 9px; line-height: 14px; top: -4px; right: -4px; }
-             .dropdown-menu { max-height: 150px; }
-             #app-area { padding: 8px; }
-             #ttt-board { width: 180px; height: 180px; } .ttt-cell { font-size: 1.8em; }
-             .rps-choice-button { font-size: 0.9em; padding: 8px 12px; margin: 3px; }
-             #gtn-input { width: 100px; font-size: 0.9em; } #gtn-submit { font-size: 0.9em; padding: 8px 10px; } #gtn-indicator { min-width: 140px; font-size: 0.9em; }
-             #tq-question-input, #tq-guess-input { width: calc(100% - 70px); max-width: 220px; font-size: 0.9em; }
-             #tq-ask-button, #tq-guess-button { font-size: 0.85em; padding: 7px; }
-             #tq-questions-left { font-size: 1em; margin-bottom: 10px;}
-             .diary-top-notes-area { height: 70px; padding: 4px; } .diary-note-item { font-size: 0.8em; padding: 2px 5px;}
-             #diary-add-button, #diary-view-entries-button { font-size: 0.75em; padding: 4px 8px;}
-             .diary-chat-log-area { padding: 6px; } .diary-chat-log-area p { padding-right: 20px; } .diary-heart-button { font-size: 0.9em; }
-             .diary-input-area { padding: 6px; } .diary-chat-input { font-size: 0.9em; padding: 5px 10px; } .diary-send-button { font-size: 0.9em; padding: 5px 10px; }
-             .diary-entry-item { padding: 6px 10px; } .diary-entry-date { font-size: 0.7em; } .diary-entry-item p { font-size: 0.9em; }
-             .story-display-area { padding: 8px 10px; font-size: 0.95em; }
-             .story-choice { font-size: 0.85em; padding: 5px 10px;}
-             .story-text-input { font-size: 0.9em; padding: 6px 10px; }
-             .story-send-button { font-size: 0.9em; padding: 6px 10px; }
-             #story-initial-prompt h3 { font-size: 1.1em; } #story-initial-prompt p { font-size: 0.9em; }
-             #story-custom-prompt-input { font-size: 0.9em; }
-             .length-button { font-size: 0.7em !important; padding: 3px 5px !important; }
-             .library-item { padding: 8px 12px; } .library-item-title { font-size: 0.95em; } .library-item-date { font-size: 0.75em; }
-             #app-message-log { height: 70px; padding: 5px;}
-             #ttt-reset-button, #back-to-chat-button { font-size: 0.85em; padding: 6px 15px; }
-             /* Responsive Chores */
-             #chore-list div { padding: 6px 3px; }
-             #chore-list input[type=checkbox] { transform: scale(1.1); margin-right: 8px; }
-             #parent-management-area { padding: 10px; }
-             #parent-management-area input[type=text], #parent-management-area input[type=number], #parent-management-area input[type=password] { padding: 4px 6px; }
-             #parent-management-area button { font-size: 0.9em; padding: 6px 10px; }
-             #chore-commentary { font-size: 0.85em; min-height: 1.4em; height: 1.4em;}
-             /* Responsive Tracker */
-             #tracker-prediction { font-size: 1em; }
-             #tracker-stats { font-size: 0.85em; }
-             #tracker-past-cycles div { font-size: 0.85em; }
-             #tracker-disclaimer { font-size: 0.8em; }
-              /* Responsive Horoscope */
-             #horoscope-display { padding: 10px; min-height: 80px; }
-             #horoscope-history-list div p { font-size: 0.9em;}
-             #horoscope-history-list div div { font-size: 0.75em;}
-              /* Responsive RPG */
-             #rpg-initial-prompt { padding: 10px; }
-             #rpg-initial-prompt select { padding: 4px; }
-             #quest-display-area { padding: 8px 10px; font-size: 0.95em; }
-              /* Responsive Jetpack */
-             #jetpack-commentary { font-size: 0.8em; min-height: 1.3em; }
-             /* Responsive Comic */
-             #comic-display-area { flex-direction: column; align-items: center; overflow-x: hidden; overflow-y: auto; }
-             .comic-panel { width: 90%; margin-bottom: 10px; }
-             .comic-panel pre { font-size: 0.75em; }
-             .comic-panel p { font-size: 0.8em; }
-             /* Responsive Gotchi */
-             #gotchi-graphic-container { width: 60px; height: 80px; } /* Slightly smaller */
-             #gotchi-message-display { font-size: 0.9em; /* Adjust size */ padding: 5px 8px; /* Adjust padding */ }
-        }
+/* --- App Specific Styles --- */
+/* ... TTT Styles ... */
+#ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 240px; height: 240px; margin: 10px auto; border: 3px solid var(--game-board-border); border-radius: 8px; background-color: var(--game-board-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); flex-shrink: 0; }
+.ttt-cell { border: 1px solid var(--game-cell-border); display: flex; justify-content: center; align-items: center; font-size: 2.5em; font-weight: bold; cursor: pointer; color: var(--game-cell-text); transition: background-color 0.2s, color 0.2s; user-select: none; }
+.ttt-cell:hover { background-color: var(--game-cell-hover-bg); } .ttt-cell.taken { cursor: not-allowed; color: var(--game-cell-taken-text); } .ttt-cell.taken:hover { background-color: transparent; }
+/* ... RPS Styles ... */
+.rps-choice-button { font-family: inherit; padding: 10px 20px; font-size: 1.1em; border-radius: 10px; border: none; cursor: pointer; background: var(--header-button-bg, #f06292); color: var(--header-button-text, #1a0d13); transition: transform 0.1s ease, background-color 0.2s, color 0.2s; flex-shrink: 0; margin: 5px; }
+.rps-choice-button:hover { transform: scale(1.05); background: var(--header-button-hover-bg, #d81b60); } .rps-choice-button:active { transform: scale(0.98); }
+.rps-choice-button.secondary { background: var(--secondary-button-bg); color: var(--secondary-button-text); border: 1px solid var(--secondary-button-border); } .rps-choice-button.secondary:hover { background: var(--secondary-button-hover-bg); }
+#rps-result-display { margin-top: 10px; padding: 10px; min-height: 30px; text-align: center; font-weight: bold; border: 1px dashed var(--game-cell-border, #f06292); border-radius: 5px; background-color: rgba(0,0,0,0.1); opacity: 0.6; transition: opacity 0.3s ease; color: var(--game-cell-text); width: 90%; max-width: 350px; }
+/* ... GTN Styles ... */
+#gtn-input { padding: 8px 12px; border: 1px solid var(--input-border, #ccc); border-radius: 5px; width: 150px; background-color: var(--input-bg); color: var(--text-color); text-align: center; font-size: 1em; margin-right: 5px; }
+#gtn-input::-webkit-outer-spin-button, #gtn-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; } #gtn-input[type=number] { -moz-appearance: textfield; }
+#gtn-submit { padding: 8px 15px; } #gtn-feedback { min-height: 20px; font-weight: bold; margin-bottom: 5px; text-align: center; font-size: 1.1em; color: var(--game-cell-text); transition: color 0.3s ease; }
+.gtn-feedback-win { color: var(--mika-message-name, #f06292); } .gtn-feedback-lose, .gtn-feedback-error { color: var(--error-color, #c62828); } .gtn-feedback-warn { color: orange; } .gtn-feedback-info { color: var(--game-cell-text); }
+#gtn-indicator { padding: 5px 15px; border-radius: 15px; color: white; font-weight: bold; text-align: center; display: inline-block; min-width: 160px; margin-bottom: 10px; transition: background-color 0.5s ease, opacity 0.5s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+#gtn-guesses-left { margin-bottom: 10px; text-align: center; color: var(--system-message-text); font-size: 0.9em; } #gtn-new-game { margin-top: 5px; }
+/* ... 20Q Styles ... */
+#tq-question-input, #tq-guess-input { padding: 8px 12px; border: 1px solid var(--input-border, #ccc); border-radius: 5px; width: calc(80% - 70px); max-width: 300px; margin-right: 5px; background-color: var(--input-bg); color: var(--text-color); font-size: 0.95em; display: inline-block; vertical-align: middle; }
+#tq-ask-button, #tq-guess-button { padding: 8px 10px; font-size: 0.9em; display: inline-block; vertical-align: middle; }
+#tq-questions-left { margin-bottom: 10px; text-align: center; font-size: 1.1em; color: var(--system-message-text); transition: color 0.3s ease, font-weight 0.3s ease; }
+#tq-new-game { margin-top: 5px; }
+/* ... Diary Styles ... */
+#diary-chat-view, #diary-entries-view { width: 100%; height: 100%; overflow: hidden; display: flex; flex-direction: column; }
+#diary-entries-view { overflow-y: auto; }
+.diary-top-notes-area { flex-shrink: 0; height: 90px; overflow-y: auto; border-bottom: 1px solid var(--chat-input-border); padding: 5px; background-color: rgba(0,0,0, 0.1); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; }
+.diary-notes-empty { color: var(--system-message-text); font-style: italic; text-align: center; margin-top: 15px; font-size: 0.9em;}
+.diary-note-item { background-color: rgba(255, 255, 255, 0.1); padding: 4px 8px; margin-bottom: 3px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; }
+.diary-note-item span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-right: 5px; }
+.diary-note-remove { background: none; border: none; color: var(--error-color, red); font-size: 1.2em; cursor: pointer; padding: 0 5px; line-height: 1; }
+.diary-controls-area { flex-shrink: 0; padding: 5px; text-align: center; border-bottom: 1px solid var(--chat-input-border); }
+#diary-add-button, #diary-view-entries-button { margin: 0 5px; padding: 6px 12px; font-size: 0.85em; }
+#diary-add-button:disabled { opacity: 0.5; cursor: not-allowed; background: var(--secondary-button-bg); color: var(--secondary-button-text); border-color: var(--secondary-button-border); }
+.diary-chat-log-area { flex-grow: 1; overflow-y: auto; padding: 8px; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; }
+.diary-chat-log-area p { margin: 4px 0 7px 0; line-height: 1.4; word-wrap: break-word; max-width: 100%; position: relative; padding-right: 25px; }
+.diary-user-message { color: var(--user-message-text); text-align: right; margin-left: auto; max-width: 90%; } .diary-user-message strong { color: var(--user-message-name); }
+.diary-mika-message { color: var(--mika-message-text); margin-right: auto; max-width: 90%; }
+.diary-mika-message strong { color: var(--mika-message-name); }
+.diary-heart-button { position: absolute; top: 1px; right: 1px; background: none; border: none; color: var(--system-message-text); cursor: pointer; font-size: 1em; padding: 0; line-height: 1; opacity: 0.3; transition: opacity 0.2s, color 0.2s; }
+.diary-chat-log-area p:hover .diary-heart-button { opacity: 1; } .diary-heart-button.active { color: var(--mika-message-name); opacity: 1; }
+.diary-input-area { display: flex; padding: 8px; border-top: 1px solid var(--chat-input-border); background-color: var(--chat-input-area-bg); flex-shrink: 0; }
+.diary-chat-input { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--chat-input-border); background-color: var(--chat-input-bg); color: var(--chat-input-text); border-radius: 15px 0 0 15px; font-size: 0.95em; outline: none; }
+.diary-send-button { padding: 8px 15px; border: 1px solid var(--chat-input-border); background: linear-gradient(45deg, var(--send-button-bg-1), var(--send-button-bg-2)); color: white; font-weight: bold; cursor: pointer; border-radius: 0 15px 15px 0; transition: background 0.2s; }
+.diary-send-button:hover { background: linear-gradient(45deg, var(--send-button-hover-1), var(--send-button-hover-2)); }
+.diary-view-back-button { margin-bottom: 10px; }
+.diary-entries-title { text-align: center; color: var(--chat-header-text); margin-bottom: 10px; font-size: 1.1em; }
+.diary-entries-empty { color: var(--system-message-text); font-style: italic; text-align: center; }
+.diary-entry-item { background-color: rgba(255, 255, 255, 0.05); border: 1px solid var(--chat-input-border); padding: 8px 12px; margin-bottom: 8px; border-radius: 8px; }
+.diary-entry-date { display: block; font-size: 0.75em; color: var(--system-message-text); margin-bottom: 4px; }
+.diary-entry-item p { margin: 0; line-height: 1.4; color: var(--chat-log-text); font-size: 0.95em;}
+/* ... Story Time Styles ... */
+#story-wrapper { display: flex; flex-direction: column; height: 100%; width: 100%; box-sizing: border-box; }
+.story-display-area { flex-grow: 1; overflow-y: auto; padding: 10px 15px; margin-bottom: 5px; background-color: rgba(0,0,0, 0.1); border-radius: 8px; border: 1px solid var(--chat-input-border); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; color: var(--chat-log-text); }
+.story-display-area p { margin: 0 0 10px 0; line-height: 1.5; white-space: pre-wrap; } .story-display-area p:last-child { margin-bottom: 0; }
+.story-display-area p > strong:first-child { color: var(--mika-message-name); } .story-display-area p > strong { font-weight: bold; } .story-display-area p > em { font-style: italic; }
+.story-display-area p.user-action { text-align: right; color: var(--user-message-text); font-style: italic; opacity: 0.9; margin: 5px 0; border-top: 1px dashed rgba(var(--user-message-text-rgb), 0.3); padding-top: 5px; margin-top: 5px; }
+.story-status-area { flex-shrink: 0; text-align: center; padding: 3px; font-style: italic; font-size: 0.9em; color: var(--typing-indicator-text); min-height: 1.2em; display: none; }
+.story-interaction-area { flex-shrink: 0; padding: 5px 0; border-top: 1px solid var(--chat-input-border); background-color: var(--chat-input-area-bg); }
+.story-choices-area { text-align: center; margin-bottom: 8px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0 5px; }
+.story-choice { overflow: hidden; white-space: nowrap; position: relative; text-align: left; max-width: 90%; justify-content: flex-start; box-sizing: border-box; }
+.story-choice span.scrollable-text { display: inline-block; white-space: nowrap; padding: 0; margin: 0; vertical-align: middle; will-change: transform; transform: translateX(0); }
+@keyframes scroll-left-right { 0%   { transform: translateX(0); } 15%  { transform: translateX(0); } 65%  { transform: translateX(var(--scroll-distance, -50px)); } 80%  { transform: translateX(var(--scroll-distance, -50px)); } 100% { transform: translateX(0); } }
+.story-choice.text-overflow-scroll span.scrollable-text { animation: scroll-left-right 10s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .story-choice.text-overflow-scroll span.scrollable-text { animation: none; transform: translateX(0) !important; text-overflow: ellipsis; overflow: hidden; max-width: 100%; } .story-choice.text-overflow-scroll { text-overflow: initial; } }
+.story-choice { font-size: 0.9em; padding: 6px 12px; }
+.story-input-area { display: flex; justify-content: center; align-items: center; padding: 0 10px; }
+.story-text-input { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--chat-input-border); background-color: var(--chat-input-bg); color: var(--chat-input-text); border-radius: 15px 0 0 15px; font-size: 0.95em; outline: none; }
+.story-send-button { padding: 8px 15px; border-radius: 0 15px 15px 0; font-size: 0.95em; margin-left: -1px; }
+#story-initial-prompt { text-align: center; padding: 20px; display: flex; flex-direction: column; align-items: center;}
+#story-initial-prompt h3 { color: var(--chat-header-text); margin-bottom: 10px; }
+#story-initial-prompt p { color: var(--chat-text); font-size: 1em; margin-bottom: 15px;}
+#story-initial-prompt > div { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;}
+#story-custom-prompt-input { margin-top: 15px; padding: 8px 12px; border: 1px solid var(--input-border, #ccc); border-radius: 5px; width: 80%; max-width: 400px; background-color: var(--input-bg); color: var(--text-color); font-size: 0.95em; display: block; margin-left: auto; margin-right: auto; margin-bottom: 10px; }
+.length-button { font-size: 0.8em !important; padding: 4px 8px !important; margin: 0 3px !important; }
+.length-button.selected-length { background: var(--header-button-bg); color: var(--header-button-text); border-color: var(--header-button-bg); }
+/* Library Styles */
+.library-view, .story-detail-view { width: 100%; height: 100%; overflow-y: auto; padding: 10px; box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); }
+.library-title { text-align: center; color: var(--chat-header-text); margin-bottom: 15px; font-size: 1.2em; }
+.library-item { background-color: rgba(255, 255, 255, 0.05); border: 1px solid var(--chat-input-border); padding: 10px 15px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; transition: background-color 0.2s ease; }
+.library-item:hover { background-color: rgba(255, 255, 255, 0.1); }
+.library-item-title { display: block; font-weight: bold; color: var(--chat-text); margin-bottom: 5px; }
+.library-item-date { display: block; font-size: 0.8em; color: var(--system-message-text); }
+.story-detail-view h3 { text-align: center; color: var(--chat-header-text); margin-bottom: 10px; }
+.story-detail-view p { margin: 0 0 10px 0; line-height: 1.5; white-space: pre-wrap; color: var(--chat-log-text); }
+.story-detail-view p.detail-user-action { text-align: right; color: var(--user-message-text); font-style: italic; opacity: 0.8; border-top: 1px dashed rgba(var(--user-message-text-rgb), 0.3); padding-top: 5px; margin-top: 5px;}
+.library-back-button { margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; }
+/* ... Chores Styles ... */
+#chore-list div { transition: opacity 0.3s ease, text-decoration 0.3s ease; }
+#chore-commentary { transition: opacity 0.5s ease-out; min-height: 1.5em; height: 1.5em; text-align: center; font-style: italic; font-size: 0.9em; color: var(--mika-message-name); flex-shrink: 0; margin-top: 5px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; opacity: 1; }
+#parent-management-area input[type=text], #parent-management-area input[type=number], #parent-management-area input[type=password] { background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 4px; margin-bottom: 5px; padding: 5px 8px; }
+#parent-management-area h4 { margin-top: 15px; margin-bottom: 8px; color: var(--chat-header-text); }
+#manage-chore-list span { flex-grow: 1; margin-right: 10px; }
+#chore-history-view #history-list-container { background-color: rgba(0,0,0,0.1); }
+/* ... Tracker Styles ... */
+#tracker-prediction { font-size: 1.1em; margin-bottom: 5px; color: var(--mika-message-name); font-weight: bold; text-align: center; }
+#tracker-stats { font-size: 0.9em; margin-bottom: 15px; color: var(--system-message-text); text-align: center; }
+#tracker-past-cycles div { padding: 4px 0; font-size: 0.9em; border-bottom: 1px dotted var(--input-border); }
+#tracker-disclaimer { font-size: 0.85em; font-style: italic; color: var(--error-color); text-align: center; padding: 5px; border: 1px dashed var(--error-color); border-radius: 4px; margin-top: 10px; }
+/* ... Horoscope Styles ... */
+#horoscope-display { flex-grow: 1; overflow-y: auto; border: 1px solid var(--input-border); border-radius: 5px; padding: 15px; margin-bottom: 10px; background-color: rgba(0,0,0, 0.1); min-height: 100px; color: var(--chat-log-text); }
+#horoscope-display p { margin: 0; line-height: 1.5;}
+#horoscope-loading { text-align: center; font-style: italic; color: var(--typing-indicator-text); margin-bottom: 10px; display: none; min-height: 1.2em; }
+#horoscope-history-list div { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed var(--input-border); }
+#horoscope-history-list div p { font-size: 0.95em; margin: 0; color: var(--chat-log-text); }
+#horoscope-history-list div div { font-size: 0.8em; color: var(--system-message-text); margin-bottom: 3px; display: flex; justify-content: space-between; }
+/* ... RPG Styles (Reusing StoryTime where applicable) ... */
+#rpg-initial-prompt select { margin-left: 5px; padding: 5px; border-radius: 4px; background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); }
+#quest-display-area { /* Reuse story-display-area styles */ }
+#quest-choices-area { /* Reuse story-choices-area styles */ }
+#quest-input-area { /* Reuse story-input-area styles */ }
+#quest-status-area { /* Reuse story-status-area styles */ }
+/* ... Jetpack Styles ... */
+#jetpack-commentary { min-height: 1.4em; height: 2.8em; overflow: hidden; text-align: center; font-style: italic; font-size: 0.85em; color: var(--mika-message-name); padding: 3px 0; margin-bottom: 5px; opacity: 1; transition: opacity 0.5s ease-out; flex-shrink: 0; display: flex; align-items: center; justify-content: center; line-height: 1.4em; }
+#jetpack-iframe-container { width: 100%; flex-grow: 1; position: relative; } /* Added wrapper */
+#jetpack-game-iframe { width: 100%; height: 100%; border: none; display: block; border-radius: 8px; overflow: hidden; -webkit-overflow-scrolling: touch; }
+/* ... Comic Strip Styles ... */
+#comic-main-view { display: flex; flex-direction: column; align-items: center; padding: 10px; box-sizing: border-box; height: 100%; width: 100%; }
+#comic-controls { margin-bottom: 10px; text-align: center; }
+#comic-loading { font-style: italic; color: var(--typing-indicator-text); margin-bottom: 10px; }
+#comic-display-area { display: flex; justify-content: space-around; align-items: flex-start; width: 100%; max-width: 700px; flex-grow: 1; overflow-x: auto; overflow-y: hidden; padding-bottom: 10px; /* Space for scrollbar if needed */ }
+.comic-panel { width: 30%; border: 1px solid var(--chat-input-border); border-radius: 5px; background-color: rgba(255, 255, 255, 0.05); padding: 8px; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; margin: 0 5px; }
+.comic-panel pre { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; font-size: 0.8em; line-height: 1.1; margin: 0 0 5px 0; white-space: pre; overflow-x: auto; /* In case ASCII is too wide */ color: var(--chat-text); background-color: var(--game-board-bg); padding: 5px; border-radius: 3px; width: 100%; box-sizing: border-box; }
+.comic-panel p { font-size: 0.85em; margin: 0; color: var(--chat-log-text); flex-grow: 1; width: 100%; }
+#comic-history-view { padding: 15px; box-sizing: border-box; height: 100%; overflow-y: auto; }
+#comic-history-list { margin-top: 10px; }
+.comic-history-item { background-color: rgba(255, 255, 255, 0.05); border: 1px solid var(--chat-input-border); padding: 8px 12px; margin-bottom: 8px; border-radius: 8px; cursor: pointer; transition: background-color 0.2s ease; display: flex; justify-content: space-between; font-size: 0.9em; }
+.comic-history-item:hover { background-color: rgba(255, 255, 255, 0.1); }
+.comic-history-item span:first-child { color: var(--chat-text); }
+.comic-history-item span:last-child { color: var(--system-message-text); font-size: 0.9em; }
+/* ... Gotchi Styles ... */
+/* (Keyframe animations defined within Gotchi creation) */
+/* Base text color for stats area */
+.gotchi-stats-area { color: var(--chat-log-text, #ffe0f0); }
+#gotchi-poo-visual { position: absolute; bottom: 5px; left: 60%; font-size: 1.8em; opacity: 0; transition: opacity 0.5s ease-in-out; z-index: 1; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); cursor: default; }
+#gotchi-confirmation { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); background-color: rgba(0, 150, 136, 0.85); color: white; padding: 8px 15px; border-radius: 10px; font-size: 0.9em; text-align: center; opacity: 0; transition: opacity 0.5s ease-in-out; z-index: 4; max-width: 80%; pointer-events: none; }
+/* Floating message text - no background */
+#gotchi-message-display { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); color: var(--mika-message-name, #f06292); font-weight: bold; padding: 5px; font-size: 1em; text-align: center; opacity: 0; transition: opacity 0.3s ease-in, color 0.3s ease; z-index: 3; max-width: 90%; white-space: normal; pointer-events: none; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); background: none; /* Explicitly no background */ }
+/* Floating message text - WITH background for Advice Corner */
+#advice-message-bubble {
+    position: absolute; bottom: 130px; /* Base position */ left: 50%; transform: translateX(-50%);
+    color: var(--mika-message-name, #f06292); /* Dynamic color */
+    font-weight: bold; padding: 8px 12px; font-size: 1em; text-align: center;
+    opacity: 0; transition: opacity 0.4s ease-in-out, bottom 0.4s ease-in-out;
+    z-index: 4; max-width: 80%; white-space: normal; pointer-events: none;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    background: rgba(var(--chat-input-bg-rgb, 26, 26, 46), 0.85); /* Use RGB var with alpha */
+    border: 1px solid var(--chat-input-border); border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3); backdrop-filter: blur(3px);
+}
+
+/* Shared App Message Log */
+#app-message-log { width: calc(100% - 20px); max-width: 600px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin: 10px auto 10px auto; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0; display: none; }
+#app-message-log p { margin: 2px 0; line-height: 1.3; word-wrap: break-word; }
+#app-message-log .mika-gamemsg { color: var(--game-message-mika); } #app-message-log .mika-gamemsg strong { color: var(--mika-message-name); font-weight: bold; }
+#app-message-log .user-gamemsg { color: var(--game-message-user); } #app-message-log .system-gamemsg { color: var(--game-message-system); font-style: italic; }
+/* Shared App Buttons */
+#ttt-reset-button, #back-to-chat-button { padding: 8px 20px; font-size: 0.9em; font-weight: bold; border-radius: 15px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease; border: none; color: var(--button-text); background: linear-gradient(45deg, var(--button-gradient-1), var(--button-gradient-2)); margin-top: 10px; flex-shrink: 0; display: block; margin-left: auto; margin-right: auto; }
+#ttt-reset-button:hover, #back-to-chat-button:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.3); background: linear-gradient(45deg, var(--send-button-hover-1), var(--send-button-hover-2)); }
+#ttt-reset-button:active, #back-to-chat-button:active { transform: scale(0.98); }
+/* Scrollbar Styles */
+::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: var(--scrollbar-track); border-radius: 10px; } ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; } ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+/* Responsive Styles */
+@media (max-width: 600px) {
+     body { padding: 5px; }
+     .popup-modal { padding: 20px 25px; max-width: 95%; } .popup-modal h2 { font-size: 1.4em; } .popup-modal p { font-size: 0.9em;} .popup-button { padding: 8px 20px; font-size: 0.9em; }
+     #chat-container { height: 95vh; border-radius: 10px; font-size: 14px; }
+     #chat-header h2 { font-size: 1.1em; } .header-button { font-size: 0.75em; padding: 4px 8px; }
+     #chat-log { padding: 10px; } #chat-input-area { padding: 6px 8px; }
+     #image-upload-button, #camera-button { font-size: 1.4em; padding: 4px 6px; }
+     #chat-input { padding: 8px 12px; font-size: 0.9em; } #send-button { padding: 8px 12px; font-size: 0.9em; }
+     #image-preview-area img { max-height: 30px; } #remove-image-button { width: 14px; height: 14px; font-size: 9px; line-height: 14px; top: -4px; right: -4px; }
+     .dropdown-menu { max-height: 150px; }
+     #app-area { padding: 8px; }
+     #ttt-board { width: 180px; height: 180px; } .ttt-cell { font-size: 1.8em; }
+     .rps-choice-button { font-size: 0.9em; padding: 8px 12px; margin: 3px; }
+     #gtn-input { width: 100px; font-size: 0.9em; } #gtn-submit { font-size: 0.9em; padding: 8px 10px; } #gtn-indicator { min-width: 140px; font-size: 0.9em; }
+     #tq-question-input, #tq-guess-input { width: calc(100% - 70px); max-width: 220px; font-size: 0.9em; }
+     #tq-ask-button, #tq-guess-button { font-size: 0.85em; padding: 7px; }
+     #tq-questions-left { font-size: 1em; margin-bottom: 10px;}
+     .diary-top-notes-area { height: 70px; padding: 4px; } .diary-note-item { font-size: 0.8em; padding: 2px 5px;}
+     #diary-add-button, #diary-view-entries-button { font-size: 0.75em; padding: 4px 8px;}
+     .diary-chat-log-area { padding: 6px; } .diary-chat-log-area p { padding-right: 20px; } .diary-heart-button { font-size: 0.9em; }
+     .diary-input-area { padding: 6px; } .diary-chat-input { font-size: 0.9em; padding: 5px 10px; } .diary-send-button { font-size: 0.9em; padding: 5px 10px; }
+     .diary-entry-item { padding: 6px 10px; } .diary-entry-date { font-size: 0.7em; } .diary-entry-item p { font-size: 0.9em; }
+     .story-display-area { padding: 8px 10px; font-size: 0.95em; }
+     .story-choice { font-size: 0.85em; padding: 5px 10px;}
+     .story-text-input { font-size: 0.9em; padding: 6px 10px; }
+     .story-send-button { font-size: 0.9em; padding: 6px 10px; }
+     #story-initial-prompt h3 { font-size: 1.1em; } #story-initial-prompt p { font-size: 0.9em; }
+     #story-custom-prompt-input { font-size: 0.9em; }
+     .length-button { font-size: 0.7em !important; padding: 3px 5px !important; }
+     .library-item { padding: 8px 12px; } .library-item-title { font-size: 0.95em; } .library-item-date { font-size: 0.75em; }
+     #app-message-log { height: 70px; padding: 5px;}
+     #ttt-reset-button, #back-to-chat-button { font-size: 0.85em; padding: 6px 15px; }
+     /* Responsive Chores */
+     #chore-list div { padding: 6px 3px; }
+     #chore-list input[type=checkbox] { transform: scale(1.1); margin-right: 8px; }
+     #parent-management-area { padding: 10px; }
+     #parent-management-area input[type=text], #parent-management-area input[type=number], #parent-management-area input[type=password] { padding: 4px 6px; }
+     #parent-management-area button { font-size: 0.9em; padding: 6px 10px; }
+     #chore-commentary { font-size: 0.85em; min-height: 1.4em; height: 1.4em;}
+     /* Responsive Tracker */
+     #tracker-prediction { font-size: 1em; }
+     #tracker-stats { font-size: 0.85em; }
+     #tracker-past-cycles div { font-size: 0.85em; }
+     #tracker-disclaimer { font-size: 0.8em; }
+      /* Responsive Horoscope */
+     #horoscope-display { padding: 10px; min-height: 80px; }
+     #horoscope-history-list div p { font-size: 0.9em;}
+     #horoscope-history-list div div { font-size: 0.75em;}
+      /* Responsive RPG */
+     #rpg-initial-prompt { padding: 10px; }
+     #rpg-initial-prompt select { padding: 4px; }
+     #quest-display-area { padding: 8px 10px; font-size: 0.95em; }
+      /* Responsive Jetpack */
+     #jetpack-commentary { font-size: 0.8em; min-height: 1.3em; }
+     /* Responsive Comic */
+     #comic-display-area { flex-direction: column; align-items: center; overflow-x: hidden; overflow-y: auto; }
+     .comic-panel { width: 90%; margin-bottom: 10px; }
+     .comic-panel pre { font-size: 0.75em; }
+     .comic-panel p { font-size: 0.8em; }
+     /* Responsive Gotchi */
+     #gotchi-graphic-container { width: 60px; height: 80px; } /* Slightly smaller */
+     #gotchi-message-display { font-size: 0.9em; /* Adjust size */ padding: 5px 8px; /* Adjust padding */ }
+     /* Responsive Advice Corner */
+     #advice-booth-sign-top { font-size: 0.8em; padding: 6px 4px; }
+     #advice-booth-counter { height: 60px; }
+     #advice-character-graphic { /* Maybe scale character down slightly? */ }
+     #advice-message-bubble { font-size: 0.9em; padding: 6px 10px; }
+     #advice-text-input { font-size: 0.9em; padding: 8px 12px; }
+     #advice-send-button { font-size: 0.9em; padding: 8px 12px; }
+}
+
+/* --- END OF FILE styles.css --- */

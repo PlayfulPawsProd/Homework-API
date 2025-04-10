@@ -1,4 +1,3 @@
-    <!-- Main Application Logic -->
         // Nyaa~! Mika & Kana's Helper & Fun Time App! ♡ (With Notifications!)
 
         // --- DOM Elements ---
@@ -21,7 +20,7 @@
         const historyDropdown = document.getElementById('history-dropdown'); const settingsDropdown = document.getElementById('settings-dropdown');
         const appsDropdown = document.getElementById('apps-dropdown');
         // App Buttons
-        const appTttButton = document.getElementById('app-ttt-button'); const appRpsButton = document.getElementById('app-rps-button'); const appGtnButton = document.getElementById('app-gtn-button'); const app20qButton = document.getElementById('app-20q-button'); const appDiaryButton = document.getElementById('app-diary-button'); const appStoryButton = document.getElementById('app-story-button'); const appChoresButton = document.getElementById('app-chores-button'); const appTrackerButton = document.getElementById('app-tracker-button'); const appHoroscopeButton = document.getElementById('app-horoscope-button'); const appRpgButton = document.getElementById('app-rpg-button'); const appJetpackButton = document.getElementById('app-jetpack-button'); const appComicButton = document.getElementById('app-comic-button'); const appGotchiButton = document.getElementById('app-gotchi-button');
+        const appTttButton = document.getElementById('app-ttt-button'); const appRpsButton = document.getElementById('app-rps-button'); const appGtnButton = document.getElementById('app-gtn-button'); const app20qButton = document.getElementById('app-20q-button'); const appDiaryButton = document.getElementById('app-diary-button'); const appStoryButton = document.getElementById('app-story-button'); const appChoresButton = document.getElementById('app-chores-button'); const appTrackerButton = document.getElementById('app-tracker-button'); const appHoroscopeButton = document.getElementById('app-horoscope-button'); const appRpgButton = document.getElementById('app-rpg-button'); const appJetpackButton = document.getElementById('app-jetpack-button'); const appComicButton = document.getElementById('app-comic-button'); const appGotchiButton = document.getElementById('app-gotchi-button'); const appAdviceButton = document.getElementById('app-advice-button');
         // Settings Buttons
         const settingsInstallButton = document.getElementById('settings-install-button'); const settingsThemeButton = document.getElementById('settings-theme-button');
         const settingsAboutButton = document.getElementById('settings-about-button');
@@ -160,6 +159,7 @@
          function loadJetpackGame() { const module = JetpackGame; const appTitle = "Kitty Jet Pack 🚀"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, null, currentUserName, currentPersona); } else { console.error("Jetpack Game load fail"); switchToChatView(); appendMessage('system', 'Meeeow! Jetpack game failed to load...'); } }
          function loadComicStripApp() { const module = ComicStripApp; const appTitle = "Daily Comic Strip 😂"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("Comic Strip App load fail"); switchToChatView(); appendMessage('system', 'Meeeow! Comic Strip app failed to load...'); } }
          function loadMikaGotchi() { const module = MikaGotchi; const appTitle = "Mika-Gotchi! ♡"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, displayAppMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("MikaGotchi App load fail"); switchToChatView(); appendMessage('system', 'Meeeow! Mika-Gotchi app failed to load...'); } }
+         function loadAdviceCorner() { const module = AdviceCorner; const appTitle = "Advice Corner"; switchToAppView(module, appTitle); if (appArea && module?.init) { module.init(appArea, appendMessage, callMikaApiForApp, currentUserName, currentPersona); } else { console.error("Advice Corner load fail"); switchToChatView(); appendMessage('system', `${currentPersona === 'Kana' ? 'Advice module failed.' : 'Meeeow! Advice Corner failed...'}`); } }
          function clearAppAreaContent() { if (appArea) appArea.innerHTML = ''; }
 
         // --- Image Handling ---
@@ -562,6 +562,7 @@
         if (appJetpackButton) appJetpackButton.addEventListener('click', () => { closeAllDropdowns(); loadJetpackGame(); });
         if (appComicButton) appComicButton.addEventListener('click', () => { closeAllDropdowns(); loadComicStripApp(); });
         if (appGotchiButton) appGotchiButton.addEventListener('click', () => { closeAllDropdowns(); loadMikaGotchi(); });
+        if (appAdviceButton) appAdviceButton.addEventListener('click', () => { closeAllDropdowns(); loadAdviceCorner(); });
         // Settings Listeners
         if (settingsInstallButton) settingsInstallButton.addEventListener('click', handleManualInstall);
         if (settingsThemeButton) settingsThemeButton.addEventListener('click', toggleTheme);
