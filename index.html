@@ -47,6 +47,21 @@
              </div>
          </div>
      </div>
+    <!-- ADDED Backup/Restore Popup -->
+    <div id="backup-restore-popup" class="popup-overlay">
+        <div class="popup-modal">
+            <h2 id="backup-restore-title">Backup & Restore ♡</h2>
+            <p id="backup-restore-explanation">Loading explanation...</p>
+            <div class="popup-buttons">
+                <button id="backup-button" class="popup-button">Backup Data! 💾</button>
+                <button id="restore-button" class="popup-button secondary">Restore Data! 📂</button>
+            </div>
+            <button id="backup-restore-close-button" class="popup-button secondary" style="margin-top: 15px;">Close</button>
+        </div>
+    </div>
+    <!-- ADDED Hidden file input for restore (outside popup-modal) -->
+    <input type="file" id="restore-file-input" accept="application/json" style="display: none;">
+
 
     <!-- Main Interface -->
     <div id="chat-container">
@@ -80,12 +95,15 @@
                 <p class="no-items" style="display: none;">More apps soon~!</p>
             </div>
             <div id="settings-dropdown" class="dropdown-menu">
+                <!-- ... other settings buttons ... -->
                 <button id="settings-install-button" title="Install Helper as an App">♡ Install App</button>
                 <button id="settings-theme-button" title="Toggle between Light and Dark Mode">✨ Toggle Theme</button>
-                <!-- *** ADDED Notifications Button *** -->
+                <!-- ADDED Notifications Button -->
                 <button id="settings-notifications-button" title="Manage Daily Reminders">🔔 Reminders</button>
                 <button id="settings-about-button" title="About this Helper!">ℹ️ About</button>
                 <button id="settings-persona-button" title="Switch Assistant Persona">Switch to Kana</button>
+                <!-- ADDED Backup/Restore button -->
+                <button id="settings-backup-restore-button" title="Backup or restore all app data">Backup All/Restore</button>
                 <button id="settings-reset-button" class="reset-settings" title="Clear API Key, Name, etc., and Reload">⚠️ Reset All & Reload</button>
             </div>
         </div>
@@ -127,6 +145,10 @@
     <script src="comicstrip.js"></script>
     <script src="gotchi.js"></script>
     <script src="advice_corner.js"></script>
+
+    <!-- Include Backup/Restore script BEFORE main.js -->
+    <script src="backup.js"></script>
+
     <!-- Include API script -->
     <script src="api.js"></script>
     <script src="main.js"></script>

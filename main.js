@@ -130,19 +130,50 @@
             if (appsDropdown) appsDropdown.style.display = 'none';
             if (aboutPopup && aboutPopup.style.display === 'flex') aboutPopup.style.display = 'none';
             if (notificationsPopup && notificationsPopup.style.display === 'flex') notificationsPopup.style.display = 'none'; // <<< Close notifications popup
+             // ADDED: Close backup/restore popup (using direct element check)
+             const backupRestorePopupElement = document.getElementById('backup-restore-popup');
+             if (backupRestorePopupElement && backupRestorePopupElement.style.display === 'flex') {
+                 backupRestorePopupElement.style.display = 'none';
+             }
         }
         function toggleDropdown(dd) { const isOpen = dd.style.display === 'block'; closeAllDropdowns(); if (!isOpen) { dd.style.display = 'block'; if (dd === historyDropdown) updateHistoryDropdown(); if (dd === settingsDropdown) updateSettingsDropdown(); if (dd === appsDropdown) updateAppsDropdown(); } }
         function updateHistoryDropdown() { if (!historyDropdown) return; historyDropdown.innerHTML = ''; const ids = Object.keys(allChats).sort((a, b) => b - a); if (ids.length === 0) { const p = document.createElement('p'); p.className = 'no-items'; p.textContent = 'No past chats!'; historyDropdown.appendChild(p); } else { ids.forEach(id => { const chat = allChats[id]; if (chat && chat.length > 0) { const btn = document.createElement('button'); const firstMsg = chat.find(m => m.role === 'user'); const txt = firstMsg?.parts.find(p => p.text)?.text || 'Chat'; const img = firstMsg?.parts.some(p => p.placeholder === "[Image Sent]"); const prev = sanitizeHTML(txt.substring(0, 20)) + (img ? ' [📷]' : '') + '...'; const date = new Date(parseInt(id)).toLocaleString(); btn.textContent = `${date} - ${prev}`; btn.title = `Load: ${date}`; btn.onclick = () => loadChat(id); historyDropdown.appendChild(btn); } }); } if (ids.length > 0) { const delBtn = deleteAllHistoryButtonTemplate.cloneNode(true); delBtn.onclick = deleteAllChats; historyDropdown.appendChild(delBtn); } }
-        function updateSettingsDropdown() { if (!settingsInstallButton || !settingsPersonaButton || !settingsNotificationsButton) return; settingsInstallButton.disabled = !deferredInstallPrompt; applyTheme(loadThemePreference() || 'light'); settingsPersonaButton.textContent = (currentPersona === 'Mika') ? "Switch to Kana" : "Switch to Mika"; updateNotificationButtonState(); /* Update notification button state */ }
+        function updateSettingsDropdown() {
+            if (!settingsInstallButton || !settingsPersonaButton || !settingsNotificationsButton) {
+                console.warn("Not all settings buttons found for updateSettingsDropdown.");
+                return; // Exit if critical buttons are missing
+            }
+            settingsInstallButton.disabled = !deferredInstallPrompt;
+            applyTheme(loadThemePreference() || 'light');
+            settingsPersonaButton.textContent = (currentPersona === 'Mika') ? "Switch to Kana" : "Switch to Mika";
+            updateNotificationButtonState();
+
+            // Check if BackupRestore module *exists* before trying to access its button
+            const backupRestoreButton = document.getElementById('settings-backup-restore-button');
+            if (backupRestoreButton) {
+                // Disable backup/restore if app is active (settings dropdown should be closed anyway, but for safety)
+                // Or if the module itself failed to load (checked implicitly by BackupRestore.init existence)
+                backupRestoreButton.disabled = isAppActive || (typeof BackupRestore === 'undefined');
+                if (typeof BackupRestore === 'undefined') {
+                     backupRestoreButton.textContent = 'Backup Broken 😿';
+                     backupRestoreButton.title = 'Backup/Restore module failed to load.';
+                } else {
+                     backupRestoreButton.textContent = 'Backup All/Restore';
+                     backupRestoreButton.title = 'Backup or restore all app data';
+                }
+            } else {
+                console.warn("Backup/Restore settings button not found during update.");
+            }
+        }
         function updateAppsDropdown() { /* Placeholder */ }
 
         // --- View Switching ---
-        async function switchToChatView() { if (!appArea || !chatArea) return; console.log(`Switching to Chat. isAppActive: ${isAppActive}, currentModule: ${currentActiveAppModule?.constructor?.name}`); if (isAppActive && currentActiveAppModule?.onExit) { console.log("Calling app onExit..."); try { await Promise.race([ currentActiveAppModule.onExit(), new Promise((_, reject) => setTimeout(() => reject(new Error("App onExit timed out")), 2000)) ]); console.log("App onExit completed."); } catch (err) { console.error("App onExit error or timeout:", err); } } else if (isAppActive) { console.warn("App was active but no onExit function found."); } currentActiveAppModule = null; isAppActive = false; appArea.style.display = 'none'; chatArea.style.display = 'flex'; clearAppAreaContent(); console.log("View switched to: Chat"); if (homeButton) { homeButton.textContent = '➕ New Chat'; homeButton.title = 'Start a New Chat'; homeButton.onclick = () => startNewChat(true); } updateChatTitle(); updateInputPlaceholder(); enableChatInput(); if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred install prompt."); installPopup.style.display = 'flex'; } }
-        function switchToAppView(module = null, appTitle = "Running App...") { if (!appArea || !chatArea) return; chatArea.style.display = 'none'; appArea.style.display = 'flex'; isAppActive = true; currentActiveAppModule = module; closeAllDropdowns(); disableChatInput("App Active..."); if (chatTitle) chatTitle.textContent = appTitle; document.title = appTitle; if (installPopup.style.display === 'flex') { installPopup.style.display = 'none'; console.log("Hiding install prompt for app."); } console.log(`View switched to: App (${module?.constructor?.name || 'Unknown'})`); if (homeButton) { homeButton.textContent = '🏠 Home'; homeButton.title = 'Back to Main Chat'; homeButton.onclick = switchToChatView; } }
+        async function switchToChatView() { if (!appArea || !chatArea) return; console.log(`Switching to Chat. isAppActive: ${isAppActive}, currentModule: ${currentActiveAppModule?.constructor?.name}`); if (isAppActive && currentActiveAppModule?.onExit) { console.log("Calling app onExit..."); try { await Promise.race([ currentActiveAppModule.onExit(), new Promise((_, reject) => setTimeout(() => reject(new Error("App onExit timed out")), 2000)) ]); console.log("App onExit completed."); } catch (err) { console.error("App onExit error or timeout:", err); } } else if (isAppActive) { console.warn("App was active but no onExit function found."); } currentActiveAppModule = null; isAppActive = false; appArea.style.display = 'none'; chatArea.style.display = 'flex'; clearAppAreaContent(); console.log("View switched to: Chat"); if (homeButton) { homeButton.textContent = '➕ New Chat'; homeButton.title = 'Start a New Chat'; homeButton.onclick = () => startNewChat(true); } updateChatTitle(); updateInputPlaceholder(); enableChatInput(); if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred install prompt."); installPopup.style.display = 'flex'; } updateSettingsDropdown(); /* Re-enable settings button */ }
+        function switchToAppView(module = null, appTitle = "Running App...") { if (!appArea || !chatArea) return; chatArea.style.display = 'none'; appArea.style.display = 'flex'; isAppActive = true; currentActiveAppModule = module; closeAllDropdowns(); disableChatInput("App Active..."); if (chatTitle) chatTitle.textContent = appTitle; document.title = appTitle; if (installPopup.style.display === 'flex') { installPopup.style.display = 'none'; console.log("Hiding install prompt for app."); } console.log(`View switched to: App (${module?.constructor?.name || 'Unknown'})`); if (homeButton) { homeButton.textContent = '🏠 Home'; homeButton.title = 'Back to Main Chat'; homeButton.onclick = switchToChatView; } updateSettingsDropdown(); /* Disable settings button */ }
 
         // --- App Loading ---
         function setupAppAreaBase(titleText) { if (!appArea) return null; clearAppAreaContent(); return appArea; }
-        function displayAppMessage(sender, text) { const noLogModules = [MikaDiary, StoryTime, ChoreHelper, PeriodTracker, HoroscopeApp, RpgApp, JetpackGame, ComicStripApp, MikaGotchi]; if (noLogModules.some(mod => currentActiveAppModule === mod)) { console.log(`Skipping displayAppMessage for ${sender} in ${currentActiveAppModule?.constructor?.name || 'current app'}.`); return; } let log = document.getElementById('app-message-log'); if (!log) { console.warn("Shared app message log not found, creating."); log = document.createElement('div'); log.id = 'app-message-log'; log.style.cssText = `width: calc(100% - 20px); max-width: 600px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin: 10px auto 10px auto; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0;`; const backButton = appArea.querySelector('#back-to-chat-button'); if(backButton) { appArea.insertBefore(log, backButton); } else { appArea.appendChild(log); } } log.style.display = 'block'; const el = document.createElement('p'); let msg = sanitizeHTML(text); let css = 'system-gamemsg'; const userNameForDisplay = sanitizeHTML(currentUserName); if (sender === 'Mika' || sender === 'Kana') { css = 'mika-gamemsg'; msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); el.innerHTML = `<strong>${sender}:</strong> ${msg}`; } else if (sender === 'User') { css = 'user-gamemsg'; el.innerHTML = `<strong>${userNameForDisplay}:</strong> ${msg}`; } else { css = 'system-gamemsg'; el.innerHTML = msg; } el.className = css; log.appendChild(el); setTimeout(() => { if(log) log.scrollTop = log.scrollHeight; }, 50); }
+        function displayAppMessage(sender, text) { const noLogModules = [MikaDiary, StoryTime, ChoreHelper, PeriodTracker, HoroscopeApp, RpgApp, JetpackGame, ComicStripApp, MikaGotchi, AdviceCorner]; if (noLogModules.some(mod => currentActiveAppModule === mod)) { console.log(`Skipping displayAppMessage for ${sender} in ${currentActiveAppModule?.constructor?.name || 'current app'}.`); return; } let log = document.getElementById('app-message-log'); if (!log) { console.warn("Shared app message log not found, creating."); log = document.createElement('div'); log.id = 'app-message-log'; log.style.cssText = `width: calc(100% - 20px); max-width: 600px; height: 100px; overflow-y: auto; border: 1px solid var(--game-message-log-border); background: var(--game-message-log-bg); padding: 8px; margin: 10px auto 10px auto; border-radius: 5px; font-size: 0.9em; color: var(--game-message-log-text); scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); box-sizing: border-box; flex-shrink: 0;`; const backButton = appArea.querySelector('#back-to-chat-button'); if(backButton) { appArea.insertBefore(log, backButton); } else { appArea.appendChild(log); } } log.style.display = 'block'; const el = document.createElement('p'); let msg = sanitizeHTML(text); let css = 'system-gamemsg'; const userNameForDisplay = sanitizeHTML(currentUserName); if (sender === 'Mika' || sender === 'Kana') { css = 'mika-gamemsg'; msg = msg.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/~(\S.*?\S)~/g,'<del>$1</del>').replace(/(?<!<br>)\n/g,'<br>'); el.innerHTML = `<strong>${sender}:</strong> ${msg}`; } else if (sender === 'User') { css = 'user-gamemsg'; el.innerHTML = `<strong>${userNameForDisplay}:</strong> ${msg}`; } else { css = 'system-gamemsg'; el.innerHTML = msg; } el.className = css; log.appendChild(el); setTimeout(() => { if(log) log.scrollTop = log.scrollHeight; }, 50); }
         async function callMikaApiForApp(prompt, context = []) { if (!currentApiKey) { displayAppMessage('System', 'Error: API Key missing!'); return Promise.reject("API Key missing!"); } const user = currentUserName || "User"; console.log(`API app call (${currentPersona} for ${user}): ${prompt.substring(0,60)}...`); try { const resp = await sendMessageToMika(prompt, context, currentApiKey, user, currentPersona, null, null, incrementApiCount); return (typeof resp === 'string' && resp.trim()) ? resp : null; } catch (err) { console.error("API app error:", err); displayAppMessage('System', `API Error: ${err}`); return Promise.reject(`API error: ${err}`); } }
 
         // --- Load Specific Apps ---
@@ -491,6 +522,41 @@
         }
         // *** End of NEW Notification Functions ***
 
+        // --- ADDED List of all app localStorage keys to backup/restore/reset (Needed for Reset) ---
+        const APP_LOCAL_STORAGE_KEYS = [
+            'geminiApiKey_mikaHelper',
+            'mikaHelper_userName',
+            'mikaDisclaimerAgreed_v1',
+            'mikaThemePreference_v1',
+            'mikaPersonaPreference_v1',
+            'mikaInstallPromptShown',
+            'mikaHelper_allChats', // Main chat history
+            API_COUNT_STORAGE_KEY,
+            NOTIFICATIONS_ENABLED_KEY,
+            NOTIFICATION_CACHE_KEY + '_Mika', // Cache is persona-specific
+            NOTIFICATION_CACHE_KEY + '_Kana',
+            'mikaGotchiData_v1_Mika', // Gotchi data (persona specific)
+            'mikaGotchiData_v1_Kana',
+            'mikaChores_list_v2',
+            'mikaChores_balance_v1',
+            'mikaChores_history_v1',
+            'mikaChores_pinHash_v1',
+            'mikaChores_lockedDate_v1',
+            'mikaChores_bonusEnabled_v1',
+            'mikaChores_bonusTiers_v1',
+            'mikaStoryLibrary_v1',
+            'mikaDiaryEntries_v1',
+            'mikaPeriodTrackerData_v1',
+            'mikaHoroscopeCache_v1',
+            'mikaHoroscopeUserSign_v1',
+            'mikaRpgLibrary_v1',
+            'mikaComicCacheV2',
+            'mikaComicThemes_v1',
+            'mikaComicGenCount_v1',
+            // Add any other keys used by future apps here!
+        ];
+
+
         // --- Initialization Flow ---
         function proceedToChat() { if (!chatContainer) return; chatContainer.style.display = 'flex'; chatArea.style.display = 'flex'; appArea.style.display = 'none'; isAppActive = false; currentActiveAppModule = null; if (homeButton) { homeButton.textContent = '➕ New Chat'; homeButton.title = 'Start a New Chat'; homeButton.onclick = () => startNewChat(true); } const chatId = loadAllChats(); if (chatId) { loadChat(chatId); } else { clearChatDisplay(); const welcomeMsg = (currentPersona === 'Kana') ? `Ready when you are, ${currentUserName}. What homework have you got?` : `Ready for your homework, ${currentUserName}! Ask me anything! ♡`; appendMessage('system', welcomeMsg); enableChatInput(); } updateChatTitle(); updateInputPlaceholder(); updateHistoryDropdown(); if (deferredInstallPrompt && !hasInstallPromptBeenShown()) { console.log("Showing deferred install prompt."); installPopup.style.display = 'flex'; } }
         function checkNameAndProceed() { const name = loadUserName(); if (name) { currentUserName = name; if (namePopup) namePopup.style.display = 'none'; applyPersona(currentPersona, true); checkApiKeyAndProceed(); } else { if (namePopup && nameInput) { if(apiKeyPopup) apiKeyPopup.style.display = 'none'; if(disclaimerPopup) disclaimerPopup.style.display = 'none'; nameInput.value = "Study Buddy"; namePopup.style.display = 'flex'; nameInput.focus(); nameInput.select(); } } }
@@ -512,6 +578,31 @@
                  scheduleDailyNotification(); // <<< Start scheduling
             }
 
+            // --- Initialize BackupRestore Module ---
+            // Check if the BackupRestore object exists (meaning backup.js loaded)
+            if (typeof BackupRestore !== 'undefined' && BackupRestore.init) {
+                 BackupRestore.init(
+                     currentPersona,
+                     currentUserName,
+                     loadFromLocalStorage, // Pass our utility function
+                     saveToLocalStorage,   // Pass our utility function
+                     clearFromLocalStorage,// Pass our utility function
+                     appendMessage         // Pass our utility function to message main chat
+                 );
+                 console.log("BackupRestore module initialized.");
+             } else {
+                 console.error("BackupRestore module not found or init function missing!");
+                 // Optionally disable the backup/restore button here
+                 const btn = document.getElementById('settings-backup-restore-button');
+                 if(btn) {
+                      btn.disabled = true;
+                      btn.textContent = 'Backup Broken 😿';
+                      btn.title = 'Backup/Restore module failed to load.';
+                 }
+                 // Don't use appendMessage here as it might rely on things not yet set up
+                 // alert("Error: Backup/Restore feature failed to load.");
+             }
+
             if (hasAgreedToDisclaimer()) {
                 console.log("Disclaimer agreed.");
                 checkNameAndProceed();
@@ -527,11 +618,17 @@
             // Initial UI updates even before popups resolve
             updateChatTitle();
             updateInputPlaceholder();
+            updateSettingsDropdown(); // Update settings button state
+
         }
 
-        // --- Event Listeners ---
-        // Reset listener updated
-        if (settingsResetButton) settingsResetButton.addEventListener('click', () => { closeAllDropdowns(); const confirmMsg = `⚠️ Reset ALL Settings for ${currentUserName}? Clears API Key, Name, Persona, Disclaimer, Theme, Install status, All Chats, Notifications, AND All App Data & reloads. Sure, ${currentUserName}?!`; if (confirm(confirmMsg)) { console.log("Resetting all application data..."); clearApiKey(); clearUserName(); clearPersonaPreference(); clearDisclaimerAgreement(); clearInstallPromptShown(); clearThemePreference(); clearFromLocalStorage('mikaHelper_allChats'); clearFromLocalStorage('mikaChores_list_v2'); clearFromLocalStorage('mikaChores_balance_v1'); clearFromLocalStorage('mikaChores_history_v1'); clearFromLocalStorage('mikaChores_pinHash_v1'); clearFromLocalStorage('mikaChores_lockedDate_v1'); clearFromLocalStorage('mikaChores_bonusEnabled_v1'); clearFromLocalStorage('mikaChores_bonusTiers_v1'); clearFromLocalStorage('mikaStoryLibrary_v1'); clearFromLocalStorage('mikaDiaryEntries_v1'); clearFromLocalStorage('mikaPeriodTrackerData_v1'); clearFromLocalStorage('mikaHoroscopeCache_v1'); clearFromLocalStorage('mikaHoroscopeUserSign_v1'); clearFromLocalStorage('mikaRpgLibrary_v1'); clearFromLocalStorage('mikaComicCacheV2'); clearFromLocalStorage('mikaComicThemes_v1'); clearFromLocalStorage('mikaComicGenCount_v1'); clearFromLocalStorage('mikaGotchiData_v1_Mika'); clearFromLocalStorage('mikaGotchiData_v1_Kana'); clearFromLocalStorage(API_COUNT_STORAGE_KEY); clearFromLocalStorage(NOTIFICATIONS_ENABLED_KEY); /* <-- Clear Notif Enabled */ clearFromLocalStorage(NOTIFICATION_CACHE_KEY + '_Mika'); /* <-- Clear Notif Cache Mika */ clearFromLocalStorage(NOTIFICATION_CACHE_KEY + '_Kana'); /* <-- Clear Notif Cache Kana */ clearScheduledNotification(); window.location.reload(); } });
+        // --- Global Event Listeners (These can stay outside initializeApp) ---
+
+        // Reset listener updated (This is fine as it checks for the button before adding the listener)
+        if (settingsResetButton) settingsResetButton.addEventListener('click', () => { closeAllDropdowns(); const confirmMsg = `${currentPersona === 'Kana' ? 'WARNING: Reset ALL data for ' + currentUserName + '? Clears everything saved in your browser for this app. This cannot be undone. Are you sure?' : '⚠️ Master! Reset ALL Settings and Data for ' + currentUserName + '? This will delete everything saved in your browser for this app (API Key, Name, Persona, ALL Chats, ALL App Data like Diary, Chores, Stories, etc.) and cannot be undone! Are you really, truly sure?! 😿'}`; if (confirm(confirmMsg)) { console.log("Resetting all application data..."); APP_LOCAL_STORAGE_KEYS.forEach(key => clearFromLocalStorage(key)); clearScheduledNotification(); window.location.reload(); } });
+
+        // Disclaimer, API Key, Name, Send, Input, Image/Camera, etc. listeners are fine where they are
+        // as they attach to elements that are generally expected to be in the initial HTML and present early.
         if (disclaimerAgreeButton) disclaimerAgreeButton.addEventListener('click', () => { saveDisclaimerAgreement(); disclaimerPopup.style.display = 'none'; checkNameAndProceed(); });
         if (saveApiKeyButton) saveApiKeyButton.addEventListener('click', () => { if (!apiKeyInput) return; const key = apiKeyInput.value.trim(); if (key) { if (saveApiKey(key)) { currentApiKey = key; apiKeyPopup.style.display = 'none'; apiKeyError.style.display = 'none'; proceedToChat(); } else { apiKeyError.textContent = "Save failed?"; apiKeyError.style.display = 'block'; } } else { apiKeyError.textContent = "Key needed!"; apiKeyError.style.display = 'block'; } });
         if (apiKeyInput) apiKeyInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveApiKeyButton?.click(); if (apiKeyError) apiKeyError.style.display = 'none'; });
@@ -548,7 +645,7 @@
         if (historyButton) historyButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(historyDropdown); });
         if (appsButton) appsButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(appsDropdown); });
         if (settingsButton) settingsButton.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(settingsDropdown); });
-        // App Listeners
+        // App Listeners are fine as they call functions that check if elements are available (the appArea itself)
         if (appTttButton) appTttButton.addEventListener('click', () => { closeAllDropdowns(); loadTicTacToe(); });
         if (appRpsButton) appRpsButton.addEventListener('click', () => { closeAllDropdowns(); loadRPS(); });
         if (appGtnButton) appGtnButton.addEventListener('click', () => { closeAllDropdowns(); loadGuessTheNumber(); });
@@ -563,25 +660,25 @@
         if (appComicButton) appComicButton.addEventListener('click', () => { closeAllDropdowns(); loadComicStripApp(); });
         if (appGotchiButton) appGotchiButton.addEventListener('click', () => { closeAllDropdowns(); loadMikaGotchi(); });
         if (appAdviceButton) appAdviceButton.addEventListener('click', () => { closeAllDropdowns(); loadAdviceCorner(); });
-        // Settings Listeners
+        // Settings Listeners (These are fine as they check for the button before adding the listener)
         if (settingsInstallButton) settingsInstallButton.addEventListener('click', handleManualInstall);
         if (settingsThemeButton) settingsThemeButton.addEventListener('click', toggleTheme);
         if (settingsAboutButton) settingsAboutButton.addEventListener('click', () => { closeAllDropdowns(); showAboutPopup(); }); // Added About Listener
         if (settingsNotificationsButton) settingsNotificationsButton.addEventListener('click', handleNotificationSettingsClick); // <<< Added listener
         if (settingsPersonaButton) settingsPersonaButton.addEventListener('click', (e) => { e.stopPropagation(); closeAllDropdowns(); applyPersona(currentPersona, true); if (currentPersona === 'Mika') { if(kanaWarningPopup) kanaWarningPopup.style.display = 'flex'; } else { if(mikaWarningPopup) mikaWarningPopup.style.display = 'flex'; } });
-        // Persona Popup Button Listeners
+        // Persona Popup Button Listeners are fine where they are
         if (kanaSwitchConfirmButton) kanaSwitchConfirmButton.addEventListener('click', () => { if (kanaWarningPopup) kanaWarningPopup.style.display = 'none'; applyPersona('Kana'); closeAllDropdowns(); });
         if (kanaSwitchCancelButton) kanaSwitchCancelButton.addEventListener('click', () => { if (kanaWarningPopup) kanaWarningPopup.style.display = 'none'; closeAllDropdowns(); });
         if (mikaSwitchConfirmButton) mikaSwitchConfirmButton.addEventListener('click', () => { if (mikaWarningPopup) mikaWarningPopup.style.display = 'none'; applyPersona('Mika'); closeAllDropdowns(); });
         if (mikaSwitchCancelButton) mikaSwitchCancelButton.addEventListener('click', () => { if (mikaWarningPopup) mikaWarningPopup.style.display = 'none'; closeAllDropdowns(); });
-        // About Popup Close Button Listener
+        // About Popup Close Button Listener is fine where it is
         if (aboutCloseButton) aboutCloseButton.addEventListener('click', () => { if (aboutPopup) aboutPopup.style.display = 'none'; });
-        // *** NEW Notification Popup Listeners ***
+        // *** NEW Notification Popup Listeners *** are fine where they are
         if (notificationsEnableButton) notificationsEnableButton.addEventListener('click', () => { if (notificationPermission === 'granted') { enableNotifications(); } else { requestNotificationPermission(); } });
         if (notificationsDisableButton) notificationsDisableButton.addEventListener('click', disableNotifications);
         if (notificationsCloseButton) notificationsCloseButton.addEventListener('click', () => { if (notificationsPopup) notificationsPopup.style.display = 'none'; });
 
-        // Close dropdowns AND Popups on outside click
+        // Close dropdowns AND Popups on outside click (Updated to check if popup variables are assigned)
         document.addEventListener('click', (e) => {
             if (historyDropdown?.style.display === 'block' && !historyDropdown.contains(e.target) && e.target !== historyButton) historyDropdown.style.display = 'none';
             if (settingsDropdown?.style.display === 'block' && !settingsDropdown.contains(e.target) && e.target !== settingsButton) settingsDropdown.style.display = 'none';
@@ -591,7 +688,17 @@
             // *** Close Notifications Popup on outside click ***
             const notificationsModal = notificationsPopup?.querySelector('.popup-modal');
             if (notificationsPopup?.style.display === 'flex' && notificationsModal && !notificationsModal.contains(e.target) && e.target !== settingsNotificationsButton) { notificationsPopup.style.display = 'none'; }
+             // ADDED close logic for backup/restore popup
+             const backupRestorePopupElement = document.getElementById('backup-restore-popup');
+             if (backupRestorePopupElement && backupRestorePopupElement.style.display === 'flex') {
+                 const backupRestoreModal = backupRestorePopupElement.querySelector('.popup-modal');
+                 const settingsBackupRestoreButton = document.getElementById('settings-backup-restore-button'); // Re-get button
+                 if (backupRestoreModal && !backupRestoreModal.contains(e.target) && e.target !== settingsBackupRestoreButton) {
+                     backupRestorePopupElement.style.display = 'none'; // Close it directly
+                 }
+             }
         });
+
 
         // --- Start the App ---
         document.addEventListener('DOMContentLoaded', initializeApp);
